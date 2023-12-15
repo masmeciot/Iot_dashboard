@@ -54,4 +54,4 @@ jobs:
           app-name: 'KRE-SEA-KRE-IOT-APP'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_66F1CF6CC4E24BE697539570845E4CCA }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06E8ADFFACAD44C4ADE3269695E04D26 }}
