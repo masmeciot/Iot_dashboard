@@ -1,0 +1,282 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kreeda-IoT</title>
+    <!-- Load dependencies -->
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="shortcut icon" href="~/icon.png" />
+
+    <style>
+     
+
+        .form-control {
+            color: white !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        #table thead th {
+            color: steelblue;
+            text-align: center;
+        }
+
+
+        #table tbody td {
+            color: white;
+            text-align: center;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+      
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IoT Past Output Data</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Output Data</h4>
+                        <p class="card-title"> Filter the output data.</p>
+                        <form class="form-sample">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Date</label>
+                                        <div class="col-sm-9">
+                                            <input type="date" class="form-control" id="date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Module</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="module">
+                                                <option>FOF1</option>
+                                                <option>FOF2</option>
+                                                <option>FOF3</option>
+                                                <option>L2</option>
+                                                <option>SYN33</option>
+                                                <option>All</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Plant</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="plant">
+                                                <option>MEC</option>
+                                                <option>SYNERGY</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                             
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                       <label class="col-sm-3 col-form-label">Style</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="style" placeholder="Enter Style">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="button-container d-flex justify-content-center">
+                            <button type="submit" onclick="search()" class="btn btn-inverse-success btn-fw mx-2" id="applyFilterButton">Apply Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-lg-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title text-warning">Hourly Output by Operation</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Module</th>
+                                                    <th>Operation</th>
+
+                                                    <th>Machine</th>
+
+                                                    <th>User</th>
+                                                 
+                                                    <th>1</th>
+                                                    <th>2</th>
+                                                    <th>3</th>
+                                                    <th>4</th>
+                                                    <th>5</th>
+                                                    <th>6</th>
+                                                    <th>7</th>
+                                                    <th>8</th>
+                                                    <th>9</th>
+                                                    <th>Total count</th>
+                                                   
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function search() {
+            var date = $('#date').val();
+            var module = $('#module').val();
+            var plant = $('#plant').val();
+            var style = $('#style').val();
+            $('#fofTitle').text(module);
+
+            $.ajax({
+                url: `/iotoutfl/FOF1?date=${date}&module=${module}&plant=${plant}&style=${style}`,
+                type: 'GET',
+                success: function (response) {
+                 console.log('AJAX success:', response);
+                    if (response && Array.isArray(response.utilizationData)) {
+                        updatetable(response.utilizationData);
+                    } else {
+                        console.error('Unexpected response structure:', response);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX error:', error);
+                }
+            });
+        }
+
+        function updatetable(data) {
+            var tbody = $('#table tbody');
+            tbody.empty();
+
+            data.forEach(function (item) {
+                var hourlyCounts = item.hourlyCounts || [];
+                var totalCount = hourlyCounts.reduce((sum, count) => sum + count, 0);
+                var utilization = item.utilization || 0;
+
+                var row = `
+                        <tr>
+                            <td>${item.module}</td>
+                                    <td class="custom-text-color">${item.operation}</td>
+                            <td>${item.machine}</td>
+                            <td>${item.user}</td>
+                  
+                            <td>${hourlyCounts[0] || 0}</td>
+                            <td>${hourlyCounts[1] || 0}</td>
+                            <td>${hourlyCounts[2] || 0}</td>
+                            <td>${hourlyCounts[3] || 0}</td>
+                            <td>${hourlyCounts[4] || 0}</td>
+                            <td>${hourlyCounts[5] || 0}</td>
+                            <td>${hourlyCounts[6] || 0}</td>
+                            <td>${hourlyCounts[7] || 0}</td>
+                            <td>${hourlyCounts[8] || 0}</td>
+                            <td>${totalCount}</td>
+                          
+                        </tr>
+                    `;
+                tbody.append(row);
+            });
+        }
+    </script>
+
+
+
+
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+        </div>
+    </footer>
+
+    <!-- main-panel ends -->
+    <!-- page-body-wrapper ends -->
+    </div>
+
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="~/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="~/vendors/chart.js/Chart.min.js"></script>
+    <script src="~/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="~/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/hoverable-collapse.js"></script>
+    <script src="~/js/misc.js"></script>
+    <script src="~/js/settings.js"></script>
+    <script src="~/js/todolist.js"></script>
+    <!-- <script src="~/js/chart.js"></script> -->
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="~/js/dashboard.js"></script>
+    <!-- End custom js for this page -->
+
+</body>
+
+</html>

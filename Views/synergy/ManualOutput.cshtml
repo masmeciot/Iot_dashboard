@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Data to the Hanger System</title>
+    <link rel="shortcut icon" href="~/icon.png" />
+    <style>
+        /* General Styles */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container for the Form */
+        .container {
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 1000px;
+            text-align: center;
+        }
+
+            /* Header */
+            .container h1 {
+                font-size: 28px;
+                color: #4caf50;
+                margin-bottom: 15px;
+            }
+
+        /* Header Line */
+        .header-line {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4caf50, #2196f3);
+            margin: 0 auto 20px;
+            width: 80%;
+        }
+
+        /* Section Headers */
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #4caf50;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        /* Form Group */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+            /* Labels */
+            .form-group label {
+                display: block;
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+
+            /* Input Fields and Select */
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #333;
+                border-radius: 8px;
+                background-color: #2a2a2a;
+                color: #ffffff;
+                font-size: 16px;
+                appearance: none; /* Remove default arrow */
+                -webkit-appearance: none; /* Remove default arrow for Safari */
+                -moz-appearance: none; /* Remove default arrow for Firefox */
+                background-image: url('data:image/svg+xml;utf8,<svg fill="%234caf50" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Custom arrow */
+                background-repeat: no-repeat;
+                background-position: right 10px center;
+                background-size: 12px;
+            }
+
+                .form-group input:hover,
+                .form-group select:hover,
+                .form-group input:focus,
+                .form-group select:focus {
+                    border-color: #4caf50;
+                    outline: none;
+                }
+
+            /* Button */
+            .form-group button {
+                width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 8px;
+                background-color: #4caf50;
+                color: #ffffff;
+                font-size: 18px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+                .form-group button:hover {
+                    background-color: #45a049;
+                }
+
+        /* Separator Line */
+        .separator {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #4caf50, #2196f3);
+            margin: 25px 0;
+        }
+
+        /* Two-Column Layout for Inputs */
+        .form-row {
+            display: flex;
+            gap: 40px;
+        }
+
+            .form-row .form-group {
+                flex: 1;
+            }
+
+        /* Pop-up Message Styles */
+        .popup {
+            position: fixed;
+            top: -100px; /* Start off-screen */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+            z-index: 1000;
+            opacity: 0;
+            transition: top 0.5s ease, opacity 0.5s ease;
+        }
+
+            .popup.show {
+                top: 20px; /* Slide into view */
+                opacity: 1;
+            }
+
+            .popup.error {
+                background-color: #f44336; /* Red for error messages */
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Change the output of the device.</h1>
+        <hr class="header-line">
+
+        <form id="dataForm" method="post" action="">
+            <!-- Day Output Section -->
+            <div class="section">
+                <div class="section-title">Module</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="module1">Module</label>
+                        <select id="Module" name="Module" required>
+                          
+                            <option value="SY05">SY05</option>
+                            <option value="SY06">SY06</option>
+                            <option value="SY01">SY01</option>
+                            <option value="SY02">SY02</option>
+                            <option value="SY03">SY03</option>
+                            <option value="SY33">SY33</option>
+                            <option value="SY26">SY26</option>
+                            <option value="SY21">SY21</option>
+                            <option value="SYN33">SYN33</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dayOutputSoli">Station No</label>
+                        <input type="text" id="station" name="station" placeholder="Enter Station No" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dayOutputQuantity">Hour Value</label>
+                        <input type="text" id="Hour" name="Hour" placeholder="Hour" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="style">Total Value</label>
+                        <input type="text" id="total" name="total" placeholder="Enter total " required>
+                    </div>
+                   
+                </div>
+            </div>
+
+          
+
+            <hr class="separator">
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit">Change</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Pop-up Message -->
+    <div id="popup" class="popup"></div>
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                Module: document.getElementById('Module').value, // Updated ID
+                station: document.getElementById('station').value,
+                Hour: document.getElementById('Hour').value,
+                total: document.getElementById('total').value
+            };
+
+            try {
+                const response = await fetch('/manualOutput/Index1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData).toString()
+                });
+
+                const result = await response.json();
+                showPopup(result.message, !result.success);
+
+                // Clear form if successful
+                if (result.success) {
+                   // document.getElementById('dataForm').reset();
+                }
+
+            } catch (error) {
+                showPopup('An error occurred: ' + error.message, true);
+            }
+        });
+
+        function showPopup(message, isError = false) {
+            const popup = document.getElementById('popup');
+            popup.textContent = message;
+            popup.className = 'popup'; // Reset classes
+            if (isError) {
+                popup.classList.add('error');
+            }
+            popup.classList.add('show');
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

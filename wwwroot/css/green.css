@@ -1,0 +1,9 @@
+﻿@keyframes blink {
+    50% {
+        background-color: green;
+    }
+}
+
+.blink-green {
+    animation: blink 2s; /* 2-second Blinking effect duration */
+}

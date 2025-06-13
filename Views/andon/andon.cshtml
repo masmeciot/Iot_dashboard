@@ -1,0 +1,1018 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/color.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+    <style>
+        .top-four-grids .card {
+            width: 150px;
+            height: 100px;
+            position: relative;
+        }
+
+        .top-four-grids .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        #andonCard {
+            height: 300px; /* Adjust the height as needed */
+            /* Add any other desired styling */
+        }
+
+
+        .top-four-grids .card-body {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+    </style>
+
+     <style>
+        /* Change text color of table header */
+        #pendingAndonTable thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #pendingAndonTable tbody td {
+            color: white;
+        }
+
+       
+
+    </style>
+
+    <style>
+        /* Change text color of table header */
+        #completed thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #completed tbody td {
+            color: white;
+        }
+
+    </style>
+    <style>
+        /* Change text color of table header */
+        #notres thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #notres tbody td {
+            color: white;
+        }
+
+    </style>
+
+
+    <style>
+        /* Your existing CSS */
+        .light-green {
+            background-color: #98FB98; /* Light Green */
+        }
+
+        .light-yellow {
+            background-color: #FFFFE0; /* Light Yellow */
+        }
+
+        .light-orange {
+            background-color: #FFD700; /* Light Orange */
+        }
+
+        .light-red {
+            background-color: #FF6347; /* Light Red */
+        }
+    </style>
+
+        <style>
+        .text-muted  {
+            color: limegreen !important;
+        }
+    </style>
+
+   
+
+</head>
+
+<body>
+
+
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">ANDON - KreedaIoT</h3>
+
+            </li>
+        </ul>
+
+
+    </div>
+
+
+    <div class="content-wrapper">
+
+        <div class="row top-four-grids">
+            <div class="col-2  stretch-card">
+                <div class="card">
+                    <div class="card-body  align-items-center">
+                        <h6 class="text-muted font-weight-normal">Response Rate</h6>
+                        <h3 class="mb-0" id="respr">0%</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body  align-items-center">
+                        <h6 class="text-muted font-weight-normal">Average Response Time</h6>
+                        <div class="row">
+                            <div class="col-9">
+
+                                <div class="d-flex align-items-center align-self-start">
+
+                                    <h3 class="mb-0" id="resp">loading</h3>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body  align-items-center">
+                        <h6 class="text-muted font-weight-normal">Raised Andons</h6>
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h3 class="mb-0" id="actand">loading</h3>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body  align-items-center">
+                        <h6 class="text-muted font-weight-normal">Not resolved Andons</h6>
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h3 class="mb-0" id="not">loading</h3>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body  align-items-center">
+                        <h6 class="text-muted font-weight-normal">Resolved Andon</h6>
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h3 class="mb-0" id="reslo">loading</h3>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body  align-items-center">
+                        <h6 class="text-muted font-weight-normal">Last Andon resolved by</h6>
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h3 class="mb-0" id="reby">loading</h3>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row ">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Raised Andon</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="pendingAndonTable">
+                                <thead>
+                                    <tr>
+                                        <th> Machine ID </th>
+                                        <th> Raised By </th>
+                                        <th> Module </th>
+                                        <th> Category </th>
+                                        <th> Issue </th>
+                                        <th> Raised Time </th>
+                                        <th> Date </th>
+                                        <th> Time Countdown </th>
+                                        <th> Status </th>
+
+
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+           
+
+
+
+
+
+
+        </div>
+        <div class="row">
+            <!-- <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">User Contribution</h4>
+                        <canvas id="barChart" style="height:100px"></canvas>
+                    </div>
+                </div>
+            </div>-->
+
+
+            <div class="col-lg-5 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Completed Andon</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="completed">
+                                <thead>
+                                    <tr>
+                                        <th> Machine ID </th>
+
+                                        <th> Module </th>
+                                        <th> Category </th>
+                       
+
+                              
+                                        <th> Time </th>
+
+                                        <th> Res. by </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-7 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Not Resolved Andon</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="notres">
+                                <thead>
+                                    <tr>
+                                        <th> Machine ID </th>
+                             
+                                        <th> Module </th>
+                                        <th> Category </th>
+                                        <th> Issue </th>
+                                       
+                                        <th> Raised Date </th>
+                                        <th> Days </th>
+                                       
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <!--  <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Contribution</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover"id="contrib">
+                                <thead>
+                                    <tr>
+
+                                        <th> User Name </th>
+                                        <th> Completed Andons </th>
+                                        <th> Category </th>
+                                        <th> Response Rate </th>
+                                        <th> Average time </th>
+
+                                        <th> Common Issues </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>-->
+
+        </div>
+
+
+
+
+
+
+    </div>
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class=" d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include SignalR library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.11/signalr.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            let doughnutChart = null;
+
+            const connection = new signalR.HubConnectionBuilder().withUrl("/andonHub").build();
+
+            connection.start()
+                .then(() => {
+                    console.log("Connection started");
+                    pollForMetrics();
+                    setInterval(pollForMetrics, 100);
+                })
+                .catch(err => console.error(err.toString()));
+
+            connection.on("ReceiveEfficiencyUpdate", function (data) {
+                updateMetricWithDeviation("efficiencyPercentage", Math.floor(data.averageEfficiency));
+                updateChart(data);
+            });
+
+            function updateMetricWithDeviation(metricId, currentValue) {
+                const metricElement = $(`#${metricId}`);
+
+                if (currentValue === null || isNaN(currentValue)) {
+                    metricElement.text('loading');
+                    return;
+                }
+
+                metricElement.text(currentValue + '%');
+            }
+
+
+
+            function updateEfficiencyPercentage(value) {
+                const efficiencyElement = document.getElementById('respr');
+
+                if (value === null || isNaN(value)) {
+                    efficiencyElement.textContent = '0%';
+                } else {
+                    efficiencyElement.textContent = Math.floor(value) + '%';
+                }
+            }
+
+            function pollForMetrics() {
+                fetch("/andon/CalculateResponseRate")
+                    .then(response => response.json())
+                    .then(data => {
+                       // console.log('Data:', data);
+
+                        updateEfficiencyPercentage(data.responseRate);
+                        updateChart(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+        });
+
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+
+
+            function updateMetricWithDeviation(metricId, currentValue) {
+                const metricElement = $(`#${metricId}`);
+
+                if (currentValue === null || isNaN(currentValue)) {
+                    metricElement.text('loading');
+                    return;
+                }
+
+                if (metricId === 'resp') {
+
+                    metricElement.text(currentValue + "min");
+                } else {
+                    metricElement.text(currentValue);
+                }
+            }
+
+
+            function fetchAverageResponseTime() {
+                fetch("/andon/CalculateAverageResponseTime")
+                    .then(response => response.json())
+                    .then(data => {
+                        //console.log('Data:', data);
+
+                        updateMetricWithDeviation("resp", Math.floor(data.averageResponseTimeMinutes));
+                        updateMetricWithDeviation("actand", Math.floor(data.pendingDataCountForToday));
+                        updateMetricWithDeviation("not", Math.floor(data.pendingCount));
+                        updateMetricWithDeviation("reslo", Math.floor(data.comDataCountForToday));
+                        document.getElementById('reby').textContent = data.mostRecentResolvedBy;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+
+            }
+
+
+            fetchAverageResponseTime();
+
+            setInterval(fetchAverageResponseTime, 2000);
+        });
+
+    </script>
+
+
+
+    <script>
+        $(document).ready(function () {
+            function fetchPendingAndonData() {
+                fetch("/andon/GetPendingAndonDataForToday")
+                    .then(response => response.json())
+                    .then(data => {
+                        data.reverse();
+                        updatePendingAndonTable(data);
+                        startCountdown(data);
+                       // console.log('pending andon data:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+            function updatePendingAndonTable(data) {
+                const pendingAndonBody = $('#pendingAndonTable tbody');
+                pendingAndonBody.empty();
+
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        const countdownId = `countdown_${item.id}`;
+                        pendingAndonBody.append(`
+                                <tr>
+                                    <td>${item.machine_id}</td>
+                                    <td>${item.user_raised_by}</td>
+                                    <td>${item.module}</td>
+                                    <td>${item.andon_category}</td>
+                                    <td>${item.andon_issue}</td>
+                                    <td>${item.startTime}</td>
+                                               <td>${item.dateRaised}</td>
+                                    <td id="${countdownId}"></td>
+                                             <td>${item.status}</td>
+                                    
+                                </tr>
+                            `);
+                    });
+                } else {
+                    pendingAndonBody.append('<tr><td colspan="9">No pending andons found for today.</td></tr>');
+                }
+            }
+
+
+
+            function startCountdown(data) {
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        const countdownId = `countdown_${item.id}`;
+                        const countdownElement = document.getElementById(countdownId);
+
+                        if (countdownElement) {
+                            const [hours, minutes, seconds] = item.startTime.split(':');
+                            const startTime = new Date();
+                            startTime.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds));
+                            const startDateTime = startTime.getTime();
+
+                            function updateCountdown() {
+                                const now = new Date().getTime();
+                                const distance = now - startDateTime;
+                                const secondsPassed = Math.floor(Math.abs(distance) / 1000);
+
+                                countdownElement.innerHTML = formatTime(distance);
+
+                                const row = countdownElement.closest('tr');
+                                if (row) {
+                                    if (secondsPassed >= 0 && secondsPassed < 1800) {
+                                        row.classList.remove("blink-dark", "blink-red");
+                                        row.classList.add("blink-green");
+
+                                    } else if (secondsPassed >= 1801 && secondsPassed < 3600) {
+                                        row.classList.remove("blink-green", "blink-red");
+                                        row.classList.add("blink-dark");
+
+                                    }
+
+                                    else if (secondsPassed >= 3601) {
+                                        row.classList.remove("blink-green", "blink-dark");
+                                        row.classList.add("blink-red");
+                                    }
+
+                                }
+                            }
+
+                            function formatTime(distance) {
+                                if (distance < 0) {
+                                    clearInterval(x);
+                                    return "Countdown expired";
+                                }
+
+                                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                return `${hours}h ${minutes}m ${seconds}s`;
+                            }
+
+                            updateCountdown();
+                            const x = setInterval(updateCountdown, 1000);
+                        } else {
+                            console.error(`Countdown element '${countdownId}' not found.`);
+                        }
+                    });
+                }
+            }
+
+
+            function getColor(secondsPassed) {
+                if (secondsPassed < 600) {
+                    return "light-green";
+                } else if (secondsPassed < 1200) {
+                    return "light-yellow";
+                } else if (secondsPassed < 1800) {
+                    return "light-orange";
+                } else {
+                    return "light-red";
+                }
+            }
+
+
+            fetchPendingAndonData();
+
+
+            setInterval(fetchPendingAndonData, 2500);
+        });
+    </script>
+
+    <script>
+        function fetchAndUpdateTable() {
+            fetch('/andon/completedTdy')
+                .then(response => response.json())
+                .then(data => {
+                  //  console.log('table:', data);
+                    const table = document.getElementById('completed');
+                    const tableBody = table.querySelector('tbody');
+                    tableBody.innerHTML = '';
+
+                    if (Array.isArray(data)) {
+                        data.forEach(entry => {
+                            const row = document.createElement('tr');
+                            let efficiencyValue = (entry.timeGapMinutes).toFixed(2);
+
+                            let efficiencyClass = '';
+
+                            if (parseFloat(efficiencyValue) < 20) {
+                                efficiencyClass = 'text-success';
+                            } else {
+                                efficiencyClass = 'text-danger';
+                            }
+
+                            row.innerHTML = `
+                                            <td>${entry.machine_id}</td>
+
+                                            <td>${entry.module}</td>
+                                            <td>${entry.andon_category}</td>
+                                          
+                                   
+
+                                                       <td class="${efficiencyClass}">${efficiencyValue} min</td>
+
+
+                                            <td>${entry.resolved_by}</td>
+
+
+
+                                        `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        console.error('Data is not an array.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndUpdateTable();
+        setInterval(fetchAndUpdateTable, 5000);
+    </script>
+
+
+    <!-- <script>
+        let barChart;
+
+        function fetchDataAndUpdateChart() {
+            fetch('/Home/GetGroupedChartData')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Fetched data:', data);
+
+                    const labels = data.map(item => item.label);
+                    const counts = data.map(item => item.count);
+
+                    if (!barChart) {
+                        const barChartCanvas = document.getElementById('barChart').getContext('2d');
+                        barChart = new Chart(barChartCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Resolved By Counts',
+                                    data: counts,
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)',
+                                        'rgba(255, 159, 64, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255,99,132,1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: '#fff',
+                                        anchor: 'end',
+                                        align: 'start',
+                                        offset: 4,
+                                        font: {
+                                            weight: 'bold',
+                                            size: '14'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        barChart.data.labels = labels;
+                        barChart.data.datasets[0].data = counts;
+                        barChart.update();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchDataAndUpdateChart();
+        setInterval(fetchDataAndUpdateChart, 5000);
+    </script>-->
+
+    <script>
+        let barChart1;
+
+        function fetchDataAndUpdateChart1() {
+            fetch('/andon/GetcategorytData')
+                .then(response => response.json())
+                .then(data => {
+                    //console.log('Fetched data:', data);
+
+                    const labels1 = data.map(item => item.label);
+                    const counts1 = data.map(item => item.count);
+
+                    if (!barChart1) {
+                        const barChartCanvas1 = document.getElementById('barChart1').getContext('2d');
+                        barChart1 = new Chart(barChartCanvas1, {
+                            type: 'bar',
+                            data: {
+                                labels: labels1,
+                                datasets: [{
+                                    label: 'Resolved By Counts',
+                                    data: counts1,
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)',
+                                        'rgba(255, 159, 64, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255,99,132,1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        bottom: 20 // Adjust this value as needed
+                                    }
+                                },
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: '#fff',
+                                        anchor: 'end',
+                                        align: 'start',
+                                        offset: 4,
+                                        font: {
+                                            weight: 'bold',
+                                            size: '14'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        barChart1.data.labels = labels1;
+                        barChart1.data.datasets[0].data = counts1;
+                        barChart1.update();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchDataAndUpdateChart1();
+        setInterval(fetchDataAndUpdateChart1, 5000);
+    </script>
+
+
+
+
+
+    <script>
+        function fetchAndUpdateTable() {
+            fetch('/andon/GetPendingAndonDataForhistory')
+                .then(response => response.json())
+                .then(data => {
+                  //  console.log('table:', data);
+                    const table = document.getElementById('notres');
+                    const tableBody = table.querySelector('tbody');
+                    tableBody.innerHTML = '';
+
+                    if (Array.isArray(data)) {
+                        data.forEach(item => {
+                            const row = document.createElement('tr');
+
+                            // Calculate days between date raised and current date
+                            const dateRaised = new Date(item.dateRaised);
+                            const currentDate = new Date();
+                            const timeDifference = currentDate.getTime() - dateRaised.getTime();
+                            const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+
+                            const cells = [
+                                `<td>${item.machine_id}</td>`,
+    
+                                `<td>${item.module}</td>`,
+                                `<td>${item.andon_category}</td>`,
+                                `<td>${item.andon_issue}</td>`,
+                            
+                                `<td>${item.dateRaised}</td>`,
+                                `<td>${daysDifference}</td>`,
+                             
+                            ];
+
+
+                            cells.forEach(cell => {
+                                const cellElement = document.createElement('td');
+                                cellElement.innerHTML = cell;
+                                row.appendChild(cellElement);
+                            });
+
+
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        console.error('Data is not an array.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndUpdateTable();
+        setInterval(fetchAndUpdateTable, 5000);
+    </script>
+
+
+
+
+    <style>
+        /* CSS styles to center align table cell content */
+        .center-align {
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        function fetchAndUpdateTable() {
+            fetch('/andon/Getbytable')
+                .then(response => response.json())
+                .then(data => {
+                  //  console.log('byuser:', data);
+                    const table = document.getElementById('contrib');
+                    const tableBody = table.querySelector('tbody');
+                    tableBody.innerHTML = '';
+
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        let efficiencyValue = item.averageTime;
+                        let efficiencyClass = '';
+
+                        if (parseFloat(efficiencyValue) < 20) {
+                            efficiencyClass = 'text-success';
+                        } else {
+                            efficiencyClass = 'text-danger';
+                        }
+                        row.innerHTML = `
+                                        <td>${item.resolvedBy}</td>
+                                        <td class="center-align">${item.completedAndons}</td>
+                                        <td>${item.category}</td>
+                                        <td class="center-align">${item.responseRate} %</td>
+                                                   <td class="${efficiencyClass}">${efficiencyValue} min</td>
+                                        <td >${item.commonIssues}</td>
+                                    `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndUpdateTable();
+        setInterval(fetchAndUpdateTable, 5000);
+    </script>
+
+
+
+    <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="~/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="~/vendors/chart.js/Chart.min.js"></script>
+    <script src="~/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="~/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/hoverable-collapse.js"></script>
+    <script src="~/js/misc.js"></script>
+    <script src="~/js/settings.js"></script>
+    <script src="~/js/todolist.js"></script>
+    <!-- <script src="~/js/chart.js"></script> -->
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="~/js/dashboard.js"></script>
+    <!-- End custom js for this page -->
+</body>
+
+</html>

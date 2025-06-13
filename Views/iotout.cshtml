@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+  
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+
+   
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+
+
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/green.css" />
+  
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        #table thead th {
+            color: steelblue;
+            text-align: center;
+        }
+
+        #table tbody td {
+            color: white;
+            text-align: center;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+
+        .hidden-column {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+        <div class="back-button" onclick="window.location.href='/iotmenu/Index'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </div>
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IoT Pieces Count</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-lg-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title text-warning">Hourly Output by Operation</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Module</th>
+                                                    <th>Style</th>
+                                                    <th>Operation</th>
+                                                    <th>Machine</th>
+                                                    <th>User</th>
+                                                    <th>Target count</th>
+                                                    <th>1</th>
+                                                    <th>2</th>
+                                                    <th>3</th>
+                                                    <th>4</th>
+                                                    <th>5</th>
+                                                    <th>6</th>
+                                                    <th>7</th>
+                                                    <th>8</th>
+                                                    <th>9</th>
+                                                    <th>Total count</th>
+                                                   <!----<th>Total target</th>-->
+                                                   <!---- <th>Efficency</th>-->
+                                                   <!----<th>Utilization</th>-->
+                                                    <th>Delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function deleteData(rowIndex) {
+            if (confirm("Are you sure you want to delete this user?")) {
+                try {
+                    const table = document.getElementById('table');
+                    const row = table.rows[rowIndex];
+
+                    const module = row.cells[0].textContent.trim();
+                    const operation = row.cells[2].textContent.trim();
+                    const chipid = row.cells[3].textContent.trim();
+                    const username = row.cells[4].textContent.trim();
+                    const style = row.cells[1].textContent.trim();
+                    const mac = row.cells[16].textContent.trim();
+
+                    const deleteData = {
+                        module: module,
+                        operation: operation,
+                        chipid: chipid,
+                        username: username,
+                        style: style,
+                        mac: mac,
+                    };
+
+                    $.ajax({
+                        url: '/iotout/DeleteIotData',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(deleteData),
+                        success: function (response) {
+                            console.log('Data deleted successfully:', response);
+                            //fetchData();
+                            if (response.success) {
+                                table.deleteRow(rowIndex);
+                            } else {
+                                alert(response.message);
+                            }
+                        },
+                        error: function (error) {
+                            console.error('Error deleting data:', error);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error deleting data:', error);
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            function fetchData() {
+                $.ajax({
+                    url: '/iotout/GetIotData',
+                    type: 'GET',
+                    success: function (data) {
+                        var tableBody = $('#table tbody');
+                        tableBody.empty();
+                        console.log("DATA:", data);
+
+                        data.sort(function (a, b) {
+                            var order = ['FOF1', 'FOF2', 'FOF3', 'L2'];
+                            return order.indexOf(a.module) - order.indexOf(b.module);
+                        });
+
+                        var previousModule = '';
+
+                        data.forEach(function (item, index) {
+                            console.log("Item:", item);
+
+                            if (previousModule && previousModule !== item.module) {
+                                var emptyRow = '<tr><td colspan="17"></td></tr>';
+                                tableBody.append(emptyRow);
+                            }
+
+                            var row = '<tr ondblclick="redirectToDetailsPage(this)">' +
+                                '<td>' + (item.module || '') + '</td>' +
+                                 '<td>' + (item.style) + '</td>' +
+                                '<td class="custom-text-color">' + (item.operation || '') + '</td>' +
+                                '<td>' + (item.chipID || '') + '</td>' +
+                                '<td>' + (item.userName || '') + '</td>' +
+                                '<td>' + (item.target || '') + '</td>' +
+                                '<td>' + getColorCodedCell(item.h1, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h2, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h3, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h4, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h5, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h6, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h7, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h8, item.target) + '</td>' +
+                                '<td>' + getColorCodedCell(item.h9, item.target) + '</td>' +
+                                '<td>' + (item.sum || '') + '</td>' +
+                               
+                              // '<td>' + (item.taregt || '') + '</td>' +
+                               // '<td>' + (item.efficiency || '') + '</td>' +
+                               // '<td>' + (item.utilization || '') + '</td>' +
+                                '<td class="hidden-column">' + (item.mac) + '</td>' +
+                                '<td class="hidden-column">' + (item.machineID) + '</td>' +
+                                '<td class="hidden-column">' + (item.plant) + '</td>' +
+                                '<td><button class="btn btn-inverse-danger btn-fw" onclick="deleteData(this.parentNode.parentNode.rowIndex)">Delete</button></td>' +
+                                '</tr>';
+                            tableBody.append(row);
+
+                            previousModule = item.module;
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data: " + error);
+                    }
+                });
+            }
+
+            function getColorCodedCell(value, target) {
+                var percentage = (value / target) * 100;
+                var color = '';
+
+                if (percentage < 30) {
+                    color = 'text-danger';
+                } else if (percentage >= 30 && percentage < 70) {
+                    color = 'text-warning';
+                } else if (percentage >= 70) {
+                    color = 'text-success';
+                }
+
+                return '<span class="' + color + '">' + value + '</span>';
+            }
+
+            fetchData();
+            setInterval(fetchData, 180000);
+        });
+
+        function redirectToDetailsPage(row) {
+            const cells = row.cells;
+            const rowData = {
+                module: cells[0].textContent.trim(),
+                style: cells[1].textContent.trim(),
+                operation: cells[2].textContent.trim(),
+                chipID: cells[3].textContent.trim(),
+                userName: cells[4].textContent.trim(),
+                target: cells[5].textContent.trim(),
+                h1: cells[6].textContent.trim(),
+                h2: cells[7].textContent.trim(),
+                h3: cells[8].textContent.trim(),
+                h4: cells[9].textContent.trim(),
+                h5: cells[10].textContent.trim(),
+                h6: cells[11].textContent.trim(),
+                h7: cells[12].textContent.trim(),
+                h8: cells[13].textContent.trim(),
+                h9: cells[14].textContent.trim(),
+                mac: cells[16].textContent.trim(),
+                sum: cells[15].textContent.trim(),
+               // utilization: cells[16].textContent.trim(),
+       //aa
+       
+                plant: cells[18].textContent.trim(),
+                ft: cells[17].textContent.trim()
+            };
+
+            const url = new URL('/iotplusminus', window.location.origin);
+            Object.keys(rowData).forEach(key => url.searchParams.append(key, rowData[key]));
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>

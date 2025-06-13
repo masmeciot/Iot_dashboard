@@ -1,0 +1,365 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>ESL Module Data</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/green.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        #table thead th {
+            color: steelblue;
+        }
+
+        #table tbody td {
+            color: white;
+        }
+
+        #entertb thead th {
+            color: lightgreen;
+        }
+
+        #entertb tbody td {
+            color: white;
+        }
+
+        #plant {
+            color: white;
+        }
+
+        .form-control {
+            color: white !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Change Module Details</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Change Module details</h4>
+                        <p class="card-title">Choose the module to enter data.</p>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Module 1</label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control" id="module1" onchange="fetchData(1)">
+                                            <option value="">Select Module</option>
+                                            <option value="FOF1">FOF1</option>
+                                            <option value="FOF2">FOF2</option>
+                     
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Module 2</label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control" id="module2" onchange="fetchData(2)">
+                                            <option value="">Select Module</option>
+                                            <option value="FOF1">FOF1</option>
+                                            <option value="FOF2">FOF2</option>
+                           
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form class="form-sample">
+                            <div class="row">
+                                <!-- Module 1 Details -->
+                                <div class="col-md-6 hidden" id="module1-details">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">SO-LI</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="soli1" placeholder="Enter SO-LI">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Style</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="style1" placeholder="Enter Style">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">CW</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="cw1" placeholder="Enter CW">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Cut B Qty</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="bqty1" placeholder="Enter Cut B Qty">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">In Qty</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="iqty1" placeholder="Enter In Qty">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">FG Qty</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="fgqty1" placeholder="Enter FG Qty">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Delivery Date</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="dqty1" placeholder="Enter Delivery Qty">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Module 2 Details -->
+                                <div class="col-md-6 hidden" id="module2-details">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">SO-LI</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="soli2" placeholder="Enter SO-LI">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Style</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="style2" placeholder="Enter Style">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">CW</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="cw2" placeholder="Enter CW">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Cut B Qty</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="bqty2" placeholder="Enter Cut B Qty">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">In Qty</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="iqty2" placeholder="Enter In Qty">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">FG Qty</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="fgqty2" placeholder="Enter FG Qty">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Delivery Date</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="dqty2" placeholder="Enter Delivery Qty">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="button-container d-flex justify-content-center">
+                            <button type="button" class="btn btn-inverse-success btn-fw mx-2" onclick="addNew()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function fetchData(moduleNumber) {
+            let moduleDropdown = document.getElementById('module' + moduleNumber);
+            let selectedModule = moduleDropdown.value;
+            let moduleDetails = document.getElementById('module' + moduleNumber + '-details');
+
+            if (selectedModule) {
+                // Perform AJAX request to your C# API
+                $.ajax({
+                    url: `/moduleESL/GetModuleData?moduleId=${selectedModule}`,
+                    type: 'GET',
+                    success: function (data) {
+                        // Check if data is returned or the response is empty
+                        if (data) {
+                            // Populate the fields with the data
+                            document.getElementById('soli' + moduleNumber).value = data.soli || '';
+                            document.getElementById('style' + moduleNumber).value = data.style || '';
+                            document.getElementById('cw' + moduleNumber).value = data.cw || '';
+                            document.getElementById('bqty' + moduleNumber).value = data.bqty || '';
+                            document.getElementById('iqty' + moduleNumber).value = data.iqty || '';
+                            document.getElementById('fgqty' + moduleNumber).value = data.fgqty || '';
+                            document.getElementById('dqty' + moduleNumber).value = data.dqty || '';
+                        } else {
+                            // Clear the fields to allow entering new data
+                            document.getElementById('soli' + moduleNumber).value = '';
+                            document.getElementById('style' + moduleNumber).value = '';
+                            document.getElementById('cw' + moduleNumber).value = '';
+                            document.getElementById('bqty' + moduleNumber).value = '';
+                            document.getElementById('iqty' + moduleNumber).value = '';
+                            document.getElementById('fgqty' + moduleNumber).value = '';
+                            document.getElementById('dqty' + moduleNumber).value = '';
+                        }
+
+                        // Show the module details section
+                        moduleDetails.classList.remove('hidden');
+                    },
+                    error: function (xhr) {
+                        // If no content is found (204), display empty fields
+                        if (xhr.status === 204) {
+                            document.getElementById('soli' + moduleNumber).value = '';
+                            document.getElementById('style' + moduleNumber).value = '';
+                            document.getElementById('cw' + moduleNumber).value = '';
+                            document.getElementById('bqty' + moduleNumber).value = '';
+                            document.getElementById('iqty' + moduleNumber).value = '';
+                            document.getElementById('fgqty' + moduleNumber).value = '';
+                            document.getElementById('dqty' + moduleNumber).value = '';
+
+                            moduleDetails.classList.remove('hidden');
+                        } else {
+                            alert('Failed to fetch module data.');
+                        }
+                    }
+                });
+            } else {
+                moduleDetails.classList.add('hidden');
+            }
+        }
+
+
+        function addNew() {
+            // Collect data from Module 1 text boxes
+            let module1Data = {
+                Module: document.getElementById('module1').value,
+                SOLI: document.getElementById('soli1').value,
+                Style: document.getElementById('style1').value,
+                cw: document.getElementById('cw1').value,
+                cutb: document.getElementById('bqty1').value,
+                inqty: document.getElementById('iqty1').value,
+                fgq: document.getElementById('fgqty1').value,
+                delivery: document.getElementById('dqty1').value
+            };
+
+            // Collect data from Module 2 text boxes
+            let module2Data = {
+                Module: document.getElementById('module2').value,
+                SOLI: document.getElementById('soli2').value,
+                Style: document.getElementById('style2').value,
+                cw: document.getElementById('cw2').value,
+                cutb: document.getElementById('bqty2').value,
+                inqty: document.getElementById('iqty2').value,
+                fgq: document.getElementById('fgqty2').value,
+                delivery: document.getElementById('dqty2').value
+            };
+
+            // Combine both modules data into an array
+            let modulesData = [module1Data, module2Data];
+
+            // Send the data using AJAX to the server for both modules
+            $.ajax({
+                url: '/moduleESL/SaveModuleData', // Adjust the URL as needed
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(modulesData),
+                success: function () {
+                    alert('Data saved successfully!');
+                },
+                error: function () {
+                    alert('Failed to save data. Please check if all the fields are filled correctly');
+                }
+            });
+        }
+
+
+    </script>
+
+
+        <!-- container-scroller -->
+        <!-- plugins:js -->
+        <script src="~/vendors/js/vendor.bundle.base.js"></script>
+        <!-- endinject -->
+        <!-- Plugin js for this page -->
+        <script src="~/vendors/chart.js/Chart.min.js"></script>
+        <script src="~/vendors/progressbar.js/progressbar.min.js"></script>
+        <script src="~/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+        <script src="~/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+        <script src="~/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+        <!-- End plugin js for this page -->
+        <!-- inject:js -->
+        <script src="~/js/off-canvas.js"></script>
+        <script src="~/js/hoverable-collapse.js"></script>
+        <script src="~/js/misc.js"></script>
+        <script src="~/js/settings.js"></script>
+        <script src="~/js/todolist.js"></script>
+        <!-- endinject -->
+        <!-- Custom js for this page -->
+        <script src="~/js/dashboard.js"></script>
+        <!-- End custom js for this page -->
+</body>
+</html>

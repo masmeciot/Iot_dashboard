@@ -1,0 +1,1274 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+   
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <style>
+        #table {
+            border-color: white !important; 
+        }
+
+            #table th, #table td {
+                border: 1px solid white !important; 
+            }
+          .btn-large {
+            width: 150px;
+            height: 30px; 
+            margin: 10px;
+            font-size: 14px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px; 
+        }
+
+
+        .ui-autocomplete {
+            background-color: #191c24; 
+            color: white; 
+        }
+
+        .ui-menu-item {
+            background-color: #191c24; 
+            color: white; 
+        }
+
+            .ui-menu-item:hover {
+                background-color: #333; 
+                color: white; 
+            }
+
+        
+        .ui-autocomplete {
+            border: 1px solid #444; 
+        }
+
+       
+       
+        #module thead th {
+            color: steelblue;
+        }
+
+        
+        #module tbody td {
+            color: white;
+        }
+       
+        #tackt thead th {
+            color: steelblue;
+        }
+
+       
+        #tackt tbody td {
+            color: white;
+        }
+
+        .form-control {
+            color: white !important;
+        }
+
+        .btn-small {
+            margin: 0 0.1rem;
+        }
+
+        #stylet thead th {
+            color: steelblue;
+        }
+
+       
+        #stylet tbody td {
+            color: white;
+        }
+
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+       <!---- <div class="back-button" onclick="window.location.href='/iotmenu/Index'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </div>-->
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Sewing Details</h3>
+            </li>
+        </ul>
+    </div>
+
+
+
+
+    <div class="content-wrapper">
+
+        <div class="row">
+
+            <div class="col-md-6 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">User SMV details</h4>
+                  
+                            <form id="zoneForm" method="post">
+                            <div class="form-group">
+                                <label for="exampleInputUsername1">User name</label>
+                                <input type="text" class="form-control" id="user" name="user" placeholder="Username" oninput="filterTable()">
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label for="trolly">Handling SMV</label>
+                                <input type="text" class="form-control" id="hand" placeholder="SMV">
+                            </div>
+                            <div class="form-group">
+                                <label >Sewing SMV</label>
+                                <input type="text" class="form-control" id="sew" placeholder="SMV">
+                            </div>
+
+                             <div class="form-group">
+                                <label for="trolly">Style</label>
+                                <input type="text" class="form-control" id="style" name="style" placeholder="Style">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Operation</label>
+                                <input type="text" class="form-control" id="op" name="op" placeholder="Operation">
+                            </div>
+
+                
+                    <div class="form-group">
+                        <label for="plant">Plant</label>
+                                <select class="form-control" id="plant" name="plant" onchange="filterTable()">
+                            <option>MEC</option>
+                            <option>Synergy</option>
+                         
+                        </select>
+                    </div>
+                            <div class="form-group">
+                                <label for="">Module</label>
+                                <input type="text" class="form-control" id="modulei" name="modulei" placeholder="Module" oninput="filterTable()">
+                            </div>
+
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <div class="col-sm-12 text-center">
+                                            <table class="table table-bordered mx-auto" id="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Zone</th>
+                                                        <th>Stitch Count</th>
+                                                        <th>Operation</th>
+                                                        <th>Waiting Time</th>
+                                                        <th>Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Rows will be populated dynamically -->
+                                                </tbody>
+                                            </table>
+                                            <br>
+                                            <div class="add-zone-button">
+                                                <button type="button" class="btn btn-inverse-info btn-fw" onclick="addNewRow()">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                      
+                            <div class="button-container d-flex justify-content-center">
+                                <button type="button" onclick="searchByTrolly(); searchZone();" class="btn-large btn-inverse-primary btn-fw mx-1">Search</button>
+                                <button type="button" onclick="addNew(); addNewZone();" class="btn-large btn-inverse-success btn-fw mx-1 ">AddNew</button>
+                                <button type="button" onclick="saveChanges();updateData(); " class="btn-large btn-inverse-warning btn-fw mx-1 ">Update</button>
+                                <button type="button" onclick="deleteData(); deleteZone();" class="btn-large btn-inverse-danger btn-fw mx-1 ">Delete</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+               
+
+
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h4 class="card-title text-warning">Tack time change</h4>
+                            <form class="form">
+                                <div class="form-group">
+                                    <label for="exampleInputUsername1">Tack Time</label>
+                                    <input type="text" class="form-control" id="tack" name="tack" placeholder="Tack time">
+                                </div>
+                                <div class="form-group">
+                                    <label for="category">Module</label>
+                                    <select class="form-control" id="module1">
+                                        <option>FOF1</option>
+                                        <option>FOF2</option>
+                                        <option>FOF3</option>
+                                        <option>L1</option>
+                                        <option>L2</option>
+                                    <option>SY01</option>
+                                    <option>SY02</option>
+                                    <option>SY03</option>
+                                    <option>SY33</option>
+                                    <option>SY26</option>
+                                    <option>SY05</option>
+                                    <option>SY06</option>
+                                    <option>SY21</option>
+                                    </select>
+                                </div>
+                                <div class="button-container d-flex justify-content-center">
+                                    <button type="button" onclick="searchByTrolly1()" class="btn-large btn-inverse-primary btn-fw mx-1 btn-small">Search</button>
+                                    <button type="button" onclick="addNew1()" class="btn-large btn-inverse-success btn-fw mx-1 btn-small">AddNew</button>
+                                    <button type="button" onclick="updateData1()" class="btn-large btn-inverse-warning btn-fw mx-1 btn-small">Update</button>
+                                    <button type="button" onclick="deleteData1()" class="btn-large btn-inverse-danger btn-fw mx-1 btn-small">Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body align-items-center">
+                            <h4 class="card-title text-warning">Tack Time</h4>
+                            <div class="table-responsive">
+                                <table class="table table-hover text-center" id="tackt">
+                                    <thead>
+                                        <tr>
+                                            <th>Module</th>
+                                            <th>Tack Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+             
+            </div>
+
+            <div class="col-6 grid-margin">
+ 
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">User SMV details</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover text-center" id="module">
+                                <thead>
+                                    <tr>
+                                        <th> Style </th>
+                                        <th> Operation </th>
+                                        <th> User </th>
+                                        <th> Handl </th>
+                                        <th> Sew. </th>
+                                        <th> Plant </th>
+                                        <th> Module </th>
+                                        <th> Delete </th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+               </div>
+      </div>
+         
+             <!---  <div class="card mt-3">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Change Style data</h4>
+                        <form class="form">
+                            <div class="form-group">
+                                <label >Style</label>
+                                <input type="text" class="form-control" id="style1" name="style1" placeholder="Enter Style">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputUsername2">Operation</label>
+                                <input type="text" class="form-control" id="operation" name="operation" placeholder="Enter Operation">
+                            </div>
+
+                              <div class="form-group">
+                                <label for="exampleInputUsername2">Users</label>
+                                <input type="text" class="form-control" id="users" name="operation" placeholder="Enter Users">
+
+
+                            </div>
+                            <div class="button-container d-flex justify-content-center">
+                                
+                                <button type="button" onclick="addNew2()" class="btn-sm btn-inverse-success btn-fw mx-0.2 btn-small">Add New</button>
+                                <button type="button" onclick="updatestyle()" class="btn-sm btn-inverse-primary btn-fw mx-0.2 btn-small">Update</button>
+                                <button type="button" onclick="deleteData2()" class="btn-sm btn-inverse-warning btn-fw mx-0.2 btn-small">Delete Operation</button>
+                                <button type="button" onclick="deleteData3()" class="btn-sm btn-inverse-danger btn-fw mx-0.2 btn-small">Delete Style</button>
+                            </div>
+                        </form>
+                    </div>
+                   </div>-->
+                  
+
+          
+
+
+                <!--- <div class="card mt-3">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">Style Details</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover text-center" id="stylet">
+                                <thead>
+                                    <tr>
+                                        <th>Style</th>
+                                        <th>Operation</th>
+                                        <th>Users</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>-->
+
+
+            </div>
+
+
+
+        </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch and populate the tables first
+            fetchDataAndPopulateTable();
+            fetchDataAndPopulateTable1();
+
+            // Initialize autocomplete after data is fetched
+            $(document).ajaxStop(function () {
+                var usernames = getUsernamesFromTable();
+                if (usernames.length > 0) {
+                    initializeAutocomplete(usernames, "#user");
+                }
+
+                var styles = getStylesFromTable();
+                if (styles.length > 0) {
+                    initializeAutocomplete(styles, "#style");
+                }
+
+                var operations = getOperationsFromTable();
+                if (operations.length > 0) {
+                    initializeAutocomplete(operations, "#op");
+                }
+
+                var modules = getModulesFromTable();
+                if (modules.length > 0) {
+                    initializeAutocomplete(modules, "#modulei");
+                }
+            });
+        });
+
+        function initializeAutocomplete(sourceArray, inputSelector) {
+            $(inputSelector).autocomplete({
+                source: sourceArray,
+                minLength: 2
+            });
+        }
+
+        function getUsernamesFromTable() {
+            var usernames = [];
+            $('#module tbody tr').each(function () {
+                var username = $(this).find('td').eq(2).text().trim();
+                if (username && !usernames.includes(username)) {
+                    usernames.push(username);
+                }
+            });
+            return usernames;
+        }
+
+        function getStylesFromTable() {
+            var styles = [];
+            $('#module tbody tr').each(function () {
+                var style = $(this).find('td').eq(0).text().trim();
+                if (style && !styles.includes(style)) {
+                    styles.push(style);
+                }
+            });
+            return styles;
+        }
+
+        function getOperationsFromTable() {
+            var operations = [];
+            $('#module tbody tr').each(function () {
+                var operation = $(this).find('td').eq(1).text().trim();
+                if (operation && !operations.includes(operation)) {
+                    operations.push(operation);
+                }
+            });
+            return operations;
+        }
+
+        function getModulesFromTable() {
+            var modules = [];
+            $('#module tbody tr').each(function () {
+                var module = $(this).find('td').eq(6).text().trim();
+                if (module && !modules.includes(module)) {
+                    modules.push(module);
+                }
+            });
+            return modules;
+        }
+
+        function filterTable() {
+            var inputUser = document.getElementById('user').value.toLowerCase();
+            var selectedPlant = document.getElementById('plant').value;
+            var inputModule = document.getElementById('modulei').value.toLowerCase();
+            var table = document.getElementById('module');
+            var tr = table.getElementsByTagName('tr');
+
+            var rows = [];
+
+            for (var i = 1; i < tr.length; i++) {
+                var tdUser = tr[i].getElementsByTagName('td')[2];
+                var tdPlant = tr[i].getElementsByTagName('td')[5];
+                var tdModule = tr[i].getElementsByTagName('td')[6];
+
+                if (tdUser && tdPlant && tdModule) {
+                    var txtUserValue = tdUser.textContent || tdUser.innerText;
+                    var plantValue = tdPlant.textContent || tdPlant.innerText;
+                    var txtModuleValue = tdModule.textContent || tdModule.innerText;
+
+                    if (
+                        txtUserValue.toLowerCase().indexOf(inputUser) > -1 &&
+                        plantValue === selectedPlant &&
+                        txtModuleValue.toLowerCase().indexOf(inputModule) > -1
+                    ) {
+                        rows.push(tr[i]);
+                    }
+                }
+            }
+
+            // Hide all rows and show only the filtered ones
+            for (var j = 1; j < tr.length; j++) {
+                tr[j].style.display = 'none'; // Hide all rows initially
+            }
+
+            for (var k = 0; k < rows.length; k++) {
+                rows[k].style.display = ''; // Show the filtered rows
+            }
+        }
+
+        </script>
+
+    <script>
+        function searchZone() {
+
+            const style = $('#style').val();
+            const op = $('#op').val();
+            $.ajax({
+                url: '/IoTzone/Search',
+                type: 'GET',
+                data: {
+                    style: style,
+                    op: op
+                },
+                success: function (response) {
+                    if (response.success) {
+                 
+                        const table = $('#table tbody');
+                        table.empty();
+                        response.data.zones.forEach(zone => {
+                            const newRow = `
+                                                <tr>
+                                                    <td><input type="text" class="form-control" name="zoneName" value="${zone.zone}"></td>
+                                                            <td><input type="number" class="form-control" name="stitchCount" value="${zone.stich}"></td>
+                                                    <td><input type="text" class="form-control" name="operation" value="${zone.operation}"></td>
+                                                    <td><input type="number" class="form-control" name="waitingTime" value="${zone.wait}"></td>
+                                                    <td><button type="button" class="btn btn-inverse-danger btn-fw" onclick="deleteRow(this)">Delete</button></td>
+                                                </tr>
+                                            `;
+                            table.append(newRow);
+                        });
+                    } else {
+                        alert('No Zones found for the given style and operation');
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert('Failed to search zone data');
+                }
+            });
+        }
+
+        function addNewRow() {
+            const table = document.getElementById('table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                                <td><input type="text" class="form-control" name="zoneName" placeholder="Zone Name"></td>
+                                <td><input type="number" class="form-control" name="stitchCount" placeholder="Stitch Count"></td>
+                                <td><input type="text" class="form-control" name="operation" placeholder="Operation"></td>
+                                <td><input type="number" class="form-control" name="waitingTime" placeholder="Waiting Time"></td>
+                                <td><button type="button" class="btn btn-inverse-danger btn-fw" onclick="deleteRow(this)">Delete</button></td>
+                            `;
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.parentNode.removeChild(row);
+        }
+
+
+
+
+
+        function saveChanges() {
+            const zoneForm = document.getElementById('zoneForm');
+            const formData = new FormData(zoneForm);
+
+            // Collecting additional rows data from the table
+            const rows = document.querySelectorAll('#table tbody tr');
+            rows.forEach((row, index) => {
+                const zoneName = row.querySelector('input[name="zoneName"]').value;
+                const stitchCount = row.querySelector('input[name="stitchCount"]').value;
+                const operation = row.querySelector('input[name="operation"]').value;
+                const waitingTime = row.querySelector('input[name="waitingTime"]').value;
+
+                formData.append(`Zones[${index}].ZoneName`, zoneName);
+                formData.append(`Zones[${index}].StitchCount`, stitchCount);
+                formData.append(`Zones[${index}].Operation`, operation);
+                formData.append(`Zones[${index}].WaitingTime`, waitingTime);
+            });
+
+            $.ajax({
+                url: '/IoTzone/SaveChanges',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                  success: function (response) {
+                    if (response.success) {
+                        alert('Zone Changes saved successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to save Zone changes');
+                    }
+                },
+                error: function (error) {
+                    alert('Failed to save Zone changes');
+                }
+            });
+        }
+
+
+
+
+
+
+        function deleteZone() {
+            const style = $('#style').val();
+            const op = $('#op').val();
+
+
+            $.ajax({
+                url: '/IoTzone/Delete',
+                type: 'POST',
+                data: {
+                    style: style,
+                    op: op
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Zones deleted successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete zones');
+                    }
+                },
+                error: function (error) {
+                    alert('Failed to delete zones');
+                }
+            });
+        }
+
+        function addNewZone() {
+            const zoneForm = document.getElementById('zoneForm');
+            const formData = new FormData(zoneForm);
+
+
+            const rows = document.querySelectorAll('#table tbody tr');
+            rows.forEach((row, index) => {
+                const zoneName = row.querySelector('input[name="zoneName"]').value;
+                const stitchCount = row.querySelector('input[name="stitchCount"]').value;
+                const operation = row.querySelector('input[name="operation"]').value;
+                const waitingTime = row.querySelector('input[name="waitingTime"]').value;
+
+                formData.append(`Zones[${index}].ZoneName`, zoneName);
+                formData.append(`Zones[${index}].StitchCount`, stitchCount);
+                formData.append(`Zones[${index}].Operation`, operation);
+                formData.append(`Zones[${index}].WaitingTime`, waitingTime);
+            });
+
+            $.ajax({
+                url: '/IoTzone/AddZone',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        alert('Zone added successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to add zone');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        responseText: xhr.responseText,
+                        responseJSON: xhr.responseJSON
+                    });
+                    alert('Failed to add zone');
+                }
+            });
+
+        }
+
+
+        
+        
+
+
+
+           
+         
+
+
+
+        function searchByTrolly() {
+            var user = document.getElementById('user').value;
+            var style = document.getElementById('style').value;
+            var operation = document.getElementById('op').value;
+            var plant = document.getElementById('plant').value;
+
+            $.ajax({
+                url: '/Machine/SearchBySlot',
+                method: 'GET',
+                data: { user: user,
+                style:style,
+                operation:operation,
+                plant:plant},
+                success: function (response) {
+                   // console.log(response);
+                    var hand = response.hand;
+                    var sew = response.sew;
+                    var style = response.style;
+                    var module = response.module;
+                    document.getElementById('hand').value = hand;
+                    document.getElementById('sew').value = sew;
+                    document.getElementById('style').value = style;
+                    document.getElementById('modulei').value = module;
+                    fetchDataAndPopulateTable();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        function checkUsernameExists(username, style, Operation, callback) {
+            $.ajax({
+                url: '/Machine/CheckUsernameExists',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ username: username, style : style , Operation : Operation}),
+                success: function (response) {
+                    callback(response.exists);
+                },
+                error: function (error) {
+                    console.error('Error checking username:', error);
+                    callback(false);
+                }
+            });
+        }
+
+        function addNew() {
+            var user = document.getElementById('user').value;
+            var hand = document.getElementById('hand').value;
+            var sew = document.getElementById('sew').value;
+            var Plant = document.getElementById('plant').value;
+            var style = document.getElementById('style').value;
+            var Operation = document.getElementById('op').value;
+            var Module = document.getElementById('modulei').value; // Fix typo here
+
+            checkUsernameExists(user, style, Operation, function (exists) {
+                if (exists) {
+                    alert('Username, Style, and operation already exist!');
+                } else {
+                    var newData = {
+                        UserName: user,
+                        Hand: hand,
+                        sew: sew,
+                        style: style,
+                        Plant: Plant,
+                        Operation: Operation,
+                        Module: Module // Fix typo here
+                    };
+
+                    $.ajax({
+                        url: '/Machine/AddNewData',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(newData),
+                        success: function (response) {
+                            document.getElementById('user').value = '';
+                            document.getElementById('hand').value = '';
+                            document.getElementById('sew').value = '';
+                            document.getElementById('style').value = '';
+                            document.getElementById('op').value = '';
+                            document.getElementById('modulei').value = '';
+                            fetchDataAndPopulateTable();
+                        },
+                        error: function (error) {
+                            console.error('Error adding new data:', error);
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function updateData() {
+            var user = document.getElementById('user').value;
+            var hand = document.getElementById('hand').value;
+            var sew = document.getElementById('sew').value;
+            var style = document.getElementById('style').value;
+            var Operation = document.getElementById('op').value;
+            var Module = document.getElementById('modulei').value; 
+
+            var updatedData = {
+                UserName: user,
+                Hand: hand,
+                sew: sew,
+                style: style,
+                Operation: Operation,
+                Module: Module 
+            };
+
+            $.ajax({
+                url: '/Machine/UpdateData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    // Clear form fields after success
+                    document.getElementById('user').value = '';
+                    document.getElementById('hand').value = '';
+                    document.getElementById('sew').value = '';
+                    document.getElementById('style').value = '';
+                    document.getElementById('op').value = '';
+                    document.getElementById('modulei').value = '';
+                    fetchDataAndPopulateTable(); 
+                },
+                error: function (error) {
+                    console.error('Error updating data:', error);
+                }
+            });
+        }
+
+
+
+        function fetchDataAndPopulateTable() {
+            $.ajax({
+                url: '/Machine/GetUserData',
+                method: 'GET',
+                success: function (response) {
+                    var tableBody = document.querySelector('#module tbody');
+                    tableBody.innerHTML = '';
+
+                    response.forEach(function (item) {
+                        var row = tableBody.insertRow();
+
+                        var styleCell = row.insertCell(0);
+                        var opCell = row.insertCell(1);
+                        var userNameCell = row.insertCell(2);
+                        var handCell = row.insertCell(3);
+                        var sewCell = row.insertCell(4);
+                        var plantCell = row.insertCell(5);
+                        var moduleCell = row.insertCell(6);
+                        var actionCell = row.insertCell(7);
+
+                        var deleteButton = document.createElement('button');
+                        deleteButton.className = 'btn btn-inverse-danger btn-fw';
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.onclick = function () {
+                            deleteDat(item.userName, item.style, item.operation, item.plant)
+                        };
+                        actionCell.appendChild(deleteButton);
+
+                        userNameCell.textContent = item.userName;
+                        opCell.textContent = item.operation;
+                        handCell.textContent = item.hand;
+                        sewCell.textContent = item.sew;
+                        styleCell.textContent = item.style;
+                        plantCell.textContent = item.plant;
+                        moduleCell.textContent = item.module;
+
+                        // Add double-click event listener to the row
+                        row.addEventListener('dblclick', onRowDoubleClick);
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+
+
+        function onRowDoubleClick(event) {
+            var row = event.currentTarget;
+
+            // Extract values from the clicked row
+            var cells = row.getElementsByTagName('td');
+
+            document.getElementById('user').value = cells[2].textContent.trim();
+            document.getElementById('style').value = cells[0].textContent.trim();
+            document.getElementById('op').value = cells[1].textContent.trim();
+            document.getElementById('hand').value = cells[3].textContent.trim();
+            document.getElementById('sew').value = cells[4].textContent.trim();
+            document.getElementById('plant').value = cells[5].textContent.trim();
+            document.getElementById('modulei').value = cells[6].textContent.trim();
+        }
+
+
+        function deleteDat(userName, style, operation, plant) {
+            $.ajax({
+                url: '/Machine/DeleteData', 
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    Slot: userName,
+                    style: style,
+                    Operation:operation,
+                    plant: plant
+                }),
+                success: function (response) {
+                    alert('Data deleted successfully');
+                    fetchDataAndPopulateTable(); 
+                },
+                error: function (error) {
+                    console.error('Error deleting data:', error);
+                    alert('Error deleting data');
+                }
+            });
+        }
+
+        function deleteData() {
+            var user = document.getElementById('user').value;
+            var style = document.getElementById('style').value;
+            var Operation = document.getElementById('op').value;
+            var Plant = document.getElementById('plant').value;
+
+            $.ajax({
+                url: '/Machine/DeleteData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ Slot: user, style: style, Operation: Operation, plant: Plant }),
+                success: function (response) {
+                    // Clear form fields after success
+                    document.getElementById('user').value = '';
+                    document.getElementById('hand').value = '';
+                    document.getElementById('sew').value = '';
+                    document.getElementById('style').value = '';
+                    document.getElementById('op').value = '';
+                    document.getElementById('modulei').value = '';
+                    fetchDataAndPopulateTable(); // Refresh the table data
+                },
+                error: function (error) {
+                    console.error('Error deleting data:', error);
+                }
+            });
+        }
+
+       
+
+       
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+    <script>
+        function searchByTrolly1() {
+            var user = document.getElementById('module1').value;
+
+            $.ajax({
+                url: '/Machine/SearchBySlot1',
+                method: 'GET',
+                data: { user: user },
+                success: function (response) {
+                   // console.log(response);
+                    var hand = response.tack;
+             
+                    document.getElementById('tack').value = hand;
+       
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        function addNew1() {
+            var user = document.getElementById('module1').value;
+            var hand = document.getElementById('tack').value;
+
+            var newData = {
+                Module: user,
+                Tack: hand
+            };
+
+            $.ajax({
+                url: '/Machine/AddNewData1',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newData),
+                success: function (response) {
+                  //  console.log('New data added successfully:', response);
+                    document.getElementById('module1').value = '';
+                    document.getElementById('tack').value = '';
+                    fetchDataAndPopulateTable1();
+                },
+                error: function (error) {
+                    console.error('Error adding new data:', error);
+                }
+            });
+        }
+
+
+        function updateData1() {
+            var user = document.getElementById('module1').value;
+            var hand = document.getElementById('tack').value;
+
+            var updatedData = {
+                Module: user,
+                Tack: hand
+            };
+
+            $.ajax({
+                url: '/Machine/UpdateData1',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    //console.log('Data updated successfully:', response);
+                    document.getElementById('module1').value = '';
+                    document.getElementById('tack').value = '';
+                    fetchDataAndPopulateTable1();
+                },
+                error: function (error) {
+                    console.error('Error updating data:', error);
+                }
+            });
+        }
+
+
+        function deleteData1() {
+            var user = document.getElementById('module1').value;
+
+            $.ajax({
+                url: '/Machine/DeleteData1',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ Slot: user }),
+                success: function (response) {
+                   // console.log('Data deleted successfully:', response);
+                    document.getElementById('module1').value = '';
+                    document.getElementById('tack').value = '';
+                    fetchDataAndPopulateTable1();
+                },
+                error: function (error) {
+                    console.error('Error deleting data:', error);
+                }
+            });
+        }
+
+
+      
+        function fetchDataAndPopulateTable1() {
+            $.ajax({
+                url: '/Machine/GettackData',
+                method: 'GET',
+                success: function (response) {
+                    var tableBody = document.querySelector('#tackt tbody');
+                    tableBody.innerHTML = '';
+
+                    response.forEach(function (item) {
+                        var row = tableBody.insertRow();
+
+                     
+                        var userNameCell = row.insertCell(0);
+                        var handCell = row.insertCell(1);
+
+
+                        userNameCell.textContent = item.module;
+                        handCell.textContent = item.tack;
+                        
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+      
+
+
+    </script>
+
+
+
+
+    <script>
+        function updatestyle() {
+            var style1 = document.getElementById('style1').value;
+            var operation = document.getElementById('operation').value;
+            var users = document.getElementById('users').value;
+
+            var updateData = {
+                Style: style1,
+                Operation: operation,
+                Users: users
+            };
+
+            checkStyleAndOperationExists(updateData, function (exists) {
+                if (exists) {
+                    $.ajax({
+                        url: '/Machine/UpdateStyleData',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(updateData),
+                        success: function (response) {
+                            console.log('Data updated successfully:', response);
+                            document.getElementById('style1').value = '';
+                            document.getElementById('operation').value = '';
+                            document.getElementById('users').value = '';
+                            fetchDataAndPopulateTable3();
+                        },
+                        error: function (error) {
+                            console.error('Error updating data:', error);
+                        }
+                    });
+                } else {
+                    alert('Style and Operation combination does not exist! Please click Add New to create new entry.');
+                }
+            });
+        }
+
+        function addNew2() {
+            var style1 = document.getElementById('style1').value;
+            var operation = document.getElementById('operation').value;
+            var users = document.getElementById('users').value;
+
+            var newData = {
+                Style: style1,
+                Operation: operation,
+                Users: users
+            };
+
+            checkStyleAndOperationExists(newData, function (exists) {
+                if (exists) {
+                    alert('Style and Operation combination already exists!');
+                } else {
+                    $.ajax({
+                        url: '/Machine/AddNewData2',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(newData),
+                        success: function (response) {
+                            console.log('New data added successfully:', response);
+                            document.getElementById('style1').value = '';
+                            document.getElementById('operation').value = '';
+                            document.getElementById('users').value = '';
+                            fetchDataAndPopulateTable3();
+                        },
+                        error: function (error) {
+                            console.error('Error adding new data:', error);
+                        }
+                    });
+                }
+            });
+        }
+
+        function checkStyleAndOperationExists(newData, callback) {
+            $.ajax({
+                url: '/Machine/CheckStyleAndOperationExists',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newData),
+                success: function (response) {
+                    callback(response.exists);
+                },
+                error: function (error) {
+                    console.error('Error checking style and operation:', error);
+                    callback(false);
+                }
+            });
+        }
+
+
+        
+        function deleteData2() {
+            var style = document.getElementById('style1').value;
+            var operation = document.getElementById('operation').value;
+
+            var newData = {
+                Style: style,
+                Operation: operation
+            };
+
+            $.ajax({
+                url: '/Machine/DeleteData2',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newData),
+                success: function (response) {
+                    //console.log('New data added successfully:', response);
+                    document.getElementById('style1').value = '';
+                    document.getElementById('operation').value = '';
+                    document.getElementById('users').value = '';
+                    fetchDataAndPopulateTable3();
+                },
+                error: function (error) {
+                    console.error('Error adding new data:', error);
+                }
+            });
+        }
+
+         function deleteData3() {
+            var style = document.getElementById('style1').value;
+          
+
+            var newData = {
+                Style: style
+            };
+
+            $.ajax({
+                url: '/Machine/DeleteData3',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newData),
+                success: function (response) {
+                   // console.log('New data added successfully:', response);
+                    document.getElementById('style1').value = '';
+                    document.getElementById('users').value = '';
+                    document.getElementById('operation').value = '';
+                    fetchDataAndPopulateTable3();
+                },
+                error: function (error) {
+                    console.error('Error adding new data:', error);
+                }
+            });
+
+
+        }
+
+        function fetchDataAndPopulateTable3() {
+            $.ajax({
+                url: '/Machine/GetstyleData',
+                method: 'GET',
+                success: function (response) {
+                    var tableBody = document.querySelector('#stylet tbody');
+                    tableBody.innerHTML = '';
+
+                    response.forEach(function (item) {
+                        var row = tableBody.insertRow();
+
+
+                        var userNameCell = row.insertCell(0);
+                        var handCell = row.insertCell(1);
+                        var usCell = row.insertCell(2);
+
+                        userNameCell.textContent = item.style;
+                        handCell.textContent = item.operation;
+                        usCell.textContent = item.users;
+
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        </script>
+
+
+
+    <!-- main-panel ends -->
+    <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+
+</body>
+
+</html>

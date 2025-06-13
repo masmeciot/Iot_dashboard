@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kreeda-IoT</title>
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="~/icon.png" />
+
+    <style>
+        .form-control {
+            color: white !important;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IoT File Upload</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">IoT File Upload</h4>
+                        <p class="card-title">Upload your file here.</p>
+                        <form class="form-sample" enctype="multipart/form-data" id="uploadForm">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+
+                                        <div class="col-sm-12">
+                                            <input type="file" class="form-control" name="file" id="file" accept=".bin" placeholder="Upload your file here">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button-container d-flex justify-content-center">
+                                <button type="button" class="btn btn-inverse-success btn-fw mx-2" id="upload" onclick="uploadFile()">Upload</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">IoT device Update</h4>
+                        <p class="card-title">Enter the device ID to send the message.</p>
+                        <div class="form-sample">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="deviceId" placeholder="Device ID" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button-container d-flex justify-content-center">
+                                <button type="button" class="btn btn-inverse-success btn-fw mx-2" id="update" onclick="updateDevice()">Update</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">IoT device Update for Module. </h4>
+                        <p class="card-title">Enter the module to send the messages.</p>
+                        <div class="form-sample">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" id="module" placeholder="Module" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button-container d-flex justify-content-center">
+                                <button type="button" class="btn btn-inverse-success btn-fw mx-2" id="update" onclick="updatemodule()">Update</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © KreedaFOF</span>
+        </div>
+    </footer>
+    <script>
+        function updateDevice() {
+            const deviceId = $("#deviceId").val();
+
+            if (!deviceId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Device ID is required.',
+                });
+                return;
+            }
+
+            // Show a "sending" pop-up
+            Swal.fire({
+                title: 'Sending...',
+                text: 'Please wait while we update the device.',
+                icon: 'info',
+                background: '#333',
+                 olor: 'white',
+                  confirmButtonColor: '#4caf50',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading(); // Show loading spinner
+                }
+            });
+
+            $.ajax({
+                url: '/UpdateDevice/UpdateDevice',
+                method: 'POST',
+                data: { deviceId: deviceId },
+                success: function (response) {
+                    Swal.close(); // Close the "sending" pop-up
+
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                                        background: '#333',
+                            color: 'white',
+                       confirmButtonColor: '#4caf50',
+                        });
+                         $("#deviceId").val('');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                                        background: '#333',
+                            color: 'white',
+                       confirmButtonColor: '#4caf50',
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.close(); // Close the "sending" pop-up
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'An unexpected error occurred.',
+                    });
+                }
+            });
+        }
+
+    </script>
+    <script>
+        function uploadFile() {
+            var formData = new FormData();
+            var fileInput = document.getElementById('file');
+            var file = fileInput.files[0];
+
+            if (!file) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No File Selected',
+                    text: 'Please select a file to upload!',
+                });
+                return;
+            }
+
+            formData.append("file", file);
+
+            $.ajax({
+                url: "/iotfile2/UploadFile",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'File uploaded successfully!',
+                         background: '#333',
+                            color: 'white',
+                       confirmButtonColor: '#4caf50',
+                        confirmButtonText: 'OK'
+                    });
+                },
+                error: function (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Upload Failed',
+                        text: error.responseText || 'An error occurred while uploading the file.',
+                    });
+                }
+            });
+        }
+    </script>
+
+
+    <script>
+
+                function updatemodule() {
+
+            const module = document.getElementById('module').value;
+
+            // Validation check
+            if (!module) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Please select a plant and enter a module.',
+                    icon: 'error',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#4caf50'
+                });
+                return;
+            }
+
+            // Show a processing alert
+            Swal.fire({
+                title: 'Sending.....',
+                text: 'Sending SYNC messages to devices in batches. Please wait.',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                background: '#333',
+                color: 'white'
+            });
+
+            // Fetch API for backend communication
+            fetch("/UpdateDevice/updatemodule", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ module: module })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display success or failure counts in SweetAlert
+                Swal.fire({
+                    title: 'Batch Sync Complete',
+                    html: `
+                        <p>Successfully sent: <b>${data.successCount}</b> devices.</p>
+                        <p>Failed to send: <b>${data.failureCount}</b> devices.</p>
+                    `,
+                    icon: 'success',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#4caf50'
+                });
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error during batch sync:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred during batch processing. Please try again.',
+                    icon: 'error',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#4caf50'
+                });
+            });
+        }
+
+    </script>
+</body>
+
+</html>

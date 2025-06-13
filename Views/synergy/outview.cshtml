@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/green.css" />
+
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 0.8rem; /* Reduce font size further */
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            height: 100%;
+        }
+
+        .table-responsive {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        .card-body {
+            width: 100%;
+            height: calc(100% - 20px); /* Ensure full height is utilized */
+        }
+
+        table {
+            font-size: 0.7rem; /* Further reduce font size to fit more content */
+            width: 100%;
+        }
+
+        th, td {
+            padding: 0.1rem; /* Reduce padding to allow more rows to fit */
+        }
+
+        /* Ensure table doesn't exceed screen height */
+        .table-responsive table tbody {
+            max-height: 95vh; /* Adjust this to fit all rows */
+            overflow: hidden; /* Prevent overflow */
+        }
+
+        #table thead th {
+            text-align: center;
+            color: steelblue;
+            font-size: 0.8rem; /* Slightly larger for header */
+        }
+
+        #table tbody td {
+            text-align: center;
+            color: white;
+        }
+
+        /* Add word wrapping in case of long content */
+        td {
+            white-space: nowrap;
+        }
+
+
+        .hidden-column {
+            display: none;
+        }
+
+
+    </style>
+</head>
+<body>
+
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-lg-16 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title text-warning">Hourly Output by Operation</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="table">
+                                            <thead>
+                                                <tr>
+                               
+                                                    <th>Operation</th>
+
+                                                    <th>6</th>
+                                                    <th>7</th>
+                                                    <th>8</th>
+                                                    <th>9</th>
+                                                    <th>10</th>
+                                                    <th>11</th>
+                                                    <th>12</th>
+                                                    <th>13</th>
+                                                    <th>14</th>
+                                                    <th>15</th>
+                                                    <th>16</th>
+                                                    <th>17</th>
+                                                    <th>18</th>
+                                                    <th>19</th>
+                                                    <th>20</th>
+                                                    <th>21</th>
+                                                   
+
+
+                                                  <!----  <th>Target</th>-->
+                                                    <th>Total count</th>
+                                                  
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+     
+        $(document).ready(function () {
+            let previousData = [];
+
+            function fetchData() {
+                $.ajax({
+                    url: '/synout/GetIotData',
+                    type: 'GET',
+                    success: function (data) {
+                        var tableBody = $('#table tbody');
+                        tableBody.empty();
+
+                        var previousModule = '';
+
+                        data.forEach(function (item, index) {
+                            if (previousModule && previousModule !== item.module) {
+                                var emptyRow = '<tr><td colspan="17"></td></tr>';
+                                tableBody.append(emptyRow);
+                            }
+
+                            var rowClass = '';
+
+                            // Compare new data with previous data
+                            if (previousData.length > 0 && previousData[index]) {
+                                if (JSON.stringify(item) !== JSON.stringify(previousData[index])) {
+                                    rowClass = 'blink-green'; // Apply blink effect if data changed
+                                }
+                            }
+
+                            var row = '<tr class="' + rowClass + '" ondblclick="redirectToDetailsPage(this)">' +
+                      
+                                '<td class="custom-text-color">' + (item.operation || '') + '</td>' +
+ 
+            
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h6, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h7, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h8, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h9, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h10, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h11, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h12, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h13, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h14, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h15, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h16, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h17, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h18, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h19, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h20, item.target) + '</td>' +
+                                '<td class="custom-text-color1">' + getColorCodedCell(item.h21, item.target) + '</td>' +
+                              
+                               //'<td>' + (item.target || '') + '</td>' +
+                                '<td class="custom-text-color2">' + (item.sum || '') + '</td>' +
+                          
+                                '<td class="hidden-column">' + (item.style) + '</td>' +
+                                '<td class="hidden-column">' + (item.mac) + '</td>' +
+                                '<td class="hidden-column">' + (item.plant) + '</td>' +
+                                '</tr>';
+                            tableBody.append(row);
+
+                            previousModule = item.module;
+                        });
+
+                        // Store the new data as the previous data for the next fetch
+                        previousData = data;
+
+                        // Remove blink class after a short duration
+                        setTimeout(function () {
+                            $('.blink-green').removeClass('blink-green');
+                        }, 1000); // Blink for 1 second
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data: " + error);
+                    }
+                });
+            }
+
+            function getColorCodedCell(value, target) {
+                var percentage = (value / target) * 100;
+                var color = '';
+
+                if (percentage < 30) {
+                    color = 'text-danger';
+                } else if (percentage >= 30 && percentage < 70) {
+                    color = 'text-warning';
+                } else if (percentage >= 70) {
+                    color = 'text-success';
+                }
+
+                return '<span class="' + color + '">' + value + '</span>';
+            }
+
+            fetchData();
+            setInterval(fetchData, 60000);
+        });
+
+     
+    </script>
+</body>
+</html>

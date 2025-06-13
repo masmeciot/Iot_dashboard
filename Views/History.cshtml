@@ -1,0 +1,966 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+    <style>
+        .top-four-grids .card {
+            width: 150px;
+            height: 100px;
+            position: relative;
+        }
+
+        .top-four-grids .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+
+        #aCard {
+            height: 280px; /* Adjust the height as needed */
+          
+        }
+
+
+        .top-four-grids .card-body {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Center-align h2 */
+        div.card-body > div.row > div.col-9 > div.d-flex.align-items-center.align-self-start > h2.mb-0 {
+            text-align: center;
+            font-size: 28px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Real Time Monthly Data</h3>
+
+            </li>
+        </ul>
+
+
+    </div>
+
+
+
+    <div class="content-wrapper">
+
+        <div class="row top-four-grids">
+            <!-- Add a class for the top four grids -->
+            <div class="col-xl-2  stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h2 class="mb-0" id="efficiencyPercentage">0</h2>
+                                    <p class="text-success ml-2 mb-0 font-weight-medium" id="efficiencyPercentageDeviation">+0%</p>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="icon icon-box-success align-items-left " id="efficiencyPercentageBox">
+                                    <span class="mdi mdi-arrow-top-center icon-item" id="efficiencyPercentageArrow"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal">Average of Efficency</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h2 class="mb-0" id="countSum">0</h2>
+                                    <p class="text-success ml-2 mb-0 font-weight-medium" id="countSumDeviation">+0%</p>
+                                </div>  
+                            </div>
+                            <div class="col-3">
+                                <div class="icon icon-box-success align-items-left" id="countSumBox">
+                                    <span class="mdi mdi-arrow-top-center icon-item" id="countSumArrow"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal">Total Pieces Count</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card ">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h2 class="mb-0" id="performance">0</h2>
+                                    <p class="text-danger ml-2 mb-0 font-weight-medium" id="performanceDeviation">-2.4%</p>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="icon icon-box-danger" id="performanceBox">
+                                    <span class="mdi mdi-arrow-bottom-left icon-item" id="performanceArrow"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal">Average of Performance</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h2 class="mb-0" id="hour">0</h2>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <h6 class="text-muted font-weight-normal">Yesterday Pieces count</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h2 class="mb-0" id="pc">0</h2>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <h6 class="text-muted font-weight-normal">Next month prediction</h6>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h2 class="mb-0" id="machines">0</h2>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <h6 class="text-muted font-weight-normal">Worked Machines</h6>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+        <div class="row">
+
+            <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card" id="aCard">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Monthly Pieces count</h4>
+                        <canvas id="areaChart1" style="height:50px"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card" id="aCard">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Monthly Efficency Average</h4>
+                        <canvas id="areaChart2" style="height:50px"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card" id="aCard">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Summary of Cycle Time by Module</h4>
+                        <canvas id="barChart" style="height:50px"></canvas>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="row ">
+            <div class="col-lg-7 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">Lowest performance by User for Month</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="cycle">
+                                <thead>
+                                    <tr>
+                                        <th>Module</th>
+                                        <th>User</th>
+                                        <th>User Name</th>
+                                        <th>Avg Cycle Std.</th>
+                                        <th>Avg Cycle Time</th>
+                                        <th>Avg of Eff.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+           <!-- <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">Pices count contribution</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="count">
+                                <thead>
+                                    <tr>
+                                        <th> Module </th>
+                                        <th> Operation </th>
+                                        <th> User Name </th>
+
+                                        <th> Count </th>
+                                        <th> Efficency</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>-->
+            <div class="col-lg-5 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">Summary of Module</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="module">
+                                <thead>
+                                    <tr>
+                                        <th> Module </th>
+                                        <th> Pieces Count </th>
+                                        <th> Cycle Time </th>
+                                        <th> Efficency </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.12/signalr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+
+        $(document).ready(function () {
+            const connection = new signalR.HubConnectionBuilder().withUrl("/HistoryHub").build();
+            let previousEfficiency = null;
+
+            connection.start()
+                .then(() => {
+                   console.log("Connection started");
+                    setInterval(pollForMetrics, 1000);
+                })
+                .catch(err => console.error(err.toString()));
+
+            connection.on("ReceiveEfficiencyUpdate", function (data) {
+                updateMetricWithDeviation("efficiencyPercentage", Math.floor(data.averageEfficiency), data.efficiencyDeviation);
+                updateMetricWithDeviation("performance", Math.floor(data.performance1), data.performanceDeviation);
+                updateMetricWithDeviation("countSum", Math.floor(data.countSum), data.countDeviation);
+                updateMetricWithDeviation("machines", Math.floor(data.distinctChipCounts), data.machinesDeviation);
+                updateMetricWithDeviation("hour", Math.floor(data.countSumForHour));
+                updateMetricWithDeviation("pc", Math.floor(data.predictedCountForNextThirtyDays));
+            });
+            function updateMetricWithDeviation(metricId, currentValue, deviation) {
+                const metricElement = $(`#${metricId}`);
+                const deviationElement = $(`#${metricId}Deviation`);
+                const iconBoxElement = $(`#${metricId}Box`);
+                const iconArrowElement = $(`#${metricId}Arrow`);
+
+                const isEfficiencyOrPerformance = metricId === 'efficiencyPercentage' || metricId === 'performance';
+
+                if (currentValue === null || isNaN(currentValue)) {
+                    metricElement.text('loading');
+                    deviationElement.text('');
+                    return;
+                }
+                if (isEfficiencyOrPerformance) {
+                    metricElement.text(currentValue + '%');
+                } else {
+                    metricElement.text(currentValue);
+                }
+
+                const roundedDeviation = Math.round(deviation);
+                if (deviationElement.length) {
+                    if (isEfficiencyOrPerformance) {
+                        deviationElement.text(roundedDeviation > 0 ? `+${roundedDeviation}%` : `${roundedDeviation}%`);
+                        deviationElement.toggleClass('text-success', deviation >= 0);
+                        deviationElement.toggleClass('text-danger', deviation < 0);
+                    } else {
+                        deviationElement.text(roundedDeviation > 0 ? `+${roundedDeviation}` : `${roundedDeviation}`);
+                        deviationElement.toggleClass('text-success', deviation >= 0);
+                        deviationElement.toggleClass('text-danger', deviation < 0);
+                    }
+
+
+                    //console.log('Deviation:', deviation);
+
+                    if (iconBoxElement.length && iconArrowElement.length) {
+                        if (deviation >= 0) {
+
+                            iconBoxElement.removeClass('icon-box-danger').addClass('icon-box-success');
+                            iconArrowElement.removeClass('mdi-arrow-bottom-left').addClass('mdi-arrow-top-right');
+                        } else {
+
+                            iconBoxElement.removeClass('icon-box-success').addClass('icon-box-danger');
+                            iconArrowElement.removeClass('mdi-arrow-top-right').addClass('mdi-arrow-bottom-left');
+                        }
+                    }
+                }
+            }
+
+
+
+            function pollForMetrics() {
+                fetch("/History/GetAverageEfficiency")
+                    .then(response => response.json())
+                    .then(data => {
+                        // console.log('Data:', data);
+
+                        updateMetricWithDeviation("efficiencyPercentage", Math.floor(data.averageEfficiency), Math.floor(data.efficiencyDeviation));
+                        updateMetricWithDeviation("performance", Math.floor(data.performance1), Math.floor(data.performanceDeviation));
+
+
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+        });
+    </script>
+
+
+
+
+    <script>
+        const ctx = document.getElementById('areaChart1').getContext('2d');
+
+        var areaOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 20 // Adjust this value as needed
+                }
+            },
+            plugins: {
+                filler: {
+                    propagate: true
+                }
+            },
+            scales: {
+                yAxes: [{
+                    min: 0,
+                    max: 120,
+                    ticks: {
+                        stepSize: 10
+                    },
+                    gridLines: {
+                        color: "rgba(204, 204, 204,0.1)"
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        color: "rgba(204, 204, 204,0.1)"
+                    }
+                }]
+            }
+        }
+
+
+
+
+        const areaChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: areaOptions
+        });
+
+        // Previous data
+        let previousHourlyCounts = [];
+
+        function updateAreaChart(data) {
+            try {
+                const hourlyCounts = data.map(entry => entry.CountSum);
+                const hours = data.map(entry => entry.Date);
+
+                if (!hourlyCounts || hourlyCounts.length === 0 || !hours || hours.length === 0) {
+                    console.log('No data to update.');
+                    return;
+                }
+
+                if (!previousHourlyCounts.length) {
+                    areaChart.data.labels = hours;
+                    areaChart.data.datasets.push({
+                        label: 'Monthly Counts',
+                        data: hourlyCounts,
+                        backgroundColor: [
+                            'rgba(92, 184, 92, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                        ],
+                        borderColor: [
+                            'rgba(92, 184, 92, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)', 
+                        ],
+                        borderWidth: 1,
+                        fill: true,
+                        lineTension: 0.4,
+                    });
+                    areaChart.update();
+                    previousHourlyCounts = hourlyCounts.slice();
+                    return;
+                }
+
+                const changedIndices = hourlyCounts.reduce((indices, value, index) => {
+                    if (value !== previousHourlyCounts[index]) {
+                        indices.push(index);
+                    }
+                    return indices;
+                }, []);
+
+                if (changedIndices.length > 0) {
+                    changedIndices.forEach(index => {
+                        areaChart.data.datasets[0].data[index] = hourlyCounts[index];
+                    });
+                    areaChart.update();
+                }
+
+                previousHourlyCounts = hourlyCounts.slice();
+            } catch (error) {
+                console.error('Error updating area chart:', error);
+            }
+        }
+
+        function fetchAndRefreshChart() {
+            fetch("/History/GetDailyCountForLast30Days")
+                .then(response => response.json())
+                .then(data => {
+                    //console.log('Hourly pieces count for today:', data);
+                    updateAreaChart(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndRefreshChart();
+        setInterval(fetchAndRefreshChart, 100);
+    </script>
+
+
+
+    <script>
+        const ctx1 = document.getElementById('areaChart2').getContext('2d');
+
+        var area1Options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 20 // Adjust this value as needed
+                }
+            },
+            plugins: {
+                filler: {
+                    propagate: true
+                }
+            },
+            scales: {
+                yAxes: [{
+                    min: 0,
+                    max: 120,
+                    ticks: {
+                        stepSize: 10
+                    },
+                    gridLines: {
+                        color: "rgba(204, 204, 204,0.1)"
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        color: "rgba(204, 204, 204,0.1)"
+                    }
+                }]
+            }
+        }
+
+
+
+
+        const areaChart1 = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: area1Options
+        });
+
+        // Previous data
+        let previousHourlyCounts1 = [];
+
+        function updateAreaChart1(data) {
+            try {
+                const hourlyCounts1 = data.map(entry => entry.eff);
+                const hours1 = data.map(entry => entry.Date);
+
+                if (!hourlyCounts1 || hourlyCounts1.length === 0 || !hours1 || hours1.length === 0) {
+                    console.log('No data to update.');
+                    return;
+                }
+
+                if (!previousHourlyCounts1.length) {
+                    areaChart1.data.labels = hours1;
+                    areaChart1.data.datasets.push({
+                        label: 'Efficency',
+                        data: hourlyCounts1,
+                        backgroundColor: [
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(92, 184, 92, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                        ],
+                        borderColor: [
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(92, 184, 92, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(75, 192, 192, 1)',
+
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                        ],
+                        borderWidth: 1,
+                        fill: true,
+                        lineTension: 0.4,
+                    });
+                    areaChart1.update();
+                    previousHourlyCounts1 = hourlyCounts1.slice();
+                    return;
+                }
+
+                const changedIndices1 = hourlyCounts1.reduce((indices, value, index) => {
+                    if (value !== previousHourlyCounts1[index]) {
+                        indices.push(index);
+                    }
+                    return indices;
+                }, []);
+
+                if (changedIndices1.length > 0) {
+                    changedIndices1.forEach(index => {
+                        areaChart1.data.datasets[0].data[index] = hourlyCounts1[index];
+                    });
+                    areaChart1.update();
+                }
+
+                previousHourlyCounts1 = hourlyCounts1.slice();
+            } catch (error) {
+                console.error('Error updating area chart:', error);
+            }
+        }
+
+        function fetchAndRefreshChart1() {
+            fetch("/History/GetHourlyEfficiencyForLast30Days")
+                .then(response => response.json())
+                .then(data => {
+                    //console.log('Hourly efff for today:', data);
+                    updateAreaChart1(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndRefreshChart1();
+        setInterval(fetchAndRefreshChart1, 100);
+    </script>
+
+
+
+    <!-- table -->
+    <script>
+        function fetchAndUpdateTable() {
+            fetch('/History/GetTop3LowestEfficiencyUsers')
+                .then(response => response.json())
+                .then(data => {
+                    // console.log('table:', data);
+                    const table = document.getElementById('cycle');
+                    const tableBody = table.querySelector('tbody');
+                    tableBody.innerHTML = '';
+
+                    data.forEach(entry => {
+                        const row = document.createElement('tr');
+                        let efficiencyValue = Math.floor(entry.efficiencyAvg);
+                        let efficiencyClass = '';
+                        let efficiencyIcon = '';
+
+                        if (parseFloat(efficiencyValue) < 40) {
+                            efficiencyClass = 'text-danger';
+                            efficiencyIcon = '<i class="mdi mdi-arrow-down"></i>';
+                        } else {
+                            efficiencyClass = 'text-success';
+                            efficiencyIcon = '<i class="mdi mdi-arrow-up"></i>';
+                        }
+
+                        row.innerHTML = `
+                                                <td>${entry.module}</td>
+                                                <td>${entry.userID}</td>
+                                                <td>${entry.userName}</td>
+
+                                                        <td>${Math.floor(entry.cycleStandAvg)}</td>
+                                                                <td>${Math.floor(entry.cycleActAvg)}</td>
+                                        
+                                        <td class="${efficiencyClass}">${efficiencyValue}% ${efficiencyIcon}</td>
+                                    `;
+
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndUpdateTable();
+        setInterval(fetchAndUpdateTable, 100);
+    </script>
+
+
+
+
+
+    <!-- table 
+    <script>
+        function fetchAndUpdateTable() {
+            fetch('/History/GetUserDataForLast30Days')
+                .then(response => response.json())
+                .then(data => {
+                    //  console.log('table:', data);
+                    const table = document.getElementById('count');
+                    const tableBody = table.querySelector('tbody');
+                    tableBody.innerHTML = '';
+
+                    if (Array.isArray(data)) {
+                        data.forEach(item => {
+                            const entry = item.data;
+
+                            const row = document.createElement('tr');
+                            let efficiencyValue = Math.floor(item.efficiency);
+                            let efficiencyClass = '';
+
+                            if (parseFloat(efficiencyValue) < 40) {
+                                efficiencyClass = 'text-danger';
+                            } else {
+                                efficiencyClass = 'text-success';
+                            }
+
+                            row.innerHTML = `
+                                        <td>${entry.module}</td>
+                                        <td>${entry.operation}</td>
+                                        <td>${entry.userName}</td>
+
+
+                                        <td>${item.countSum}</td>
+                                        <td class="${efficiencyClass}">${efficiencyValue}%</td>
+                                    `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        console.error('Data is not an array.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndUpdateTable();
+        setInterval(fetchAndUpdateTable, 100);
+
+
+
+
+
+    </script>-->
+
+
+
+
+
+
+    <!-- table -->
+    <script>
+        function fetchAndUpdateTable() {
+            fetch('/History/GetModuleDataForLast30Days')
+                .then(response => response.json())
+                .then(data => {
+                    // console.log('table:', data);
+                    const table = document.getElementById('module');
+                    const tableBody = table.querySelector('tbody');
+                    tableBody.innerHTML = '';
+
+                    if (Array.isArray(data)) {
+                        data.forEach(item => {
+                            const entry = item.data;
+
+                            const row = document.createElement('tr');
+                            let efficiencyValue = Math.floor(item.efficiency);
+                            let efficiencyClass = '';
+
+                            if (parseFloat(efficiencyValue) < 40) {
+                                efficiencyClass = 'text-danger';
+                            } else {
+                                efficiencyClass = 'text-success';
+                            }
+
+
+                            row.innerHTML = `
+                                        <td>${entry.module}</td>
+                                                 <td>${item.countSum}</td>
+                                        <td>${Math.floor(item.cycleAv)}</td>
+
+                                        <td class="${efficiencyClass}">${efficiencyValue}%</td>
+                                    `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        console.error('Data is not an array.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchAndUpdateTable();
+        setInterval(fetchAndUpdateTable, 100);
+
+
+
+
+
+    </script>
+
+
+
+    <!-- Bar chart -->
+
+    <script>
+        let barChart;
+
+        function fetchDataAndUpdateChart() {
+            fetch('/History/GetGroupedChartDataForLast30Days')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('GetGroupedChartDataForLast30Days:', data);
+
+                    const sortedData = data.sort((a, b) => {
+                        const numA = parseInt(a.label.match(/\d+/));
+                        const numB = parseInt(b.label.match(/\d+/));
+                        return numA - numB;
+                    });
+
+                    const labels = sortedData.map(item => `${item.label} - ${item.efficiency}%`);
+                    const cycleActAverages = sortedData.map(item => item.data[0]);
+                    const cycleStandAverages = sortedData.map(item => item.data[1]);
+
+                    if (!barChart) {
+                        const barChartCanvas = document.getElementById('barChart').getContext('2d');
+                        barChart = new Chart(barChartCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [
+                                    {
+                                        label: 'Cycle Standard Average',
+                                        data: cycleStandAverages,
+                                        backgroundColor: 'rgba(255, 77, 77, 0.5)',
+                                        borderColor: 'rgba(255, 77, 77, 1)',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Cycle Actual Average',
+                                        data: cycleActAverages,
+                                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                                        borderColor: 'rgba(255, 206, 86, 1)',
+                                        borderWidth: 1
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        bottom: 20 // Adjust this value as needed
+                                    }
+                                },
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        barChart.data.labels = labels;
+                        barChart.data.datasets[1].data = cycleActAverages;
+                        barChart.data.datasets[0].data = cycleStandAverages;
+                        barChart.update();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchDataAndUpdateChart();
+        setInterval(fetchDataAndUpdateChart, 100);
+
+    </script>
+
+
+
+
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+
+        </div>
+    </footer>
+    <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="~/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="~/vendors/chart.js/Chart.min.js"></script>
+    <script src="~/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="~/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/hoverable-collapse.js"></script>
+    <script src="~/js/misc.js"></script>
+    <script src="~/js/settings.js"></script>
+    <script src="~/js/todolist.js"></script>
+    <!-- <script src="~/js/chart.js"></script> -->
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="~/js/dashboard.js"></script>
+
+
+    <!-- End custom js for this page -->
+</body>
+
+</html>

@@ -1,0 +1,289 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.12/signalr.min.js"></script>
+
+    <style>
+        /* Change text color of table header */
+        #table thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #table tbody td {
+            color: white;
+        }
+
+
+
+
+        .status-waiting {
+            color: plum !important;
+        }
+
+        .status-on-the-way {
+            color: aqua !important;
+        }
+
+        .status-arrived {
+            color: greenyellow !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Send AMR to FG</h3>
+            </li>
+        </ul>
+
+
+    </div>
+
+
+
+    <div class="content-wrapper">
+
+        <div class="row">
+
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">Pending AMR jobs</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="table">
+                                <thead>
+                                    <tr>
+                                        <th> ID </th>
+                                        <th> TRNO </th>
+                                        <th> Date </th>
+                                        <th> Job ID </th>
+                                        <th> Location </th>
+                                        <th> Time </th>
+
+                                        <th> Status </th>
+                                        <th> Send </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © KREEDA</span>
+
+        </div>
+    </footer>
+
+    <script>
+
+
+/*
+        //  using SignalR
+        async function onClickConfirm(id) {
+            try {
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl("/FG1Hub")
+                    .build();
+
+                await connection.start();
+
+                await connection.invoke("TriggerUpdate", id.toString());
+                console.log(`Status update triggered for item with ID ${id}`);
+            } catch (error) {
+                console.error(`Error triggering status update for ID ${id}: ${error}`);
+            }
+        }
+        */
+
+
+        function updateData(rowIndex) {
+            try {
+                const table = document.getElementById('table');
+                const row = table.rows[rowIndex];
+
+
+                const ID = row.cells[0].textContent.trim();
+                                        // Disable the Send button immediately to prevent multiple submissions
+                const sendBtn = row.querySelector('button');
+                if (sendBtn) {
+                   sendBtn.disabled = true;
+                }
+
+
+                const updatedData = {
+                    ID: ID,
+
+                };
+
+                $.ajax({
+                    url: '/FG1/UpdateData',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedData),
+                    success: function (response) {
+                        console.log('Data updated successfully:', response);
+
+                    },
+                    error: function (error) {
+                        console.error('Error updating data:', error);
+                        if (sendBtn) {
+                            sendBtn.disabled = false;
+                        }
+
+                    }
+                });
+            } catch (error) {
+                console.error('Error updating data:', error);
+
+            }
+        }
+
+
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/FG1/GetData');
+                const data = await response.json();
+
+                const tableBody = document.querySelector('#table tbody');
+                tableBody.innerHTML = '';
+
+                data.forEach(item => {
+                    // Log the status value to the console
+                    // console.log(`Item status from server: ${item.status}`);
+
+                    const row = document.createElement('tr');
+                    let statusClass = '';
+
+                    // Set the CSS class based on the status
+                    switch (item.status.toLowerCase()) {
+                        case 'waiting':
+                            statusClass = 'status-waiting';
+                            break;
+                        case 'on the way':
+                            statusClass = 'status-on-the-way';
+                            break;
+                        case 'arrived':
+                            statusClass = 'status-arrived';
+                            break;
+                        default:
+                            break;
+                    }
+
+                 
+                    console.log(`Selected status class: ${statusClass}`);
+
+                    // Set the row HTML with the proper status class
+                    row.innerHTML = `
+                                <td>${item.id}</td>
+                                        <td class="custom-text-color">${item.tRNO}</td>
+                                <td>${item.date}</td>
+                                <td>${item.job}</td>
+                                <td>${item.location}</td>
+                                <td>${item.time}</td>
+                                <td class="${statusClass}">${item.status}</td>
+                                <td>
+                                    <button class="btn btn-inverse-success btn-fw"
+                                                    onclick="updateData(this.parentNode.parentNode.rowIndex)"
+                                            ${item.status.toLowerCase() !== 'arrived' ? 'disabled' : ''}>
+                                        Send
+                                    </button>
+                                </td>
+                            `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error(`Error fetching data: ${error}`);
+            }
+        }
+
+
+        fetchData();
+        setInterval(fetchData, 200000);
+
+
+
+    </script>
+
+
+
+    <!-- main-panel ends -->
+    <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="~/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="~/vendors/chart.js/Chart.min.js"></script>
+    <script src="~/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="~/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/hoverable-collapse.js"></script>
+    <script src="~/js/misc.js"></script>
+    <script src="~/js/settings.js"></script>
+    <script src="~/js/todolist.js"></script>
+    <!-- <script src="~/js/chart.js"></script> -->
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="~/js/dashboard.js"></script>
+    <!-- End custom js for this page -->
+</body>
+
+</html>

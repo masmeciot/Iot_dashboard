@@ -1,0 +1,287 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="~/icon.png" />
+
+    <style>
+        .form-control {
+            color: white !important;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+
+        .chartjs-render-monitor {
+            color: white !important;
+        }
+
+        .chartjs-legend ul li span {
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Different between FG Out and the Count</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Cycle time Data</h4>
+                        <p class="card-title">Filter the cycle data.</p>
+                        <form class="form-sample">
+                            <div class="row">
+                               
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Select Style</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="style">
+                                                <option>DX5416</option>
+                                                <option>BV2671</option>
+                            
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Select Module</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="module">
+                                                <option>SYN33</option>
+                                                <option>SYN31</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="button-container d-flex justify-content-center">
+                            <button type="submit" onclick="search()" class="btn btn-inverse-success btn-fw mx-2" id="applyFilterButton">Apply Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+  
+            <div class="col-lg-8 grid-margin stretch-card" style="height: 570px;">
+                <div class="card stretch-card">
+                    <div class="card-body" style="height: 280px;">
+                        <div class="raw">
+                            <h4 id="fofTitle" class="card-title text-warning">Module</h4>
+                        </div>
+                        <canvas id="barChart1" style="height: 90%; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+      
+
+        <div class="col-lg-4 grid-margin">
+            <div class="card">
+                    <div class="card-body align-items-center" >
+                    <h4 class="card-title text-warning">Summary</h4>
+                    <canvas id="pieChart" style="height:180px"></canvas>
+
+
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+
+
+        // Declare pieChart and barChart as global variabls
+        let pieChart, barChart;
+
+        function search() {
+            const style = $('#style').val();
+            const module = $('#module').val();
+            console.log("Selected Style:", style);
+            console.log("Selected Module:", module);
+
+            $.ajax({
+                url: '/DifferentBetweenCounts/GetChipIdDifferences',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ style, module }),
+                success: function (response) {
+                    console.log(response);
+
+                    const fgCount = response.fgcount;
+                    const differences = response.differences; 
+
+                    
+                    $('#fofTitle').text(`FG COUNT = ${fgCount}`);
+
+                    // Define the fixed module order (M01 to M28)
+                    const fixedOrder = Array.from({ length: 28 }, (_, i) => `M${String(i + 1).padStart(2, '0')}`);
+
+                    // Create arrays for labels and values based on the fixed order
+                    const labels = fixedOrder;
+                    const values = labels.map(label => (differences[label] >= 0 ? differences[label] : 0)); 
+
+                    // Filter out labels and values where the value is 0
+                    const filteredLabels = labels.filter((label, index) => values[index] > 0);
+                    const filteredValues = values.filter(value => value > 0);
+
+                    console.log("Filtered Labels (non-zero values):", filteredLabels);
+                    console.log("Filtered Values (non-zero):", filteredValues); 
+
+                    // Destroy the previous bar chart if it exists
+                    if (barChart) {
+                        barChart.destroy();
+                    }
+
+                    // Create the bar chart
+                    const ctxBar = document.getElementById('barChart1').getContext('2d');
+                    barChart = new Chart(ctxBar, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Difference from FG Count',
+                                data: values,
+                                backgroundColor: 'rgba(255, 206, 86, 0.3)',
+                                borderColor: 'rgba(255, 206, 86, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                datalabels: {
+                                    color: 'white',
+                                    anchor: 'center',
+                                    align: 'center',
+                                    offset: 0,
+                                    formatter: function (value, context) {
+                                        return value;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+
+                    // Destroy the previous pie chart if it exists
+                    if (pieChart) {
+                        pieChart.destroy();
+                    }
+
+                    // Create the pie chart with filtered data (no 0 values)
+                    const ctxPie = document.getElementById('pieChart').getContext('2d');
+                    pieChart = new Chart(ctxPie, {
+                        type: 'pie',
+                        data: {
+                            labels: filteredLabels, 
+                            datasets: [{
+                                label: 'Module Distribution',
+                                data: filteredValues,
+                                backgroundColor: filteredValues.map((_, index) => `hsl(${index * 360 / filteredLabels.length}, 70%, 70%)`), 
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        filter: function (legendItem, chartData) {
+                                            // Hide legend for items where value is 0
+                                            const labelIndex = chartData.labels.indexOf(legendItem.text);
+                                            return chartData.datasets[0].data[labelIndex] > 0;
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                        }
+                                    }
+                                },
+                                datalabels: {
+                                    color: 'white',
+                                    font: {
+                                        weight: 'bold'
+                                    },
+                                    formatter: function (value, context) {
+                                        return value; // Show the value on the pie chart
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                },
+                error: function (err) {
+                    console.error("Error:", err.responseJSON.error);
+                }
+            });
+        }
+
+
+
+
+
+
+
+
+
+       
+    </script>
+
+    <!-- content-wrapper ends -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © KreedaFOF</span>
+        </div>
+    </footer>
+</body>
+</html>

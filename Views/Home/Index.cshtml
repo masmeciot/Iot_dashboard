@@ -19,13 +19,13 @@
     <!-- inject:css -->
     <!-- endinject -->
     <!-- Layout styles -->
-    <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/style.css" />
     <!-- End layout styles -->
-    <link rel="shortcut icon" href="~/images/favicon.png" />
+    <link rel="shortcut icon" href="~/icon.png" />
     <style>
         .top-four-grids .card {
             width: 150px;
-            height: 150px;
+            height: 100px;
             position: relative;
         }
 
@@ -35,6 +35,12 @@
             justify-content: center;
             height: 100%;
             text-align: center;
+        }
+
+
+        #aCard {
+            height: 240px; /* Adjust the height as needed */
+            /* Add any other desired styling */
         }
 
 
@@ -55,23 +61,57 @@
             font-size: 28px; 
         }
     </style>
+
+    <style>
+        /* Change text color of table header */
+        #cycle thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #cycle tbody td {
+            color: white;
+        }
+
+    </style>
+
+    <style>
+        /* Change text color of table header */
+        #module thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #module tbody td {
+            color: white;
+        }
+
+
+    </style>
+    <style>
+        .text-muted {
+            color: limegreen !important;
+        }
+    </style>
+
+
 </head>
 
 <body>
-
 
 
     <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
 
         <ul class="navbar-nav w-100">
             <li class="nav-item w-100">
-                <h3 style="text-align: center;">IOT Device Data</h3>
+                <h3 style="text-align: center;">Real Time Data</h3>
 
             </li>
         </ul>
 
 
     </div>
+
 
 
     <div class="content-wrapper">
@@ -84,17 +124,17 @@
                         <div class="row">
                             <div class="col-9">
                                 <div class="d-flex align-items-center align-self-start">
-                                    <h1 class="mb-0" id="efficiencyPercentage">loading</h1>
+                                    <h2 class="mb-0" id="efficiencyPercentage">0</h2>
                                     <p class="text-success ml-2 mb-0 font-weight-medium" id="efficiencyPercentageDeviation">+0%</p>
                                 </div>
                             </div>
                             <div class="col-3">
-                                <div class="icon icon-box-success " id="efficiencyPercentageBox">
-                                    <span class="mdi mdi-arrow-top-right icon-item" id="efficiencyPercentageArrow"></span>
+                                <div class="icon icon-box-success align-items-left " id="efficiencyPercentageBox">
+                                    <span class="mdi mdi-arrow-top-center icon-item" id="efficiencyPercentageArrow"></span>
                                 </div>
                             </div>
                         </div>
-                        <h3 class="text-muted font-weight-normal">Total Efficency</h3>
+                        <h6 class="text-muted font-weight-normal">Total Performance</h6>
                     </div>
                 </div>
             </div>
@@ -104,17 +144,34 @@
                         <div class="row">
                             <div class="col-9">
                                 <div class="d-flex align-items-center align-self-start">
-                                    <h1 class="mb-0" id="countSum">loading</h1>
+                                    <h2 class="mb-0" id="countSum">0</h2>
                                     <p class="text-success ml-2 mb-0 font-weight-medium" id="countSumDeviation">+0%</p>
                                 </div>
                             </div>
                             <div class="col-3">
                                 <div class="icon icon-box-success align-items-left" id="countSumBox">
-                                    <span class="mdi mdi-arrow-top-right icon-item" id="countSumArrow"></span>
+                                    <span class="mdi mdi-arrow-top-center icon-item" id="countSumArrow"></span>
                                 </div>
                             </div>
                         </div>
-                        <h4 class="text-muted font-weight-normal">Total Pieces Count</h4>
+                        <h6 class="text-muted font-weight-normal">Total Pieces Count</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-2 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center align-self-start">
+                                    <h2 class="mb-0" id="hour">0</h2>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <h6 class="text-muted font-weight-normal">Hourly Pieces count</h6>
                     </div>
                 </div>
             </div>
@@ -124,49 +181,13 @@
                         <div class="row">
                             <div class="col-9">
                                 <div class="d-flex align-items-center align-self-start">
-                                    <h1 class="mb-0" id="performance">loading</h1>
-                                    <p class="text-danger ml-2 mb-0 font-weight-medium" id="performanceDeviation">-2.4%</p>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="icon icon-box-danger" id="performanceBox">
-                                    <span class="mdi mdi-arrow-bottom-left icon-item" id="performanceArrow"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <h4 class="text-muted font-weight-normal">Performance</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-2 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body align-items-center">
-                        <div class="row">
-                            <div class="col-9">
-                                <div class="d-flex align-items-center align-self-start">
-                                    <h1 class="mb-0" id="hour">loading</h1>
+                                    <h2 class="mb-0" id="pc">0</h2>
 
                                 </div>
                             </div>
 
                         </div>
-                        <h4 class="text-muted font-weight-normal">Hourly Pieces count</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-2 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body align-items-center">
-                        <div class="row">
-                            <div class="col-9">
-                                <div class="d-flex align-items-center align-self-start">
-                                    <h1 class="mb-0" id="pc">loading</h1>
-
-                                </div>
-                            </div>
-
-                        </div>
-                        <h4 class="text-muted font-weight-normal">Pieces count Predection for day </h4>
+                        <h6 class="text-muted font-weight-normal">Day Prediction </h6>
                     </div>
                 </div>
             </div>
@@ -176,45 +197,64 @@
                         <div class="row">
                             <div class="col-9">
 
-                                <h1 class="mb-0 " id="machines">loading</h1>
+                                <h2 class="mb-0 " id="machines">0</h2>
                               
                               
                               
                               
                             </div>
-                            <h3 class="text-muted font-weight-normal ">Active Machines</h3>
+                            <h6 class="text-muted font-weight-normal">Active Machines</h6>
                         </div>
                         
                     </div>
                 </div>
             </div>
+
+                        <div class="col-xl-2 grid-margin stretch-card ">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <div class="row">
+                            <div class="col-9">
+
+                                <h2 class="mb-0" id="">MEC</h2>
+
+
+
+
+                            </div>
+                            <h6 class="text-muted font-weight-normal">Plant</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
 
         <div class="row">
 
             <div class="col-lg-4 grid-margin stretch-card">
-                <div class="card">
+                <div class="card" id="aCard">
                     <div class="card-body">
                         <h4 class="card-title text-warning">Hourly Pieces count</h4>
-                        <canvas id="areaChart1" style="height:250px"></canvas>
+                        <canvas id="areaChart1" style="height:50px"></canvas>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-4 grid-margin stretch-card">
-                <div class="card">
+                <div class="card" id="aCard">
                     <div class="card-body">
-                        <h4 class="card-title text-warning">Summary of Efficency</h4>
-                        <canvas id="areaChart2" style="height:250px"></canvas>
+                        <h4 class="card-title text-warning">Hourly Performance Average</h4>
+                        <canvas id="areaChart2" style="height:50px"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 grid-margin stretch-card">
-                <div class="card">
+                <div class="card" id="aCard">
                     <div class="card-body">
-                        <h4 class="card-title text-warning">Summary of Efficency</h4>
-                        <canvas id="barChart" style="height:250px"></canvas>
+                        <h4 class="card-title text-warning">Summary of Cycle Time by Module</h4>
+                        <canvas id="barChart" style="height:50px"></canvas>
                     </div>
                 </div>
             </div>
@@ -223,10 +263,10 @@
         </div>
 
         <div class="row ">
-            <div class="col-lg-4 grid-margin stretch-card">
+            <div class="col-lg-7 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body align-items-center">
-                        <h4 class="card-title text-warning">Last circle</h4>
+                        <h4 class="card-title text-warning">Last cycle data</h4>
                         <div class="table-responsive">
                             <table class="table table-hover" id="cycle">
                                 <thead>
@@ -234,10 +274,9 @@
                                         <th>Module</th>
                                         <th>Machine</th>
                                         <th>Operation</th>
-                                        <th>Date</th>
                                         <th>Cycle Standard</th>
                                         <th>Cycle Time</th>
-                                        <th>Efficiency</th>
+                                        <th>Performance</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -249,7 +288,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 grid-margin stretch-card">
+            <!--<div class="col-lg-4 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body align-items-center">
                         <h4 class="card-title text-warning">Pices count contribution</h4>
@@ -276,8 +315,8 @@
 
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4 grid-margin stretch-card">
+            </div>-->
+            <div class="col-lg-5 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body align-items-center">
                         <h4 class="card-title text-warning">Summary of Module</h4>
@@ -288,7 +327,7 @@
                                         <th> Module </th>
                                         <th> Pieces Count </th>
                                         <th> Cycle Time </th>
-                                        <th> Efficency </th>
+                                        <th> Performance </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -319,7 +358,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.12/signalr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <script>
+     <script>
 
         $(document).ready(function () {
             const connection = new signalR.HubConnectionBuilder().withUrl("/dashboardHub").build();
@@ -359,14 +398,14 @@
                     metricElement.text(currentValue);
                 }
 
-
+                const roundedDeviation = Math.round(deviation);
                 if (deviationElement.length) {
                     if (isEfficiencyOrPerformance) {
-                        deviationElement.text(deviation > 0 ? `+${deviation.toFixed(2)}%` : `${deviation.toFixed(2)}%`);
+                        deviationElement.text(roundedDeviation > 0 ? `+${roundedDeviation}%` : `${roundedDeviation}%`);
                         deviationElement.toggleClass('text-success', deviation >= 0);
                         deviationElement.toggleClass('text-danger', deviation < 0);
                     } else {
-                        deviationElement.text(deviation > 0 ? `+${deviation}` : `${deviation}`);
+                        deviationElement.text(roundedDeviation > 0 ? `+${roundedDeviation}` : `${roundedDeviation}`);
                         deviationElement.toggleClass('text-success', deviation >= 0);
                         deviationElement.toggleClass('text-danger', deviation < 0);
                     }
@@ -396,8 +435,8 @@
                     .then(data => {
                         console.log('Data:', data);
 
-                        updateMetricWithDeviation("efficiencyPercentage", Math.floor(data.averageEfficiency), data.efficiencyDeviation);
-                        updateMetricWithDeviation("performance", Math.floor(data.performance1), data.performanceDeviation);
+                        updateMetricWithDeviation("efficiencyPercentage", Math.floor(data.averageEfficiency),Math.floor(data.efficiencyDeviation));
+                        updateMetricWithDeviation("performance", Math.floor(data.performance1), Math.floor(data.performanceDeviation));
 
              
                     })
@@ -415,6 +454,13 @@
         const ctx = document.getElementById('areaChart1').getContext('2d');
 
         var areaOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 20 // Adjust this value as needed
+                }
+            },
             plugins: {
                 filler: {
                     propagate: true
@@ -520,7 +566,7 @@
             fetch("/Home/GetHourlyCountForToday")
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Hourly pieces count for today:', data);
+                  //  console.log('Hourly pieces count for today:', data);
                     updateAreaChart(data);
                 })
                 .catch(error => {
@@ -538,6 +584,13 @@
         const ctx1 = document.getElementById('areaChart2').getContext('2d');
 
         var area1Options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 20 // Adjust this value as needed
+                }
+            },
             plugins: {
                 filler: {
                     propagate: true
@@ -590,7 +643,7 @@
                 if (!previousHourlyCounts1.length) {
                     areaChart1.data.labels = hours1;
                     areaChart1.data.datasets.push({
-                        label: 'Efficency',
+                        label: 'Performance',
                         data: hourlyCounts1,
                         backgroundColor: [
                             'rgba(255, 159, 64, 0.2)',
@@ -645,7 +698,7 @@
             fetch("/Home/GetHourlyEffForToday")
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Hourly efff for today:', data);
+                    //console.log('Hourly efff for today:', data);
                     updateAreaChart1(data);
                 })
                 .catch(error => {
@@ -665,7 +718,7 @@
             fetch('/Home/GetTop10Data')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('table:', data);
+                   // console.log('table:', data);
                     const table = document.getElementById('cycle');
                     const tableBody = table.querySelector('tbody');
                     tableBody.innerHTML = '';
@@ -689,7 +742,7 @@
                                 <td>${entry.machineID}</td>
                                 <td>${entry.operation}</td>
                                
-                                <td>${entry.time}</td>
+                             
                                         <td>${entry.cycleStand}</td>
                                 <td>${entry.cycleAct}</td>
                                 <td class="${efficiencyClass}">${efficiencyValue}% ${efficiencyIcon}</td>
@@ -711,13 +764,13 @@
 
 
 
-    <!-- table -->
+    <!-- table 
     <script>
         function fetchAndUpdateTable() {
             fetch('/Home/GetuserData')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('table:', data);
+                  //  console.log('table:', data);
                     const table = document.getElementById('count');
                     const tableBody = table.querySelector('tbody');
                     tableBody.innerHTML = '';
@@ -763,7 +816,7 @@
 
 
 
-    </script>
+    </script>-->
 
 
 
@@ -776,7 +829,7 @@
             fetch('/Home/GetModuleData')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('table:', data);
+                   // console.log('table:', data);
                     const table = document.getElementById('module');
                     const tableBody = table.querySelector('tbody');
                     tableBody.innerHTML = '';
@@ -834,7 +887,7 @@
             fetch('/Home/GetGroupedChartData')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Fetched data:', data);
+                   // console.log('Fetched data:', data);
 
                     const sortedData = data.sort((a, b) => {
                         const numA = parseInt(a.label.match(/\d+/));
@@ -870,6 +923,13 @@
                                 ]
                             },
                             options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                layout: {
+                                    padding: {
+                                        bottom: 20 // Adjust this value as needed
+                                    }
+                                },
                                 scales: {
                                     yAxes: [{
                                         ticks: {
@@ -908,7 +968,7 @@
     <!-- partial:partials/_footer.html -->
     <footer class="footer">
         <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"></span>
 
         </div>
     </footer>

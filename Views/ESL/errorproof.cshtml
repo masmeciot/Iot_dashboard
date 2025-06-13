@@ -1,0 +1,407 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/green.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        #table thead th {
+            color: steelblue;
+        }
+
+        #table tbody td {
+            color: white;
+        }
+
+        #entertb thead th {
+            color: lightgreen;
+        }
+
+        #entertb tbody td {
+            color: white;
+        }
+
+        #plant {
+            color: white;
+        }
+
+        .form-control {
+            color: white !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Error Proof details</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Change Error Proof details</h4>
+                        <p class="card-title"> Use EP NO.</p>
+                        <form class="form-sample">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">EP No.</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="snum" placeholder="EP Number">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Level</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="module" placeholder="Level">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Operation</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="op" placeholder="Operation">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 mx-auto text-center">
+                                            <table class="table table-bordered mx-auto" id="entertb">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Task</th>
+                                                        <th>L1</th>
+                                                        <th>L2</th>
+                                                        <th>L3</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Pick and Place</td>
+                                                        <td><input type="checkbox" name="task1" value="1"></td>
+                                                        <td><input type="checkbox" name="task1" value="2"></td>
+                                                        <td><input type="checkbox" name="task1" value="3"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Sewing</td>
+                                                        <td><input type="checkbox" name="task2" value="1"></td>
+                                                        <td><input type="checkbox" name="task2" value="2"></td>
+                                                        <td><input type="checkbox" name="task2" value="3"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Dispose</td>
+                                                        <td><input type="checkbox" name="task3" value="1"></td>
+                                                        <td><input type="checkbox" name="task3" value="2"></td>
+                                                        <td><input type="checkbox" name="task3" value="3"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="button-container d-flex justify-content-center">
+                           <!---- <button type="button" onclick="search()" class="btn btn-inverse-primary btn-fw mx-2">Search</button>-->
+                            <button type="button" onclick="addNew()" class="btn btn-inverse-success btn-fw mx-2">Submit</button>
+                           <!---- <button type="button" onclick="update()" class="btn btn-inverse-warning btn-fw mx-2">Update</button>-->
+                           <!-- <button type="button" onclick="deleteData()" class="btn btn-inverse-danger btn-fw mx-2">Delete</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      <!----  <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">IoT Device Details</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="table">
+                                <thead>
+                                    <tr>
+                                        <th>MachineSn</th>
+                                        <th>Operation</th>
+                                        <th>Module</th>
+                                        <th>Pick And Place</th>
+                                        <th>Sewing</th>
+                                        <th>Dispose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+        </div>
+    </footer>
+
+    <script>
+    /*    $(document).ready(function () {
+            fetchDataTable();
+        });
+
+        function fetchDataTable() {
+            $.ajax({
+                url: '/Iotconfig1/GetData',
+                method: 'GET',
+                success: function (response) {
+                    var tableBody = document.querySelector('#table tbody');
+                    tableBody.innerHTML = '';
+                    response.forEach(function (item) {
+                        var row = tableBody.insertRow();
+
+                        var slotCell = row.insertCell(0);
+                        slotCell.textContent = item.machineSn;
+                        slotCell.classList.add('custom-text-color');
+
+                        var categoryCell = row.insertCell(1);
+                        categoryCell.textContent = item.operation;
+
+                        var moduleCell = row.insertCell(2);
+                        moduleCell.textContent = item.module;
+
+                        var pickAndPlaceCell = row.insertCell(3);
+                        pickAndPlaceCell.textContent = item.pickAndPlace;
+
+                        var sewingCell = row.insertCell(4);
+                        sewingCell.textContent = item.sewing;
+
+                        var disposeCell = row.insertCell(5);
+                        disposeCell.textContent = item.dispose;
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }*/
+
+
+     /*   function search() {
+            const snum = document.getElementById('snum').value;
+            const module = document.getElementById('module').value;
+            const op = document.getElementById('op').value;
+
+            $.ajax({
+                url: '/Iotconfig/SearchBy',
+                method: 'GET',
+                data: {
+                    snum: snum,
+                    module: module,
+                    op: op
+                },
+                success: function (response) {
+                    console.log(response);
+                    // Fill the form with the response data if needed
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                    console.log('Server Response:', xhr.responseText);
+                }
+            });
+        }
+        */
+            function getSelectedCheckboxValue(name) {
+                const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+                for (const checkbox of checkboxes) {
+                    if (checkbox.checked) {
+                        return checkbox.value;
+                    }
+                }
+                return null;
+            }
+
+            function clearInputs() {
+                document.getElementById('snum').value = '';
+                document.getElementById('module').value = '';
+                document.getElementById('op').value = '';
+
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+
+            function addNew() { 
+                const snum = document.getElementById('snum').value;
+                const module = document.getElementById('module').value;
+                const op = document.getElementById('op').value;
+
+                const pickAndPlace = getSelectedCheckboxValue('task1');
+                const sewing = getSelectedCheckboxValue('task2');
+                const dispose = getSelectedCheckboxValue('task3');
+
+                const newData = {
+                    snum: snum,
+                    module: module,
+                    op: op,
+                    pickAndPlace: pickAndPlace,
+                    sewing: sewing,
+                    dispose: dispose
+                };
+
+                $.ajax({
+                    url: '/error/AddNewItem',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(newData),
+                    success: function (response) {
+                        console.log('Response from server:', response);
+                        if (response.status === "Success") {
+                           
+                            clearInputs();
+                        } else {
+                            console.error(response);
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error adding new data:', error);
+                    }
+                });
+            }
+
+     /*   function update() {
+            const snum = document.getElementById('snum').value;
+            const module = document.getElementById('module').value;
+            const op = document.getElementById('op').value;
+
+            const pickAndPlace = getSelectedCheckboxValue('task1');
+            const sewing = getSelectedCheckboxValue('task2');
+            const dispose = getSelectedCheckboxValue('task3');
+
+            const updatedData = {
+                snum: snum,
+                module: module,
+                op: op,
+                pickAndPlace: pickAndPlace,
+                sewing: sewing,
+                dispose: dispose
+            };
+
+            $.ajax({
+                url: '/Iotconfig/UpdateData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    console.log('Data updated successfully:', response);
+                    fetchDataTable();
+                },
+                error: function (error) {
+                    console.error('Error updating data:', error);
+                    console.log('Server response:', error.responseText);
+                }
+            });
+        }
+
+        function deleteData() {
+            const snum = document.getElementById('snum').value;
+
+            $.ajax({
+                url: '/Iotconfig/DeleteData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ snum: snum }),
+                success: function (response) {
+                    console.log('Data deleted successfully:', response);
+                    fetchDataTable();
+                },
+                error: function (error) {
+                    console.error('Error deleting data:', error);
+                    console.log('Server response:', error.responseText);
+                }
+            });
+        }*/
+    </script>
+
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="~/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="~/vendors/chart.js/Chart.min.js"></script>
+    <script src="~/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="~/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/hoverable-collapse.js"></script>
+    <script src="~/js/misc.js"></script>
+    <script src="~/js/settings.js"></script>
+    <script src="~/js/todolist.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="~/js/dashboard.js"></script>
+    <!-- End custom js for this page -->
+</body>
+</html>
