@@ -1,0 +1,97 @@
+﻿@keyframes blink-green {
+    0% {
+        background-color: rgba(0, 255, 0, 0.5); /* Adjust alpha value as needed */
+    }
+
+    50% {
+        background-color: transparent;
+    }
+
+    100% {
+        background-color: rgba(0, 255, 0, 0.5); /* Adjust alpha value as needed */
+    }
+}
+
+@keyframes blink-dark {
+    0% {
+        background-color: rgba(255, 165, 0, 0.5);
+        ; /* Adjust alpha value as needed */
+    }
+
+    50% {
+        background-color: transparent;
+    }
+
+    100% {
+        background-color: rgba(255, 165, 0, 0.5);
+        ; /* Adjust alpha value as needed */
+    }
+}
+
+@keyframes blink-red {
+    0% {
+        background-color: rgba(255, 0, 0, 0.5); /* Adjust alpha value as needed */
+    }
+
+    50% {
+        background-color: transparent;
+    }
+
+    100% {
+        background-color: rgba(255, 0, 0, 0.5); /* Adjust alpha value as needed */
+    }
+}
+
+
+
+
+
+.blink-green {
+    animation: blink-green 3s infinite;
+}
+
+.blink-dark {
+    animation: blink-dark 3s infinite;
+}
+
+.blink-red {
+    animation: blink-red 3s infinite;
+}
+
+.blink {
+    animation: blink-animation 3s infinite;
+}
+
+@keyframes blink-animation {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes blink {
+    0% {
+        background-color: transparent;
+    }
+
+    50% {
+        background-color: #ff0000; /* Red color */
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.countdown-row.blink {
+    animation: blink 1s infinite;
+}
+
+

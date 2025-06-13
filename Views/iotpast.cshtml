@@ -1,0 +1,332 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kreeda-IoT</title>
+    <!-- Load dependencies -->
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="~/icon.png" />
+
+    <style>
+        .form-control {
+            color: white !important;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+
+        .chartjs-render-monitor {
+            color: white !important;
+        }
+
+        .chartjs-legend ul li span {
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+       
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IoT Past Data</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Cycle time Data</h4>
+                        <p class="card-title">Filter the cycle data.</p>
+                        <form class="form-sample">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Date</label>
+                                        <div class="col-sm-9">
+                                            <input type="date" class="form-control" id="date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Module</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="module">
+                                                <option>SYN26</option>
+                                                <option>SYN33</option>
+                                                <option>FOF1</option>
+                                                <option>FOF2</option>
+                                                  <option>FOF3</option>
+                                                <option>L2</option>
+                                                <option>All</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Plant</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="plant">
+                                                <option>MEC</option>
+                                                <option>SYNERGY</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Time</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="time">
+                                                <option>6:00-14:00</option>
+                                                <option>14:00-22:00</option>
+                                                <option>7:30-17:30</option>
+                                                <option>7:30-8:50</option>
+                                                <option>8:50-9:50</option>
+                                                <option>9:50-10:50</option>
+                                                <option>10:50-11:50</option>
+                                                <option>11:50-13:20</option>
+                                                <option>13:20-14:20</option>
+                                                <option>14:20-15:20</option>
+                                                <option>15:20-16:30</option>
+                                                <option>16:30-17:30</option>
+                                            </select>
+                                       
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Style</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="style" placeholder="Enter Style">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Takt Time</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="takt" placeholder="Enter Takt Time">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="button-container d-flex justify-content-center">
+                            <button type="submit" onclick="search()" class="btn btn-inverse-success btn-fw mx-2" id="applyFilterButton">Apply Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card" style="height: 450px;">
+                <div class="card stretch-card">
+                    <div class="card-body" style="height: 180px;">
+                        <div class="raw">
+                            <h4 id="fofTitle" class="card-title text-warning">Module</h4>
+                        </div>
+                        <canvas id="barChart1" style="height: 90%; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var barChart;
+
+        function search() {
+            var date = $('#date').val();
+            var module = $('#module').val();
+            var plant = $('#plant').val();
+            var time = $('#time').val();
+          
+            var style = $('#style').val();
+            $('#fofTitle').text(module);
+
+            $.ajax({
+                url: `/iotpast/FOF1?date=${date}&module=${module}&plant=${plant}&time=${time}&style=${style}`,
+                type: 'GET',
+                success: function (response) {
+                    console.log('AJAX success:', response);
+                    updateChart(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX error:', error);
+                }
+            });
+        }
+
+        function updateChart(data) {
+            var takt = $('#takt').val();
+            const latestData = data.latestData;
+            //console.log('Chart data:', latestData);
+
+            if (!latestData || !Array.isArray(latestData)) {
+                console.error('Invalid latestData:', latestData);
+                return;
+            }
+
+            const usernames = [];
+            const deltaRunValues = [];
+
+            latestData.forEach(item => {
+                usernames.push(item.userName);
+                deltaRunValues.push([item.deltaAvg, item.runAvg]);
+            });
+
+            if (barChart) {
+                barChart.data.labels = usernames;
+                barChart.data.datasets[0].data = deltaRunValues.map(values => values[1]);
+                barChart.data.datasets[1].data = deltaRunValues.map(values => values[0]);
+                if (barChart.options.plugins.annotation.annotations[0]) {
+                    barChart.options.plugins.annotation.annotations[0].value = takt;
+                } else {
+                    barChart.options.plugins.annotation.annotations.push({
+                        type: 'line',
+                        mode: 'horizontal',
+                        scaleID: 'y',
+                        value: takt,
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        label: {
+                            enabled: true,
+                            content: 'Target Line'
+                        }
+                    });
+                }
+                barChart.update();
+            } else {
+                const barChartCanvas = document.getElementById('barChart1');
+                barChart = new Chart(barChartCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: usernames,
+                        datasets: [
+                            {
+                                label: 'Actual Machine Time(Sec)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 2,
+                                data: deltaRunValues.map(values => values[1]),
+                                stack: 'Stack 2'
+                            },
+                            {
+                                label: 'Actual Man Time(Sec)',
+                                backgroundColor:  'rgba(255, 206, 86, 0.2)',
+                                borderColor: 'rgba(255, 206, 86, 1)',
+                                borderWidth: 2,
+                                data: deltaRunValues.map(values => values[0]),
+                                stack: 'Stack 2'
+                            },
+                            {
+                                type: 'line',
+                                backgroundColor: 'red',
+                                label: 'Takt Time',
+
+                                fill: false,
+
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: {
+                                    color: 'white' 
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: {
+                                    color: 'white'  // Set y-axis labels to white
+                                }
+                            }
+                        },
+                        plugins: {
+                            datalabels: {
+                                color: 'white',  // Set data label text color to white
+                                anchor: 'center',
+                                align: 'center',
+                                offset: 0,  // Position the labels inside the bar
+                                formatter: function (value, context) {
+                                    return value;  
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    color: 'white'  
+                                }
+                            },
+                            annotation: {
+                                annotations: [{
+                                    type: 'line',
+                                    mode: 'horizontal',
+                                    scaleID: 'y',
+                                    value: takt,
+                                    borderColor: 'red',
+                                    borderWidth: 1,
+                                    label: {
+                                        enabled: true,
+                                        content: 'Target Line'
+                                    }
+                                }]
+                            }
+                        },
+                        elements: {
+                            bar: {
+                                borderWidth: 1
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]  
+                });
+            }
+        }
+    </script>
+
+    <!-- content-wrapper ends -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © KreedaFOF</span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -5,9 +5,9 @@ $(function() {
    */
   'use strict';
   var data = {
-    labels: ["2013", "2014", "2014", "2015", "2016", "2017"],
+    labels: [],
     datasets: [{
-      label: '# of Votes',
+      label: ',
       data: [10, 10, 3, 5, 2, 3],
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
@@ -60,7 +60,8 @@ $(function() {
       }
     ]
   };
-  var options = {
+    var options = {
+    
     scales: {
       yAxes: [{
         ticks: {
@@ -75,8 +76,21 @@ $(function() {
           color: "rgba(204, 204, 204,0.1)"
         }
       }]
-    },
-    legend: {
+      },
+      plugins: {
+          datalabels: {
+              align: 'center',
+              anchor: 'center',
+              labels: {
+                  value: {
+                      color: 'white'
+                  }
+              }
+          },
+      legend: {
+          labels: {
+              color: 'white'
+          },
       display: false
     },
     elements: {
@@ -211,10 +225,10 @@ $(function() {
     }
   };
   var areaData = {
-    labels: ["2013", "2014", "2015", "2016", "2017"],
+    labels: [],
     datasets: [{
-      label: '# of Votes',
-      data: [12, 19, 3, 5, 2, 3],
+      label: ,
+      data: [],
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
         'rgba(54, 162, 235, 0.2)',
@@ -236,7 +250,14 @@ $(function() {
     }]
   };
 
-  var areaOptions = {
+    var areaOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: {
+                bottom: 20 // Adjust this value as needed
+            }
+        },
     plugins: {
       filler: {
         propagate: true
@@ -384,19 +405,10 @@ $(function() {
       }]
     }
   }
-  // Get context with jQuery - using jQuery's .get() method.
-  if ($("#barChart").length) {
-    var barChartCanvas = $("#barChart").get(0).getContext("2d");
-    // This will get the first returned node in the jQuery collection.
-    var barChart = new Chart(barChartCanvas, {
-      type: 'bar',
-      data: data,
-      options: options
-    });
-  }
+
 
   if ($("#lineChart").length) {
-    var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
+    var lineChartCanvas = $("#lineChart").get(0).getContext("3d");
     var lineChart = new Chart(lineChartCanvas, {
       type: 'line',
       data: data,

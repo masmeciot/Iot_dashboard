@@ -1,0 +1,189 @@
+﻿<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Chart.register(ChartDataLabels);
+        let chartInstance; // Store the single chart instance
+
+        function createOrUpdateChart(data, tackValue) {
+            const usernames = data.map(item => item.userName);
+            const handSewValues = data.map(item => [item.hand, item.sew]);
+            const deltaRunValues = data.map(item => [item.deltaAvg, item.runAvg]);
+
+            // Calculate the sum of deltaAvg and runAvg for each username
+            const sumDeltaRunValues = data.map(item => item.deltaAvg + item.runAvg);
+
+            // Check if any sum exceeds the tackValue
+            const exceededIndex = sumDeltaRunValues.findIndex(sum => sum > tackValue);
+
+            if (!chartInstance) {
+                const container = document.createElement('div');
+                container.classList.add('col-lg-12', 'grid-margin');
+                container.style.height = '320px';
+
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.style.height = '320px';
+
+                const cardBody = document.createElement('div');
+                cardBody.classList.add('card-body');
+                cardBody.style.height = '180px';
+
+                const title = document.createElement('h4');
+                title.classList.add('card-title', 'text-warning');
+                title.innerText = 'SYN26';
+
+                const canvas = document.createElement('canvas');
+                canvas.id = 'syn26Chart';
+                canvas.style.height = '90%';
+                canvas.style.width = '100%';
+
+                cardBody.appendChild(title);
+                cardBody.appendChild(canvas);
+                card.appendChild(cardBody);
+                container.appendChild(card);
+
+                document.getElementById('charts-container').appendChild(container);
+
+                // Create a new chart
+                chartInstance = new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: usernames,
+                        datasets: [
+                            {
+                                label: 'SMV Machine Time(Sec)',
+                                backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                borderColor: 'rgba(255, 191, 0, 1)',
+                                borderWidth: 2,
+                                data: handSewValues.map(values => values[1]),
+                                stack: 'Stack 1',
+                            },
+                            {
+                                label: 'SMV Man Time(Sec)',
+                                backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                                borderColor: 'rgba(255, 191, 0, 1)',
+                                borderWidth: 2,
+                                data: handSewValues.map(values => values[0]),
+                                stack: 'Stack 1',
+                            },
+                            {
+                                label: 'Actual Machine Time(Sec)',
+                                backgroundColor: usernames.map((_, index) =>
+                                    index === exceededIndex ? 'rgba(255, 0, 0, 0.6)' : 'rgba(150, 255, 150, 0.4)'
+                                ),
+                                borderColor: usernames.map((_, index) =>
+                                    index === exceededIndex ? 'rgba(255, 0, 0, 1)' : 'rgba(54, 162, 235, 1)'
+                                ),
+                                borderWidth: 2,
+                                data: deltaRunValues.map(values => values[1]),
+                                stack: 'Stack 2',
+                            },
+                            {
+                                label: 'Actual Man Time(Sec)',
+                                backgroundColor: usernames.map((_, index) =>
+                                    index === exceededIndex ? 'rgba(255, 0, 0, 0.6)' : 'rgba(255, 192, 203, 0.5)'
+                                ),
+                                borderColor: usernames.map((_, index) =>
+                                    index === exceededIndex ? 'rgba(255, 0, 0, 1)' : 'rgba(54, 162, 235, 1)'
+                                ),
+                                borderWidth: 2,
+                                data: deltaRunValues.map(values => values[0]),
+                                stack: 'Stack 2',
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { color: 'white' }
+                            },
+                            y: {
+                                stacked: true,
+                                display: true,
+                                beginAtZero: true,
+                                ticks: { min: 0, mirror: true, color: 'white' }
+                            }
+                        },
+                        plugins: {
+                            datalabels: {
+                                align: 'center',
+                                anchor: 'center',
+                                labels: { value: { color: 'white' } }
+                            },
+                            legend: {
+                                labels: { color: 'white' }
+                            },
+                            annotation: {
+                                annotations: [{
+                                    type: 'line',
+                                    mode: 'horizontal',
+                                    scaleID: 'y',
+                                    value: tackValue, // tack
+                                    borderColor: 'red',
+                                    borderWidth: 1,
+                                    label: {
+                                        enabled: true,
+                                        content: `Target Line: ${tackValue}`
+                                    }
+                                }]
+                            }
+                        },
+                        elements: {
+                            bar: { borderWidth: 1, borderColor: 'white' }
+                        }
+                    }
+                });
+            } else {
+                // Update existing chart data
+                chartInstance.data.labels = usernames;
+                chartInstance.data.datasets[0].data = handSewValues.map(values => values[1]);
+                chartInstance.data.datasets[1].data = handSewValues.map(values => values[0]);
+                chartInstance.data.datasets[2].data = deltaRunValues.map(values => values[1]);
+                chartInstance.data.datasets[3].data = deltaRunValues.map(values => values[0]);
+
+                // Update target line annotation dynamically
+                chartInstance.options.plugins.annotation.annotations[0].value = tackValue;
+                chartInstance.options.plugins.annotation.annotations[0].label.content = `Target Line: ${tackValue}`;
+
+                // Highlight only "Actual Machine Time" and "Actual Man Time" bars
+                chartInstance.data.datasets[2].backgroundColor = usernames.map((_, index) =>
+                    index === exceededIndex ? 'rgba(255, 0, 0, 0.6)' : 'rgba(150, 255, 150, 0.4)'
+                );
+                chartInstance.data.datasets[2].borderColor = usernames.map((_, index) =>
+                    index === exceededIndex ? 'rgba(255, 0, 0, 1)' : 'rgba(54, 162, 235, 1)'
+                );
+
+                chartInstance.data.datasets[3].backgroundColor = usernames.map((_, index) =>
+                    index === exceededIndex ? 'rgba(255, 0, 0, 0.6)' : 'rgba(255, 192, 203, 0.5)'
+                );
+                chartInstance.data.datasets[3].borderColor = usernames.map((_, index) =>
+                    index === exceededIndex ? 'rgba(255, 0, 0, 1)' : 'rgba(54, 162, 235, 1)'
+                );
+
+                chartInstance.update();
+            }
+        }
+
+        function fetchDataAndUpdateCharts() {
+            fetch('https://kre-sea-kre-iot-app.azurewebsites.net/api/realtime/data/SY06')
+                .then(response => response.json())
+                .then(responseData => {
+                    console.log(responseData);
+                    const firstKey = Object.keys(responseData)[0]; // Get the first key (e.g., "SY05", "SYN26", etc.)
+                    if (responseData[firstKey] && Array.isArray(responseData[firstKey].latestData)) {
+                        const latestData = responseData[firstKey].latestData;
+                        const tackValue = responseData[firstKey].tack || 0; // Get tack value from API
+                        createOrUpdateChart(latestData, tackValue);
+                    } else {
+                        console.error('Invalid data structure:', responseData);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        fetchDataAndUpdateCharts();
+        setInterval(fetchDataAndUpdateCharts, 180000);
+    });
+</script>

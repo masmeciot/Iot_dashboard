@@ -1,0 +1,398 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/green.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        .ui-autocomplete {
+            background-color: #191c24; 
+            color: white; 
+        }
+
+        .ui-menu-item {
+            background-color: #191c24; 
+            color: white; 
+        }
+
+            .ui-menu-item:hover {
+                background-color: #333; 
+                color: white; 
+            }
+
+      
+        .ui-autocomplete {
+            border: 1px solid #444; 
+        }
+
+        }
+        #table thead th {
+            color: steelblue;
+        }
+
+        #table tbody td {
+            color: white;
+        }
+
+        #plant {
+            color: white;
+        }
+
+        .form-control {
+            color: white !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+       <!--- <div class="back-button" onclick="window.location.href='/iotmenu/Index'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </div>-->
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IoT Zone Data</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Cycle Zone Data</h4>
+                        <p class="card-title">Change the zone data.</p>
+                        <form id="zoneForm" method="post">
+                            <div class="row">
+                              
+                                <div class="col-md-6 justify-content-center">
+                                    <div class="form-group row ">
+                                        <label class="col-sm-3 col-form-label">Style :</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="style" name="style" placeholder="Style">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 justify-content-center">
+                                    <div class="form-group row ">
+                                        <label class="col-sm-3 col-form-label">Operation : </label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="oper" name="operationZone" placeholder="Operation">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button-container d-flex justify-content-center">
+                                <button type="button" onclick="searchZone()" class="btn btn-inverse-primary btn-fw mx-2">Search</button>
+                                <button type="button" onclick="addNewZone()" class="btn btn-inverse-success btn-fw mx-2">Add New Zone</button>
+                                <button type="button" onclick="saveChanges()" class="btn btn-inverse-warning btn-fw mx-2">Save Changes</button>
+                                <button type="button" onclick="deleteZone()" class="btn btn-inverse-danger btn-fw mx-2">Delete</button>
+                            </div>
+                            <br>
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-sm-12 text-center">
+                                        <table class="table table-bordered mx-auto" id="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Zone</th>
+                                                    <th>Stitch Count</th>
+                                                    <th>Operation</th>
+                                                    <th>Waiting Time</th>
+                                                    <th>Delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Rows will be populated dynamically -->
+                                            </tbody>
+                                        </table>
+                                        <br>
+                                        <div class="add-zone-button">
+                                            <button type="button" class="btn btn-inverse-info btn-fw" onclick="addNewRow()">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- content-wrapper ends -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+        </div>
+    </footer>
+
+    <!-- main-panel ends -->
+    <!-- page-body-wrapper ends -->
+    </div>
+
+ 
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        let allStyles = [];
+        let allOperations = [];
+
+        $(document).ready(function () {
+            // Fetch styles and operations on page load
+            $.ajax({
+                url: '/IoTzone/GetSuggestions',
+                method: 'GET',
+                success: function (data) {
+                    console.log('Response data:', data);
+
+                    // Transform data for autocomplete
+                    allStyles = [...new Set(data.map(item => item.style))].map(style => ({ label: style, value: style }));
+                    allOperations = [...new Set(data.map(item => item.operationZone))].map(operation => ({ label: operation, value: operation }));
+
+                    // Initialize autocomplete after data is fetched
+                    initializeAutocomplete();
+                },
+                error: function (error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        });
+
+        function initializeAutocomplete() {
+            // Autocomplete for Style
+            $("#style").autocomplete({
+                source: allStyles,
+                minLength: 2 // Minimum number of characters before suggestions start
+            });
+
+            // Autocomplete for Operation
+            $("#oper").autocomplete({
+                source: allOperations,
+                minLength: 2 // Minimum number of characters before suggestions start
+            });
+        }
+
+
+
+
+        function addNewRow() {
+            const table = document.getElementById('table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                        <td><input type="text" class="form-control" name="zoneName" placeholder="Zone Name"></td>
+                        <td><input type="number" class="form-control" name="stitchCount" placeholder="Stitch Count"></td>
+                        <td><input type="text" class="form-control" name="operation" placeholder="Operation"></td>
+                        <td><input type="number" class="form-control" name="waitingTime" placeholder="Waiting Time"></td>
+                        <td><button type="button" class="btn btn-inverse-danger btn-fw" onclick="deleteRow(this)">Delete</button></td>
+                    `;
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.parentNode.removeChild(row);
+        }
+
+        function searchZone() {
+          
+            const style = $('#style').val();
+            const op = $('#oper').val();
+            $.ajax({
+                url: '/IoTzone/Search',
+                type: 'GET',
+                data: { style: style,
+                        op: op},
+                success: function (response) {
+                    if (response.success) {
+                        $('#style').val(response.data.style);
+                        $('#oper').val(response.data.operationZone);
+                        const table = $('#table tbody');
+                        table.empty();
+                        response.data.zones.forEach(zone => {
+                            const newRow = `
+                                        <tr>
+                                            <td><input type="text" class="form-control" name="zoneName" value="${zone.zone}"></td>
+                                                    <td><input type="number" class="form-control" name="stitchCount" value="${zone.stich}"></td>
+                                            <td><input type="text" class="form-control" name="operation" value="${zone.operation}"></td>
+                                            <td><input type="number" class="form-control" name="waitingTime" value="${zone.wait}"></td>
+                                            <td><button type="button" class="btn btn-inverse-danger btn-fw" onclick="deleteRow(this)">Delete</button></td>
+                                        </tr>
+                                    `;
+                            table.append(newRow);
+                        });
+                    } else {
+                        alert('No data found for the given style and operation');
+                    }
+                },
+                error: function (error) {
+                    alert('Failed to search zone data');
+                }
+            });
+        }
+
+        function addNewZone() {
+            const zoneForm = document.getElementById('zoneForm');
+            const formData = new FormData(zoneForm);
+
+        
+            const rows = document.querySelectorAll('#table tbody tr');
+            rows.forEach((row, index) => {
+                const zoneName = row.querySelector('input[name="zoneName"]').value;
+                const stitchCount = row.querySelector('input[name="stitchCount"]').value;
+                const operation = row.querySelector('input[name="operation"]').value;
+                const waitingTime = row.querySelector('input[name="waitingTime"]').value;
+
+                formData.append(`Zones[${index}].ZoneName`, zoneName);
+                formData.append(`Zones[${index}].StitchCount`, stitchCount);
+                formData.append(`Zones[${index}].Operation`, operation);
+                formData.append(`Zones[${index}].WaitingTime`, waitingTime);
+            });
+
+            $.ajax({
+                url: '/IoTzone/AddZone',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        alert('Zone added successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to add zone');
+                    }
+                },
+                error: function (error) {
+                    alert('Failed to add zone');
+                }
+            });
+        }
+
+        function saveChanges() {
+            const zoneForm = document.getElementById('zoneForm');
+            const formData = new FormData(zoneForm);
+
+            // Collecting additional rows data from the table
+            const rows = document.querySelectorAll('#table tbody tr');
+            rows.forEach((row, index) => {
+                const zoneName = row.querySelector('input[name="zoneName"]').value;
+                const stitchCount = row.querySelector('input[name="stitchCount"]').value;
+                const operation = row.querySelector('input[name="operation"]').value;
+                const waitingTime = row.querySelector('input[name="waitingTime"]').value;
+
+                formData.append(`Zones[${index}].ZoneName`, zoneName);
+                formData.append(`Zones[${index}].StitchCount`, stitchCount);
+                formData.append(`Zones[${index}].Operation`, operation);
+                formData.append(`Zones[${index}].WaitingTime`, waitingTime);
+            });
+
+            $.ajax({
+                url: '/IoTzone/SaveChanges',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        alert('Changes saved successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to save changes');
+                        console.error('Server-side failure:', response);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Failed to save changes');
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        responseText: xhr.responseText,
+                        responseJSON: xhr.responseJSON
+                    });
+                }
+            });
+        }
+
+
+        function deleteZone() {
+            const style = $('#style').val();
+            const op = $('#oper').val();
+           
+               
+            $.ajax({
+                url: '/IoTzone/Delete',
+                type: 'POST',
+                    data: {
+                        style: style,
+                        op: op
+                    },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Zones deleted successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete zones');
+                    }
+                },
+                error: function (error) {
+                    alert('Failed to delete zones');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

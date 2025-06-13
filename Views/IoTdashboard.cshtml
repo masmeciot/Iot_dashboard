@@ -1,0 +1,572 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kreeda-IoT</title>
+
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+
+    <link rel="shortcut icon" href="~/icon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        .chartjs-plugin-datalabels span {
+            color: white !important;
+        }
+
+
+
+    </style>
+    <style>
+        .chartjs-render-monitor .chartjs-legend ul li span {
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-wrapper">
+        <div id="charts-container" class="row"></div>
+    </div>
+
+
+     
+    <!----<div class="row">
+            <div class="col-lg-12 grid-margin" style="height: 320px;">
+                <div class="card" style="height: 320px;">
+                    <div class="card-body" style="height: 180px;">
+                        <div class="raw">
+                            <h4 id="fofTitle1" class="card-title text-warning">FOF 2</h4>
+                        </div>
+                        <canvas id="barChar1" style="height: 90%; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+
+
+
+
+
+     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            Chart.register(ChartDataLabels);
+            const charts = {}; // Store chart instances
+
+            // module order
+            const moduleOrder = ['FOF1', 'FOF2', 'FOF3', 'L2'];
+
+            function createOrUpdateChart(containerId, style, data) {
+                const usernames = data.map(item => item.userName);
+                const handSewValues = data.map(item => [item.hand, item.sew]);
+                const deltaRunValues = data.map(item => [item.deltaAvg, item.runAvg]);
+
+                if (!charts[containerId]) {
+                    // Create chart container if it doesn't exist
+                    const container = document.createElement('div');
+                    container.classList.add('col-lg-12', 'grid-margin');
+                    container.style.height = '320px';
+
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.style.height = '320px';
+
+                    const cardBody = document.createElement('div');
+                    cardBody.classList.add('card-body');
+                    cardBody.style.height = '180px';
+
+                    const title = document.createElement('h4');
+                    title.classList.add('card-title', 'text-warning');
+                    title.innerText = style;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.id = containerId;
+                    canvas.style.height = '90%';
+                    canvas.style.width = '100%';
+
+                    cardBody.appendChild(title);
+                    cardBody.appendChild(canvas);
+                    card.appendChild(cardBody);
+                    container.appendChild(card);
+
+                    document.getElementById('charts-container').appendChild(container);
+
+                    // Create a new chart
+                    charts[containerId] = new Chart(canvas, {
+                        type: 'bar',
+                        data: {
+                            labels: usernames,
+                            datasets: [
+                                {
+                                    label: 'SMV Machine Time(Sec)',
+                                    backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                    borderColor: 'rgba(255, 191, 0,1)',
+                                    borderWidth: 2,
+                                    data: handSewValues.map(values => values[1]),
+                                    stack: 'Stack 1',
+                                },
+                                {
+                                    label: 'SMV Man Time(Sec)',
+                                    backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                                    borderColor: 'rgba(255, 191, 0,1)',
+                                    borderWidth: 2,
+                                    data: handSewValues.map(values => values[0]),
+                                    stack: 'Stack 1',
+                                },
+                                {
+                                    label: 'Actual Machine Time(Sec)',
+                                    backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 2,
+                                    data: deltaRunValues.map(values => values[1]),
+                                    stack: 'Stack 2',
+                                },
+                                {
+                                    label: 'Actual Man Time(Sec)',
+                                    backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 2,
+                                    data: deltaRunValues.map(values => values[0]),
+                                    stack: 'Stack 2',
+                                },
+                                {
+                                    type: 'line',
+                                    backgroundColor: 'red',
+                                    label: 'TaktTime',
+                                    fill: false,
+                                }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    ticks: {
+                                        color: 'white'
+                                    }
+                                },
+                                y: {
+                                    stacked: true,
+                                    display: true,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        min: 0,
+                                        mirror: true,
+                                        color: 'white'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                datalabels: {
+                                    align: 'center',
+                                    anchor: 'center',
+                                    labels: {
+                                        value: {
+                                            color: 'white'
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    labels: {
+                                        color: 'white'
+                                    }
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y',
+                                        value: 60,
+                                        borderColor: 'red',
+                                        borderWidth: 1,
+                                        label: {
+                                            enabled: true,
+                                            content: 'Target Line'
+                                        }
+                                    }]
+                                }
+                            },
+                            elements: {
+                                bar: {
+                                    borderWidth: 1,
+                                    borderColor: 'white'
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    color: 'white'
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Update existing chart
+                    const chart = charts[containerId];
+                    chart.data.labels = usernames;
+                    chart.data.datasets[0].data = handSewValues.map(values => values[1]);
+                    chart.data.datasets[1].data = handSewValues.map(values => values[0]);
+                    chart.data.datasets[2].data = deltaRunValues.map(values => values[1]);
+                    chart.data.datasets[3].data = deltaRunValues.map(values => values[0]);
+                    chart.update();
+                }
+            }
+
+            function fetchDataAndUpdateCharts() {
+                fetch('/IoTdash/Data')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+
+                        // Sort data by predefined module order
+                        moduleOrder.forEach(style => {
+                            if (data[style]) {
+                                const containerId = `barChart-${style}`;
+                                createOrUpdateChart(containerId, style, data[style]);
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+            fetchDataAndUpdateCharts();
+            setInterval(fetchDataAndUpdateCharts, 200000);
+        });
+
+
+    </script>
+
+   <!---- <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            Chart.register(ChartDataLabels);
+            let barChart;
+
+            function fetchDataAndUpdateChart() {
+                fetch('/IoTdash/FOF1')
+                    .then(response => response.json())
+                    .then(data => {
+                        const usernames = [];
+                        const handSewValues = [];
+                        const deltaRunValues = [];
+                       console.log(data);
+                        data.forEach(item => {
+                            usernames.push(item.userName);
+                            handSewValues.push([item.hand, item.sew]);
+                            deltaRunValues.push([item.deltaAvg, item.runAvg]);
+                        });
+
+                        if (!barChart) {
+                            const barChartCanvas = document.getElementById('barChart');
+                            barChart = new Chart(barChartCanvas, {
+                                type: 'bar',
+                                data: {
+                                    labels: usernames,
+                                    datasets: [
+                                        {
+                                            label: 'SMV Machine Time(Sec)',
+                                            backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                     
+                                            borderColor: 'rgba(255, 191, 0,1)',
+                                            borderWidth: 2,
+                                            data: handSewValues.map(values => values[1]),
+                                            stack: 'Stack 1',
+                                           
+                                           
+                                        },
+                                        {
+                                            label: 'SMV Man Time(Sec)',
+                                            backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                                            borderColor: 'rgba(255, 191, 0,1)',
+                                            borderWidth: 2,
+                                           
+                                            data: handSewValues.map(values => values[0]),
+                                            stack: 'Stack 1',
+                                          
+                                           
+                                        },
+                                        {
+                                            label: 'Actual Machine Time(Sec)',
+                                            backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                            borderWidth: 2,
+                                            data: deltaRunValues.map(values => values[1]),
+                                            stack: 'Stack 2',
+                                           
+                                          
+                                        },
+                                        {
+                                            label: 'Actual Man Time(Sec)',
+                                            backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                            borderWidth: 2,
+                                            data: deltaRunValues.map(values => values[0]),
+                                            stack: 'Stack 2',
+                                           
+                                        },
+                                        {
+                                            type: 'line',
+                                            backgroundColor: 'red',
+                                           label: 'TaktTime',
+           
+                                            fill: false,
+
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    scales: {
+                                        x: {
+                                            stacked: true,
+                                            ticks: {
+                                                color: 'white'
+                                            }
+                                        },
+                                        y: {
+                                            stacked: true,
+                                            display: true,
+                                            beginAtZero: true,
+                                            ticks: {
+                                                min: 0,
+                                                mirror: true,
+                                                color: 'white'
+                                            }
+                                        }
+                                    },
+
+                                    plugins: {
+                                        datalabels: {
+                                            align: 'center',
+                                            anchor: 'center',
+                                            labels: {
+                                                value: {
+                                                    color: 'white'
+                                                }
+                                            }
+                                        },
+                                        legend: {
+                                            labels: {
+                                                color: 'white'
+                                            }
+                                        },
+
+                                        annotation: {
+                                            annotations: [{
+                                                type: 'line',
+                                                mode: 'horizontal',
+                                                scaleID: 'y',
+                                                value: 60,
+                                                borderColor: 'red',
+                                                borderWidth: 1,
+                                                label: {
+                                                    enabled: true,
+                                                    content: 'Target Line'
+                                                }
+                                            }]
+                                        }
+
+
+                                            },
+                                    elements: {
+                                        bar: {
+                                            borderWidth: 1,
+                                            borderColor: 'white'
+                                        }
+                                    },
+                                    legend: {
+                                        labels: {
+                                            color: 'white'
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            barChart.data.labels = usernames;
+                            barChart.data.datasets[0].data = handSewValues.map(values => values[1]);
+                            barChart.data.datasets[1].data = handSewValues.map(values => values[0]);
+                            barChart.data.datasets[2].data = deltaRunValues.map(values => values[1]);
+                            barChart.data.datasets[3].data = deltaRunValues.map(values => values[0]);
+                            barChart.update();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+            fetchDataAndUpdateChart();
+            setInterval(fetchDataAndUpdateChart, 5000);
+        });
+
+
+
+
+
+    </script>
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            Chart.register(ChartDataLabels);
+            let barChart1; 
+
+            function fetchDataAndUpdateChart1() {
+                fetch('/IoTdash/FOF2')
+                    .then(response => response.json())
+                    .then(data => {
+                        const usernames = [];
+                        const handSewValues = [];
+                        const deltaRunValues = [];
+                       // console.log(data);
+                        data.forEach(item => {
+                            usernames.push(item.userName);
+                            handSewValues.push([item.hand, item.sew]);
+                            deltaRunValues.push([item.deltaAvg, item.runAvg]);
+                        });
+
+                        if (!barChart1) { 
+                            const barChartCanvas1 = document.getElementById('barChar1'); 
+                            barChart1 = new Chart(barChartCanvas1, { 
+                                type: 'bar',
+                                data: {
+                                    labels: usernames,
+                                    datasets: [
+                                        {
+                                            label: 'SMV Machine Time(Sec)',
+                                            backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                            borderColor: 'rgba(255, 191, 0,1)',
+                                            borderWidth: 2,
+                                            data: handSewValues.map(values => values[1]),
+                                            stack: 'Stack 1'
+                                        },
+                                        {
+                                            label: 'SMV Man Time(Sec)',
+                                            backgroundColor: 'rgba(255, 192, 203, 0.4)',
+                                            borderColor: 'rgba(255, 191, 0,1)',
+                                            borderWidth: 2,
+                                            data: handSewValues.map(values => values[0]),
+                                            stack: 'Stack 1'
+                                        },
+                                        {
+                                            label: 'Actual Machine Time(Sec)',
+                                            backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                            borderWidth: 2,
+                                            data: deltaRunValues.map(values => values[1]),
+                                            stack: 'Stack 2'
+                                        },
+                                        {
+                                            label: 'Actual Man Time(Sec)',
+                                            backgroundColor: 'rgba(255, 192, 203, 0.4)',
+                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                            borderWidth: 2,
+                                            data: deltaRunValues.map(values => values[0]),
+                                            stack: 'Stack 2'
+                                        },
+                                                {
+                                            type: 'line',
+                                            backgroundColor: 'red',
+                                            label: 'Takt Time',
+
+                                            fill: false,
+
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    scales: {
+                                        x: {
+                                            stacked: true,
+                                            ticks: {
+                                                color: 'white'
+                                            }
+                                        },
+                                        y: {
+                                            stacked: true,
+                                            display: true,
+                                            beginAtZero: true,
+                                            ticks: {
+                                                min: 0,
+                                                mirror: true,
+                                                color: 'white'
+                                            }
+                                        }
+                                    },
+
+                                    plugins: {
+                                        datalabels: {
+                                            align: 'center',
+                                            anchor: 'center',
+                                            labels: {
+                                                value: {
+                                                    color: 'white'
+                                                }
+                                            }
+                                        },
+                                        legend: {
+                                            labels: {
+                                                color: 'white'
+                                            }
+                                        },
+                                        annotation: {
+                                            annotations: [{
+                                                type: 'line',
+                                                mode: 'horizontal',
+                                                scaleID: 'y',
+                                                value: 55,
+                                                borderColor: 'red',
+                                                borderWidth: 1,
+                                                label: {
+                                                    enabled: true,
+                                                    content: 'Target Line'
+                                                }
+                                            }]
+                                        }
+                                    },
+                                    elements: {
+                                        bar: {
+                                            borderWidth: 1,
+                                            borderColor: 'white'
+                                        }
+                                    },
+                                    legend: {
+                                        labels: {
+                                            color: 'white'
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            barChart1.data.labels = usernames;
+                            barChart1.data.datasets[0].data = handSewValues.map(values => values[1]);
+                            barChart1.data.datasets[1].data = handSewValues.map(values => values[0]);
+                            barChart1.data.datasets[2].data = deltaRunValues.map(values => values[1]);
+                            barChart1.data.datasets[3].data = deltaRunValues.map(values => values[0]);
+                            barChart1.update();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+            fetchDataAndUpdateChart1();
+            setInterval(fetchDataAndUpdateChart1, 5000);
+        });
+
+    </script>-->
+
+</body>
+
+</html>

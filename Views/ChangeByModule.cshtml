@@ -1,0 +1,419 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Kreeda-IoT</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+
+        .form-control {
+            color: white !important;
+        }
+
+        .ui-autocomplete {
+            background-color: #191c24;
+            color: white;
+        }
+
+        .ui-menu-item {
+            background-color: #191c24;
+            color: white;
+        }
+
+            .ui-menu-item:hover {
+                background-color: #333;
+                color: white;
+            }
+
+
+        .ui-autocomplete {
+            border: 1px solid #444;
+        }
+
+
+
+      
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+        <!---- <div class="back-button" onclick="window.location.href='/iotmenu/Index'">
+             <i class="fas fa-arrow-left"></i>
+             <span>Back</span>
+         </div>-->
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Change Style and Operation.</h3>
+            </li>
+        </ul>
+    </div>
+
+
+
+
+    <div class="content-wrapper">
+
+        <div class="row">
+            <div class="col-3 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                   <h4 class="card-title text-warning">Change operation by device.</h4>
+                        <form class="form">
+
+                           <div class="form-group">
+                            <label for="exampleInputUsername1">Device :</label>
+                            <input type="text" class="form-control" id="ChipID" name="ChipID" placeholder="Enter the Device ID.">
+                        </div>
+                      
+                             <div class="form-group">
+                            <label for="exampleInputUsername1">Operation :</label>
+                            <input type="text" class="form-control" id="Operation" name="Operation" placeholder="Enter the Operation">
+                        </div>
+                            <div class="button-container d-flex justify-content-center">
+
+                                <button type="button" onclick="updateoperation()" class="btn btn-inverse-success btn-fw mx-2">Change Operation</button>
+
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+
+
+            <div class="col-3 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                   <h4 class="card-title text-warning">Change style by module.</h4>
+                        <form class="form">
+
+                        <div class="form-group">
+
+                            <label for="category">Plant :</label>
+                            <select class="form-control" id="plant">
+                                <option>Synergy</option>
+                                <option>MEC</option>
+
+                            </select>
+                        </div>
+                            <div class="form-group">
+
+                                <label for="category">Module :</label>
+                                <select class="form-control" id="module">
+                                <option>SYN33</option>
+                                <option>SYN26</option>
+                                    <option>FOF1</option>
+                                    <option>FOF2</option>
+                                    <option>FOF3</option>
+                                    <option>L1</option>
+                                    <option>L2</option>
+                                    <option>SYN1</option>
+                                    <option>SYN2</option>
+                                    <option>SYN3</option>
+
+                                </select>
+                            </div>
+                        <div class="form-group">
+                            <label for="exampleInputUsername1">Style</label>
+                            <input type="text" class="form-control" id="style" name="style" placeholder="Enter new Style">
+                        </div>
+                            <div class="button-container d-flex justify-content-center">
+                                <button type="button" onclick="updateStyle()" class="btn btn-inverse-success btn-fw mx-2">Change</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                </div>
+
+
+
+                            <div class="col-3 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                   <h4 class="card-title text-warning">Sync Devices By Module.</h4>
+                        <form class="form">
+
+                        <div class="form-group">
+
+                            <label for="category">Plant :</label>
+                            <select class="form-control" id="plant2">
+                                <option>Synergy</option>
+                                <option>MEC</option>
+
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputUsername1">Module :</label>
+                            <input type="text" class="form-control" id="module2" name="module2" placeholder="Enter the Module">
+                        </div>
+                            <div class="button-container d-flex justify-content-center">
+                                <button type="button" onclick="sync()" class="btn btn-inverse-success btn-fw mx-2">Sync</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                </div>
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+               function updateStyle() {
+            const plant = $('#plant').val();
+            const module = $('#module').val();
+            const style = $('#style').val();
+
+            if (!plant || !module || !style) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Plant, module, and style fields cannot be empty.',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#e57373'
+                });
+                return;
+            }
+
+            $.ajax({
+                url: 'ChangebyModule/UpdateStyle',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ plant, module, style }),
+                success: function (response) {
+                    console.log('Server response:', response);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message || 'Style updated successfully!',
+                        background: '#333',
+                        color: 'white',
+                        confirmButtonColor: '#4caf50'
+                    });
+
+                    // Clear input fields
+                    $('#plant').val('');
+                    $('#module').val('');
+                    $('#style').val('');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error updating style:', error, xhr.responseText);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update style. Please check the server logs.',
+                        background: '#333',
+                        color: 'white',
+                        confirmButtonColor: '#e57373'
+                    });
+                }
+            });
+        }
+
+
+
+                         function updateoperation() {
+            const ChipID = document.getElementById("ChipID").value;
+            const Operation = document.getElementById("Operation").value;
+
+            if (!ChipID || !Operation) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Device number and operation cannot be empty.',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#e57373'
+                });
+                return;
+            }
+
+            fetch('ChangebyModule/UpdateOperation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ChipID, Operation })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message || 'Operation updated successfully!',
+                        background: '#333',
+                        color: 'white',
+                        confirmButtonColor: '#4caf50'
+                     
+                      
+                    });
+
+                    // Clear input fields
+                    document.getElementById("ChipID").value = '';
+                    document.getElementById("Operation").value = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'An error occurred while updating the operation.',
+                        background: '#333',
+                        color: 'white',
+                        confirmButtonColor: '#e57373'
+                    });
+                });
+        }
+
+
+
+
+
+                function sync() {
+            const plant = document.getElementById('plant2').value;
+            const module = document.getElementById('module2').value;
+
+            // Validation check
+            if (!plant || !module) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Please select a plant and enter a module.',
+                    icon: 'error',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#4caf50'
+                });
+                return;
+            }
+
+            // Show a processing alert
+            Swal.fire({
+                title: 'Sending.....',
+                text: 'Sending SYNC messages to devices in batches. Please wait.',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                background: '#333',
+                color: 'white'
+            });
+
+            // Fetch API for backend communication
+            fetch("ChangebyModule/SyncDevices", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ plant: plant, module: module })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display success or failure counts in SweetAlert
+                Swal.fire({
+                    title: 'Batch Sync Complete',
+                    html: `
+                        <p>Successfully sent: <b>${data.successCount}</b> devices.</p>
+                        <p>Failed to send: <b>${data.failureCount}</b> devices.</p>
+                    `,
+                    icon: 'success',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#4caf50'
+                });
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error during batch sync:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred during batch processing. Please try again.',
+                    icon: 'error',
+                    background: '#333',
+                    color: 'white',
+                    confirmButtonColor: '#4caf50'
+                });
+            });
+        }
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+
+
+
+  
+</body>
+
+</html>

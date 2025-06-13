@@ -1,0 +1,438 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/green.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+        <style>
+        /* Change text color of table header */
+        #park thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #park tbody td {
+            color: white;
+        }
+
+
+        #trolly thead th {
+            color: steelblue;
+        }
+
+        /* Change text color of table body */
+        #trolly tbody td {
+            color: white;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">AMR Details</h3>
+            </li>
+        </ul>
+
+
+    </div>
+
+
+
+    <div class="content-wrapper">
+
+        <div class="row">
+
+            <div class="col-md-4 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Parking slot details</h4>
+                    
+                            <div class="form-group">
+                                <label for="exampleInputUsername1">Slot</label>
+                                <input type="text" class="form-control" id="slot" name="slot" placeholder="Slot">
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select class="form-control" id="category">
+                                    <option>CUT</option>
+                                    <option>L1</option>
+                                    <option>L2</option>
+                                    <option>L3</option>
+                                <option>FG</option>
+                                <option>L3O</option>
+                                </select>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="trolly">Trolly</label>
+                                <input type="text" class="form-control" name="status" id="status" placeholder="Trolly">
+                            </div><br>
+                            <div class="button-container">
+                                <button type="button" onclick="searchByTrolly()" class="btn-sm btn-inverse-primary btn-fw" style="width: 80px;">Search</button>
+                                <button type="button" onclick="addNew()" class="btn-sm btn-inverse-success btn-fw" style="margin-left: 1px; width: 80px;">Add New</button>
+                                <button type="button" onclick="updateData()" class="btn-sm btn-inverse-warning btn-fw" style="margin-left: 1px; width: 80px;">Update</button>
+                                <button type="button" onclick="deleteData()" class="btn-sm btn-inverse-danger btn-fw" style="margin-left: 1px; width: 80px;">Delete</button>
+                            </div>
+                     
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">Parking slots</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="park">
+                                <thead>
+                                    <tr>
+                                        <th> Slot </th>
+                                        <th> Category </th>
+                                        <th> Trolly </th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4 grid-margin">
+                <div class="card">
+                    <div class="card-body align-items-center">
+                        <h4 class="card-title text-warning">Trolly Locations</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="trolly">
+                                <thead>
+                                    <tr>
+                                        <th> Trolly </th>
+                                        <th> Slot </th>
+                                        <th> Category </th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+
+    </div>
+
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+
+        </div>
+    </footer>
+
+  
+    <!-- main-panel ends -->
+    <!-- page-body-wrapper ends -->
+    </div>
+
+
+
+    <script>
+        function searchByTrolly() {
+            var slot = document.getElementById('slot').value;
+
+ 
+            $.ajax({
+                url: '/amr_dash/SearchBySlot',
+                method: 'GET',
+                data: { slot: slot },
+                success: function (response) {
+                   
+                    console.log(response); 
+
+                    var categoryValue = response.category;
+                    var trollyValue = response.trolly;
+
+                    document.getElementById('category').value = categoryValue;
+                    document.getElementById('status').value = trollyValue;
+                },
+
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                    console.log('Server Response:', xhr.responseText);
+                   
+                }
+
+
+            });
+        }
+
+
+        function addNew() {
+            var slotInput = document.getElementById('slot');
+            var categoryInput = document.getElementById('category');
+            var trollyInput = document.getElementById('status');
+
+            var slot = slotInput.value;
+            var category = categoryInput.value;
+            var status = trollyInput.value;
+
+            var newData = {
+                slot: slot,
+                category: category,
+                status: status
+            };
+
+            $.ajax({
+                url: '/amr_dash/AddNewData', 
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newData),
+                success: function (response) {
+                   
+                    console.log('New data added successfully:', response);
+                   
+                    slotInput.value = '';
+                    categoryInput.value = '';
+                    trollyInput.value = '';
+                    
+                },
+                error: function (error) {
+                    console.error('Error adding new data:', error);
+                
+                }
+            });
+        }
+
+
+        function updateData() {
+            var slot1 = document.getElementById('slot').value;
+            var category1 = document.getElementById('category').value;
+            var status1 = document.getElementById('status').value;
+
+            var slot = slot1.value; 
+            var category = category1.value;
+            var status = status1.value;
+
+
+
+            var updatedData = {
+                slot: slot1,
+                category: category1,
+                status: status1
+            };
+
+           
+            $.ajax({
+                url: '/amr_dash/UpdateData', 
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedData),
+                success: function (response) {
+                    console.log('Data updated successfully:', response);
+
+                 
+                    document.getElementById('slot').value = '';
+                    document.getElementById('category').value = '';
+                    document.getElementById('status').value = '';
+                },
+
+                error: function (error) {
+                    console.error('Error updating data:', error);
+           
+                }
+            });
+        }
+
+
+
+        function deleteData() {
+        var slot = document.getElementById('slot').value;
+
+       
+            $.ajax({
+                url: '/amr_dash/DeleteData', 
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ slot: slot }),
+                success: function(response) {
+                    // Handle success response if needed
+                    console.log('Data deleted successfully:', response);
+                        document.getElementById('slot').value = '';
+                        document.getElementById('category').value = '';
+                        document.getElementById('status').value = '';
+                 
+                },
+                error: function(error) {
+                    console.error('Error deleting data:', error);
+        
+                }
+            });
+        }
+
+
+
+       
+        function fetchDataAndPopulateTable() {
+            
+            $.ajax({
+                url: '/amr_dash/GetParkingData', 
+                method: 'GET',
+                success: function (response) {
+            
+                    var tableBody = document.querySelector('#park tbody');
+                    tableBody.innerHTML = ''; 
+
+                    
+                    response.forEach(function (item) {
+                        var row = tableBody.insertRow();
+
+                        var slotCell = row.insertCell(0);
+                        slotCell.textContent = item.slot;
+
+                        var categoryCell = row.insertCell(1);
+                        categoryCell.textContent = item.category;
+
+                        var trollyCell = row.insertCell(2);
+                        trollyCell.textContent = item.status;
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching data:', error);
+                   
+                }
+            });
+        }
+
+
+        setInterval(fetchDataAndPopulateTable, 10000);
+
+
+
+
+
+    
+        let previousSlots = {}; 
+
+        function fetchTrollyLocations() {
+            $.ajax({
+                url: '/amr_dash/GetTrollyData',
+                method: 'GET',
+                success: function (response) {
+                    var trollyTableBody = document.querySelector('#trolly tbody');
+                    trollyTableBody.innerHTML = '';
+
+                    response.forEach(function (item) {
+                        var row = trollyTableBody.insertRow();
+
+                        var trollyCell = row.insertCell(0);
+                        trollyCell.textContent = item.status;
+
+                        var slotCell = row.insertCell(1);
+                        slotCell.textContent = item.slot;
+
+                        var categoryCell = row.insertCell(2);
+                        categoryCell.textContent = item.category;
+
+                        if (previousSlots[item.status] !== item.slot) {
+                            slotCell.classList.add('blink-green'); 
+                            previousSlots[item.status] = item.slot;
+                        }
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching trolly data:', error);
+                }
+            });
+        }
+
+     
+        setInterval(fetchTrollyLocations, 1000);
+
+        
+        setInterval(function () {
+            $(".blink-green").removeClass("blink-green");
+        }, 10000); 
+
+
+
+        </script>
+
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="~/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="~/vendors/chart.js/Chart.min.js"></script>
+    <script src="~/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="~/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="~/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="~/js/off-canvas.js"></script>
+    <script src="~/js/hoverable-collapse.js"></script>
+    <script src="~/js/misc.js"></script>
+    <script src="~/js/settings.js"></script>
+    <script src="~/js/todolist.js"></script>
+    <!-- <script src="~/js/chart.js"></script> -->
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="~/js/dashboard.js"></script>
+    <!-- End custom js for this page -->
+
+
+
+</body>
+
+
+</html>

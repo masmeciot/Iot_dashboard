@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>End point output</title>
+  
+
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+
+    <link rel="shortcut icon" href="~/icon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <style>
+        .chartjs-plugin-datalabels span {
+            color: white !important;
+        }
+
+
+        .chartjs-render-monitor .chartjs-legend ul li span {
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-wrapper">
+        <div id="charts-container" class="row"></div>
+    </div>
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Chart.register(ChartDataLabels);
+            const charts = {}; 
+
+            function createOrUpdateChart(containerId, moduleName, data) {
+                const usernames = data.map(item => item.userName);
+                const sumOfHValues = data.map(item => item.sumOfH);
+
+                if (!charts[containerId]) {
+                    // Create chart container if it doesn't exist
+                    const container = document.createElement('div');
+                    container.classList.add('col-lg-12', 'grid-margin');
+                    container.style.height = '320px';
+
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.style.height = '320px';
+
+                    const cardBody = document.createElement('div');
+                    cardBody.classList.add('card-body');
+                    cardBody.style.height = '180px';
+
+                    const title = document.createElement('h4');
+                    title.classList.add('card-title', 'text-warning');
+                    title.innerText = moduleName;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.id = containerId;
+                    canvas.style.height = '90%';
+                    canvas.style.width = '100%';
+
+                    cardBody.appendChild(title);
+                    cardBody.appendChild(canvas);
+                    card.appendChild(cardBody);
+                    container.appendChild(card);
+
+                    document.getElementById('charts-container').appendChild(container);
+
+                    // Create a new chart
+                    charts[containerId] = new Chart(canvas, {
+                        type: 'bar',
+                        data: {
+                            labels: usernames,
+                            datasets: [
+                                {
+                                    label: 'Total Count',
+                                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                    borderColor: 'rgba(255, 206, 86, 1)',
+                                    borderWidth: 2,
+                                    data: sumOfHValues,
+                                }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        color: 'white'
+                                    }
+                                },
+                                y: {
+                                    display: true,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        min: 0,
+                                        mirror: true,
+                                        color: 'white'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                datalabels: {
+                                    align: 'center',
+                                    anchor: 'center',
+                                    labels: {
+                                        value: {
+                                            color: 'white'
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    labels: {
+                                        color: 'white'
+                                    }
+                                }
+                            },
+                            elements: {
+                                bar: {
+                                    borderWidth: 1,
+                                    borderColor: 'white'
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Update existing chart
+                    const chart = charts[containerId];
+                    chart.data.labels = usernames;
+                    chart.data.datasets[0].data = sumOfHValues;
+                    chart.update();
+                }
+            }
+
+            function fetchDataAndUpdateCharts() {
+                fetch('/outAnalyze/GetModuleData')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+
+                        // Group data by module
+                        const groupedData = data.reduce((acc, item) => {
+                            if (!acc[item.module]) {
+                                acc[item.module] = [];
+                            }
+                            acc[item.module].push(item);
+                            return acc;
+                        }, {});
+
+                        // Update charts for each module
+                        Object.keys(groupedData).forEach(module => {
+                            const containerId = `barChart-${module}`;
+                            createOrUpdateChart(containerId, module, groupedData[module]);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+            fetchDataAndUpdateCharts();
+            setInterval(fetchDataAndUpdateCharts, 5000);
+        });
+
+    </script>
+
+
+
+</body>
+
+</html>

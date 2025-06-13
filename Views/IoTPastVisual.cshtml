@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kreeda-IoT</title>
+    <!-- Load dependencies -->
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="~/icon.png" />
+    <style>
+        .form-control {
+            color: white !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        #table thead th {
+            color: steelblue;
+            text-align: center;
+        }
+
+        #table tbody td {
+            color: white;
+            text-align: center;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+        <div class="back-button" onclick="window.location.href='/iotmenu/Index'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </div>
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IoT Past Output Data</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Output Data</h4>
+                        <p class="card-title">Filter the output data.</p>
+                        <form class="form-sample">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Date</label>
+                                        <div class="col-sm-9">
+                                            <input type="date" class="form-control" id="date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Module</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="module">
+                                                <option>FOF1</option>
+                                                <option>FOF2</option>
+                                                <option>All</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Plant</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="plant">
+                                                <option>MEC</option>
+                                                <option>SYNERGY</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Style</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="style" placeholder="Enter Style">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="button-container d-flex justify-content-center">
+                            <button type="submit" onclick="search()" class="btn btn-inverse-success btn-fw mx-2" id="applyFilterButton">Apply Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 grid-margin" style="height: 320px;">
+                <div class="card" style="height: 320px;">
+                    <div class="card-body" style="height: 180px;">
+                        <div class="raw">
+                            <h4 id="fofTitle" class="card-title text-warning">IoT Filter</h4>
+                        </div>
+                        <canvas id="barChar1" style="height: 90%; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function search() {
+            var date = $('#date').val();
+            var module = $('#module').val();
+            var plant = $('#plant').val();
+            var style = $('#style').val();
+            $('#fofTitle').text(module);
+
+            $.ajax({
+                url: `/IoTPastVisual/FOF1?date=${date}&module=${module}&plant=${plant}&style=${style}`,
+                type: 'GET',
+                success: function (response) {
+                    if (response && Array.isArray(response.utilizationData)) {
+                        updateChart(response.utilizationData);
+                    } else {
+                        console.error('Unexpected response structure:', response);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX error:', error);
+                }
+            });
+        }
+
+        function updateChart(data) {
+            var ctx = document.getElementById('barChar1').getContext('2d');
+
+            var datasets = data.map(function (item, index) {
+                return {
+                    label: item.user,
+                    data: item.hourlyCounts,
+                    fill: false,
+                    borderColor: getRandomColor(),
+                    tension: 0.1
+                };
+            });
+
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Hour 1', 'Hour 2', 'Hour 3', 'Hour 4', 'Hour 5', 'Hour 6', 'Hour 7', 'Hour 8', 'Hour 9'],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Hourly Counts per User'
+                        }
+                    }
+                }
+            });
+        }
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
+
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © KreedaFOF</span>
+        </div>
+    </footer>
+</body>
+
+</html>

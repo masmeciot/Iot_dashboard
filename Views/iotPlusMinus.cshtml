@@ -1,0 +1,480 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kreeda-IoT</title>
+    <!-- Load dependencies -->
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="shortcut icon" href="~/icon.png" />
+    <style>
+
+        .btn-large1 {
+    display: none;
+}
+
+
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .clicked {
+            background-color: yellow !important; 
+            color: black !important;
+        }
+        .input-disabled {
+            color: transparent !important;
+            background-color: inherit !important;
+        }
+
+        .btn-inverse-pink {
+            background-color: rgba(255, 105, 180, 0.2);
+            border: 1px solid rgba(255, 105, 180, 0.1);
+            color: rgba(255, 105, 180, 1);
+        }
+
+            .btn-inverse-pink:hover {
+                background-color: rgba(255, 105, 180, 1);
+                color: white;
+            }
+
+        .btn-inverse-bl {
+            background-color: rgba(250, 128, 114, 0.2);
+            border: 1px solid rgba(250, 128, 114, 0.1);
+            color: rgba(250, 128, 114, 1);
+        }
+
+            .btn-inverse-bl:hover {
+                background-color: rgba(250, 128, 114, 1);
+                color: white;
+            }
+
+        .btn-inverse-fl {
+            background-color: rgba(0, 128, 128, 0.2);
+            border: 1px solid rgba(0, 128, 128, 0.1);
+            color: rgba(0, 128, 128, 1);
+        }
+
+            .btn-inverse-fl:hover {
+                background-color: rgba(0, 128, 128, 1);
+                color: white;
+            }
+
+        .btn-inverse-ou {
+            background-color: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            color: rgba(255, 215, 0, 1);
+        }
+
+            .btn-inverse-ou:hover {
+                background-color: rgba(255, 215, 0, 1);
+                color: white;
+            }
+
+        .btn-inverse-de {
+            background-color: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            color: navajowhite;
+        }
+
+            .btn-inverse-de:hover {
+                background-color: navajowhite;
+                color: white;
+            }
+
+        .btn-large {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            font-size: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .btn-large1 {
+            width: 150px;
+            height: 150px;
+            margin: 10px;
+            font-size: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .form-control {
+            color: white !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        #table thead th {
+            color: steelblue;
+            text-align: center;
+        }
+
+        #table tbody td {
+            color: white;
+            text-align: center;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+        <div class="back-button" onclick="window.location.href='/iotout'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </div>
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IoT Device Output change</h3>
+            </li>
+        </ul>
+    </div>
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">IoT device hourly Output change</h4>
+               
+                        <form class="form-sample">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Serial Number</label>
+                                        <label class="col-sm-3 col-form-label custom-text-color" id="sn"></label>
+                                      
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Module</label>
+                                        <label class="col-sm-3 col-form-label custom-text-color" id="module"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Plant</label>
+                                        <label class="col-sm-3 col-form-label custom-text-color" id="plant"></label>
+                                    </div>
+                                </div>
+                                <label class="col-sm-3 col-form-label custom-text-color hidden" id="id"></label>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Machine Type</label>
+                                        <label class="col-sm-3 col-form-label custom-text-color" id="ft"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">MAC</label>
+                                        <label class="col-sm-3 col-form-label custom-text-color" id="MAC"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">User</label>
+                                        <label class="col-sm-3 col-form-label custom-text-color" id="user"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Style</label>
+                                        <label class="col-sm-3 col-form-label custom-text-color" id="style"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                   
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Operation</label>
+                                            <label class="col-sm-3 col-form-label custom-text-color" id="op"></label>
+                                        </div>
+                               
+                                </div>
+
+                               
+                            </div>
+                        </form>
+                        <div class="button-container d-flex justify-content-center">
+                            <button type="button" onclick="window.location.href='/iotout'" class="btn btn-inverse-success btn-fw mx-2">Confirm</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="btn-container">
+                            <button type="button" class="btn-large btn-inverse-secondary btn-fw" id="btn1">1</button>
+                            <button type="button" class="btn-large btn-inverse-danger btn-fw" id="btn2">2</button>
+                            <button type="button" class="btn-large btn-inverse-warning btn-fw" id="btn3">3</button>
+                            <button type="button" class="btn-large btn-inverse-success btn-fw" id="btn4">4</button>
+                            <button type="button" class="btn-large btn-inverse-secondary btn-fw" id="btn5">5</button>
+                            <button type="button" class="btn-large btn-inverse-danger btn-fw" id="btn6">6</button>
+                            <button type="button" class="btn-large btn-inverse-primary btn-fw" id="btn7">7</button>
+                            <button type="button" class="btn-large btn-inverse-success btn-fw" id="btn8">8</button>
+                            <button type="button" class="btn-large btn-inverse-warning btn-fw" id="btn9">9</button>
+                            <button type="button" class="btn-large1 btn-inverse-success btn-fw">+</button>
+                            <button type="button" class="btn-large1 btn-inverse-danger btn-fw">-</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © KreedaFOF</span>
+        </div>
+    </footer>
+    <!-- main-panel ends -->
+    <!-- page-body-wrapper ends -->
+    </div>
+
+    <!-- End custom js for this page -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('.btn-large');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    buttons.forEach(btn => {
+                        if (btn !== button) {
+                            btn.classList.remove('clicked');
+                        }
+                    });
+
+                    button.classList.toggle('clicked');
+                    updateButtonValue(button);
+                    showPlusMinusButtons();
+                });
+            });
+
+            const plusButton = document.querySelector('.btn-large1.btn-inverse-success');
+            let plusButtonClickTimeout = null;
+
+            if (plusButton) {
+                plusButton.addEventListener('click', async () => {
+                    const clickedButton = document.querySelector('.btn-large.clicked');
+                    if (clickedButton) {
+                        let currentValue = parseInt(clickedButton.textContent);
+                        clickedButton.textContent = currentValue + 1;
+
+                        const timeMapping = {
+                            1: '07:30:00',
+                            2: '08:50:00',
+                            3: '09:50:00',
+                            4: '10:50:00',
+                            5: '11:50:00',
+                            6: '13:20:00',
+                            7: '14:20:00',
+                            8: '15:20:00',
+                            9: '16:30:00'
+                        };
+
+                        const buttonId = clickedButton.id.replace('btn', '');
+                        const time = timeMapping[buttonId];
+
+                        const data = {
+                            ChipID: document.getElementById('sn').textContent,
+                            Module: document.getElementById('module').textContent,
+                            Plant: document.getElementById('plant').textContent,
+                            MachineID: document.getElementById('ft').textContent,
+                            MAC: document.getElementById('MAC').textContent,
+                            UserName: document.getElementById('user').textContent,
+                            style: document.getElementById('style').textContent,
+                            Operation: document.getElementById('op').textContent,
+                            Time: time,
+                            UID: '123',
+                            IP: 'PLUS',
+                            GatewayIp: 'PLUS',
+                            Shift: 'PLUS'
+                        };
+
+                        await sendData('/iotplusminus/InsertData', data);
+                    }
+                });
+            }
+
+            const minusButton = document.querySelector('.btn-large1.btn-inverse-danger');
+            let minusButtonClickCount = 0;
+            let minusButtonClickTimeout = null;
+
+            if (minusButton) {
+                minusButton.addEventListener('click', async () => {
+                    const clickedButton = document.querySelector('.btn-large.clicked');
+                    if (clickedButton) {
+                        let currentValue = parseInt(clickedButton.textContent);
+                        if (currentValue > 0) {
+                            clickedButton.textContent = currentValue - 1;
+                            minusButtonClickCount++;
+
+                            // Clear previous timeout to avoid premature delete
+                            if (minusButtonClickTimeout) {
+                                clearTimeout(minusButtonClickTimeout);
+                            }
+
+                            // Wait for 5 seconds to check for additional clicks
+                            minusButtonClickTimeout = setTimeout(async () => {
+                                // Send delete request with the count
+                                const buttonId = parseInt(clickedButton.id.replace('btn', ''));
+                                const data = {
+                                    ChipID: document.getElementById('sn').textContent,
+                                    MAC: document.getElementById('MAC').textContent,
+                                    UserName: document.getElementById('user').textContent,
+                                    Operation: document.getElementById('op').textContent,
+                                    style: document.getElementById('style').textContent,
+                                    ButtonId: buttonId,
+                                    ClickCount: minusButtonClickCount
+                                };
+
+                                await sendData('/iotplusminus/DeleteData', data);
+
+                                // Reset click count after sending request
+                                minusButtonClickCount = 0;
+                            }, 5000); 
+                        }
+                    }
+                });
+            }
+
+            function updateButtonValue(button) {
+                const plusButton = document.querySelector('.btn-large1.btn-inverse-success');
+                const minusButton = document.querySelector('.btn-large1.btn-inverse-danger');
+                if (button.classList.contains('clicked')) {
+                    plusButton.disabled = false;
+                    minusButton.disabled = false;
+                } else {
+                    plusButton.disabled = true;
+                    minusButton.disabled = true;
+                }
+            }
+
+            function showPlusMinusButtons() {
+                const plusButton = document.querySelector('.btn-large1.btn-inverse-success');
+                const minusButton = document.querySelector('.btn-large1.btn-inverse-danger');
+                const clickedButton = document.querySelector('.btn-large.clicked');
+                if (clickedButton) {
+                    plusButton.style.display = 'inline-block';
+                    minusButton.style.display = 'inline-block';
+                } else {
+                    plusButton.style.display = 'none';
+                    minusButton.style.display = 'none';
+                }
+            }
+
+            showPlusMinusButtons();
+        });
+
+        async function sendData(url, data) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    console.log('Data sent successfully');
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to send data:', errorData.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.slice(1);
+            queryString.split('&').forEach(param => {
+                const [key, value] = param.split('=');
+                params[key] = decodeURIComponent(value.replace(/\+/g, ' '));
+            });
+            return params;
+        }
+
+        function populateFields(params) {
+            document.getElementById('sn').textContent = params.chipID || '';
+            document.getElementById('module').textContent = params.module || '';
+            document.getElementById('plant').textContent = params.plant || 'MEC';
+            document.getElementById('ft').textContent = params.ft || '';
+            document.getElementById('MAC').textContent = params.mac || '';
+            document.getElementById('user').textContent = params.userName || '';
+            document.getElementById('style').textContent = params.style || '';
+            document.getElementById('op').textContent = params.operation || '';
+              document.getElementById('id').textContent = params.o || '';
+            for (let i = 1; i <= 9; i++) {
+                document.getElementById(`btn${i}`).textContent = params[`h${i}`] || '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = getQueryParams();
+            populateFields(params);
+        });
+
+
+
+        
+    </script>
+</body>
+</html>

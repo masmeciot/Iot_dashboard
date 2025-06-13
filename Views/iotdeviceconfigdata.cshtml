@@ -1,0 +1,796 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/green.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+   
+        #table thead th {
+            color: steelblue;
+        }
+
+      
+        #table tbody td {
+            color: white;
+        }
+
+        #plant {
+            color: white;
+        }
+
+        .form-control {
+            color: white !important;
+        }
+
+        .custom-text-color {
+            color: hotpink !important;
+        }
+
+        .navbar-menu-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+            .navbar-menu-wrapper .back-button {
+                position: absolute;
+                left: 1rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                .navbar-menu-wrapper .back-button i {
+                    margin-right: 0.5rem;
+                }
+
+            .navbar-menu-wrapper h3 {
+                margin: 0 auto;
+            }
+    </style>
+
+</head>
+
+<body>
+
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+       <!-- <div class="back-button" onclick="window.location.href='/iotmenu/Index'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </div>-->
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">IOT Device Details</h3>
+            </li>
+        </ul>
+    </div>
+
+
+
+    <div class="content-wrapper">
+
+
+
+        <div class="row">
+
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">Change IOT Device Data</h4>
+                        <p class="card-title"> Enter MAC or Serial Number to search.</p>
+                        <form class="form-sample">
+                
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">MAC</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="MAC" placeholder="MAC">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Module</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="module" name="module" onchange="handleModuleChange()">
+                                                <option value="SY21">SY21</option>
+                                                <option value="SY26">SY26</option>
+                                                <option value="SY33">SY33</option>
+                                                <option value="FOF1">FOF1</option>
+                                                <option value="FOF2">FOF2</option>
+                                                <option value="FOF3">FOF3</option>
+                                                <option value="L2">L2</option>
+                                                <option value="add_new">+ Add New</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <script>
+                                    // Load modules from local storage
+                                    function loadModules() {
+                                        let moduleDropdown = document.getElementById("module");
+                                        let savedModules = JSON.parse(localStorage.getItem("modules")) || ["SY21", "SY26", "SY33", "FOF1", "FOF2", "FOF3", "L2"];
+
+                                        // Clear existing options
+                                        moduleDropdown.innerHTML = "";
+
+                                        // Add saved modules to dropdown
+                                        savedModules.forEach(module => {
+                                            let option = document.createElement("option");
+                                            option.value = module;
+                                            option.textContent = module;
+                                            moduleDropdown.appendChild(option);
+                                        });
+
+                                        // Add the "+ Add New" option
+                                        let addNewOption = document.createElement("option");
+                                        addNewOption.value = "add_new";
+                                        addNewOption.textContent = "+ Add New";
+                                        moduleDropdown.appendChild(addNewOption);
+                                    }
+
+                                    // Handle module selection
+                                    function handleModuleChange() {
+                                        let moduleDropdown = document.getElementById("module");
+                                        let selectedValue = moduleDropdown.value;
+
+                                        if (selectedValue === "add_new") {
+                                            let newModule = prompt("Enter new module name:");
+
+                                            if (newModule && newModule.trim() !== "") {
+                                                let savedModules = JSON.parse(localStorage.getItem("modules")) || [];
+
+                                                // Check if module already exists
+                                                if (!savedModules.includes(newModule)) {
+                                                    savedModules.push(newModule);
+                                                    localStorage.setItem("modules", JSON.stringify(savedModules));
+
+                                                    // Reload dropdown to reflect new changes
+                                                    loadModules();
+                                                    moduleDropdown.value = newModule;
+                                                } else {
+                                                    alert("Module already exists!");
+                                                }
+                                            }
+
+                                            // Reset dropdown if the user cancels
+                                            moduleDropdown.value = "";
+                                        }
+                                    }
+
+                                    // Load modules when page loads
+                                    document.addEventListener("DOMContentLoaded", loadModules);
+                                </script>
+
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Machine Serial No.</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="snum" placeholder="Serial Number">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Operation Field -->
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" style="margin-left=20px">Operation</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="operation">
+                                               
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                      
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Plant</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="plant" onchange="filterTable()">
+                                                <option>SYNERGY</option>
+                                                <option>MEC</option>
+                                          
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" style="margin-left=20px">User</label>
+                                        <div class="col-sm-9">
+                                           <input type="text" class="form-control" id="user" placeholder="user">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Machine Type</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="type" placeholder="Type">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" style="margin-left=20px">No Of Shifts</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="shift" placeholder="No Of Shifts">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">No of Zones</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="NoZones" placeholder="No of Zones">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" style="margin-left=20px">Connection String</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="Connection" placeholder="Connection String">
+                                        </div>
+                                    </div>
+                            </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Kreeda Iot Device ID</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="DeviceID" placeholder="Kreeda Iot Device ID">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" style="margin-left=20px">Station ID</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="stationid" placeholder="Station ID">
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                </div>
+
+
+                            <div class="row">
+
+                                <!-- Style Field -->
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" style="margin-left=20px">Style</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="style">
+                                                <!-- Dropdown options will be dynamically populated -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" style="margin-left=20px">Mode</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="mode" name="mode">
+                                                <option>M1</option>
+                                                <option>M2</option>
+                                                <option>M3</option>
+                                                <option>M4</option>
+                                                <option>M5</option>
+                                                <option>M6</option>
+                                                <option>M7</option>
+                                                <option>M8</option>
+                                                <option>M9</option>
+                                                <option>M10</option>
+                                                <option>M11</option>
+                                                <option>M12</option>
+                                                <option>M13</option>
+                                                <option>M14</option>
+                                                <option>M15</option>
+                                                <option>M16</option>
+                                                <option>M17</option>
+                                                <option>M18</option>
+                                                <option>M19</option>
+                                                <option>M20</option>
+                                               
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                               
+                            </div>
+
+
+                        </form>
+                        <div class="button-container d-flex justify-content-center">
+                            <button type="submit" onclick="search()" class="btn btn-inverse-primary btn-fw mx-2">Search</button>
+                            <button type="submit" onclick="addNew()" class="btn btn-inverse-success btn-fw mx-2">Add New</button>
+                            <button type="submit" onclick="update()" class="btn btn-inverse-warning btn-fw mx-2">Update</button>
+                            <button type="submit" onclick="deleteData()" class="btn btn-inverse-danger btn-fw mx-2">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-warning">IoT Device Details</h4>
+
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="table">
+                                <thead>
+                                    <tr>
+                                        <th> MachineSn </th>
+                                        <th> Plant </th>
+
+                                        <th> Operation </th>
+                                        <th> MAC </th>
+                                   
+                                        <th> User </th>
+                                        <th> Type</th>
+                                        <th> Shifts </th>
+                                        <th> Zones </th>
+                                        <th> StationID </th>
+                                        <th> DeviceID </th>
+                                       
+                                        <th> Module </th>
+                                        <th> Style </th>
+                                        <th> Mode </th>
+                                        <th> Con.String </th>
+                                 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                             
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Deminda</span>
+
+        </div>
+    </footer>
+
+
+
+  
+
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Fetch distinct operations
+                fetch('/Iotconfig/GetDistinctOperations')
+                    .then(response => response.json())
+                    .then(data => {
+                        const operationDropdown = document.getElementById("operation");
+                        data.forEach(operation => {
+                            let option = document.createElement("option");
+                            option.value = operation;
+                            option.text = operation;
+                            operationDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+
+                // Fetch distinct styles
+                fetch('/Iotconfig/GetDistinctStyles')
+                    .then(response => response.json())
+                    .then(data => {
+                        const styleDropdown = document.getElementById("style");
+                        data.forEach(style => {
+                            let option = document.createElement("option");
+                            option.value = style;
+                            option.text = style;
+                            styleDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+
+
+        $(document).ready(function () {
+            fetchDataTable();
+        });
+
+        function filterTable() {
+            var moduleInput = document.getElementById('module').value.toLowerCase();
+            var plantInput = document.getElementById('plant').value.toLowerCase();
+            var table = document.getElementById('table');
+            var tr = table.getElementsByTagName('tr');
+
+            for (var i = 1; i < tr.length; i++) {
+                var moduleCell = tr[i].getElementsByTagName('td')[10];
+                var plantCell = tr[i].getElementsByTagName('td')[1];
+                if (moduleCell && plantCell) {
+                    var moduleValue = moduleCell.textContent || moduleCell.innerText;
+                    var plantValue = plantCell.textContent || plantCell.innerText;
+
+                    if (moduleValue.toLowerCase().indexOf(moduleInput) > -1 && plantValue.toLowerCase().indexOf(plantInput) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }   
+                }
+            }
+        }
+
+
+        function fetchDataTable() {
+            $.ajax({
+                url: '/Iotconfig/GetData',
+                method: 'GET',
+                success: function (response) {
+                    var tableBody = document.querySelector('#table tbody');
+                    tableBody.innerHTML = '';
+                    response.forEach(function (item) {
+                        var row = tableBody.insertRow();
+
+                        row.addEventListener('dblclick', function () {
+                            fillFormWithRowData(item);
+                        });
+
+                        var slotCell = row.insertCell(0);
+                        slotCell.textContent = item.machineSn;
+                        slotCell.classList.add('custom-text-color');
+
+                        var categoryCell = row.insertCell(1);
+                        categoryCell.textContent = item.plantName;
+
+                        var operationCell = row.insertCell(2);
+                        operationCell.textContent = item.operation;
+
+                        var macCell = row.insertCell(3);
+                        macCell.textContent = item.mac;
+
+                        var userLoggedCell = row.insertCell(4);
+                        userLoggedCell.textContent = item.userLogged;
+
+                        var machineTypeCell = row.insertCell(5);
+                        machineTypeCell.textContent = item.machineType;
+
+                        var noOfShiftsCell = row.insertCell(6);
+                        noOfShiftsCell.textContent = item.noOfShifts;
+
+                        var noZonesCell = row.insertCell(7);
+                        noZonesCell.textContent = item.noZones;
+
+                        var stationidCell = row.insertCell(8);
+                        stationidCell.textContent = item.stationID;
+
+                        var kreedIotDeviceIDCell = row.insertCell(9);
+                        kreedIotDeviceIDCell.textContent = item.kreedIotDeviceID;
+
+                        var moduleCell = row.insertCell(10);
+                        moduleCell.textContent = item.module;
+
+                        var styleStringCell = row.insertCell(11);
+                        styleStringCell.textContent = item.style;
+
+                        var mode = row.insertCell(12);
+                        mode.textContent = item.mode;
+
+                        var connectionStringCell = row.insertCell(13);
+                        connectionStringCell.textContent = item.connectionString;
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        function fillFormWithRowData(data) {
+            document.getElementById('plant').value = data.plantName;
+            document.getElementById('module').value = data.module;
+            document.getElementById('MAC').value = data.mac;
+            document.getElementById('operation').value = data.operation;
+            document.getElementById('snum').value = data.machineSn;
+            document.getElementById('user').value = data.userLogged;
+            document.getElementById('type').value = data.machineType;
+            document.getElementById('shift').value = data.noOfShifts;
+            document.getElementById('NoZones').value = data.noZones;
+            document.getElementById('stationid').value = data.stationID;
+            document.getElementById('DeviceID').value = data.kreedIotDeviceID;
+            document.getElementById('Connection').value = data.connectionString;
+            document.getElementById('style').value = data.style;
+            document.getElementById('mode').value = data.mode;
+        }
+
+
+
+
+        function search() {
+            var snm = document.getElementById('snum').value;
+            var mac = document.getElementById('MAC').value;
+
+            $.ajax({
+                url: '/Iotconfig/SearchBy',
+                method: 'GET',
+                data: { snm: snm, mac: mac },
+                success: function (response) {
+                    document.getElementById('snum').value = response.machinesn || '';
+                    document.getElementById('operation').value = response.operation || '';
+                    document.getElementById('MAC').value = response.mac || '';
+                    document.getElementById('plant').value = response.plant || '';
+                    document.getElementById('user').value = response.user || '';
+                    document.getElementById('type').value = response.machine || '';
+                    document.getElementById('shift').value = response.shift || '';
+                    document.getElementById('NoZones').value = response.zone || '';
+                   // document.getElementById('AutoCode').value = response.auto || '';
+                    document.getElementById('DeviceID').value = response.deviceid || '';
+                    document.getElementById('Connection').value = response.con || '';
+                    document.getElementById('module').value = response.module || '';
+                    document.getElementById('style').value = response.style || '';
+                    document.getElementById('mode').value = response.mode || '';
+                    document.getElementById('stationid').value = response.stationID || '';
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                    console.log('Server Response:', xhr.responseText);
+                }
+            });
+        }
+
+
+
+
+
+
+        function addNew() {
+            var plantInput = document.getElementById('plant');
+            var moduleInput = document.getElementById('module');
+            var macInput = document.getElementById('MAC');
+            var operationInput = document.getElementById('operation');
+            var serialNumberInput = document.getElementById('snum');
+            var userInput = document.getElementById('user');
+            var typeInput = document.getElementById('type');
+            var shiftInput = document.getElementById('shift');
+            var noZonesInput = document.getElementById('NoZones');
+            var stationid1 = document.getElementById('stationid');
+            var deviceIDInput = document.getElementById('DeviceID');
+            var connectionStringInput = document.getElementById('Connection');
+            var style = document.getElementById('style');
+            var mode = document.getElementById('mode');
+           
+
+            var newData = {
+                PlantName: plantInput.value,
+                Module: moduleInput.value,
+                MAC: macInput.value,
+                Operation: operationInput.value,
+                ChipID: serialNumberInput.value,
+                UserLogged: userInput.value,
+                MachineType: typeInput.value,
+                NoOfShifts: parseInt(shiftInput.value),
+                NoZones: parseInt(noZonesInput.value),
+                StationID: stationid1.value,
+                KreedIotDeviceID: deviceIDInput.value,
+                ConnectionString: connectionStringInput.value,
+                style: style.value,
+                mode: mode.value,
+                AutoCode: "0",
+            };
+
+            $.ajax({
+                url: '/Iotconfig/AddNewData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newData),
+                success: function (response) {
+                    // Clear input fields
+                    plantInput.value = '';
+                    moduleInput.value = '';
+                    macInput.value = '';
+                    operationInput.value = '';
+                    serialNumberInput.value = '';
+                    userInput.value = '';
+                    typeInput.value = '';
+                    shiftInput.value = '';
+                    noZonesInput.value = '';
+                    //autoCodeInput.value = '';
+                    deviceIDInput.value = '';
+                    connectionStringInput.value = '';
+                    style.value = '';
+                    mode.value = '';
+                      stationid1.value = '';
+                    fetchDataTable();
+                },
+                error: function (error) {
+                    if (error.status === 409) {
+                        alert('ChipID already exists. Please use a different ChipID.');
+                    } else {
+                        console.error('Error adding new data:', error);
+                    }
+                }
+            });
+        }
+
+
+
+
+        function update() {
+            var plantInput = document.getElementById('plant');
+            var moduleInput = document.getElementById('module');
+            var macInput = document.getElementById('MAC');
+            var operationInput = document.getElementById('operation');
+            var serialNumberInput = document.getElementById('snum');
+            var userInput = document.getElementById('user');
+            var typeInput = document.getElementById('type');
+            var shiftInput = document.getElementById('shift');
+            var noZonesInput = document.getElementById('NoZones');
+            var autoCodeInput = document.getElementById('AutoCode');
+            var deviceIDInput = document.getElementById('DeviceID');
+            var connectionStringInput = document.getElementById('Connection');
+            var style = document.getElementById('style');
+            var mode = document.getElementById('mode');
+            var stationid2 = document.getElementById('stationid');
+
+            var UpData = {
+                PlantName: plantInput.value,
+                Module: moduleInput.value,
+                MAC: macInput.value,
+                Operation: operationInput.value,
+                ChipID: serialNumberInput.value,
+                UserLogged: userInput.value,
+                MachineType: typeInput.value,
+                NoOfShifts: parseInt(shiftInput.value),
+                NoZones: parseInt(noZonesInput.value),
+                StationID: stationid2.value,
+                KreedIotDeviceID: deviceIDInput.value,
+                ConnectionString: connectionStringInput.value,
+                style: style.value,
+                mode: mode.value,
+            };
+
+           // console.log('Sending data:', JSON.stringify(UpData)); 
+
+            $.ajax({
+                url: '/Iotconfig/UpdateData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(UpData),
+                success: function (response) {
+                // console.log('Data updated successfully:', response);
+
+                  
+                    plantInput.value = '';
+                    moduleInput.value = '';
+                    macInput.value = '';
+                    operationInput.value = '';
+                    serialNumberInput.value = '';
+                    userInput.value = '';
+                    typeInput.value = '';
+                    shiftInput.value = '';
+                    noZonesInput.value = '';
+                    stationid2.value = '';
+                    deviceIDInput.value = '';
+                    connectionStringInput.value = '';
+                    style.value = '';
+                    mode.value = '';
+                    fetchDataTable();
+                },
+                error: function (error) {
+                    console.error('Error updating data:', error);
+                    console.log('Server response:', error.responseText);
+                }
+            });
+           
+        }
+       
+
+
+        function deleteData() {
+            var snm = document.getElementById('snum').value;
+
+            $.ajax({
+                url: '/Iotconfig/DeleteData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(snm), 
+                success: function (response) {
+                 //   console.log(response);
+                    // Clear
+                    document.getElementById('plant').value = '';
+                    document.getElementById('module').value = '';
+                    document.getElementById('MAC').value = '';
+                    document.getElementById('operation').value = '';
+                    document.getElementById('snum').value = '';
+                    document.getElementById('user').value = '';
+                    document.getElementById('type').value = '';
+                    document.getElementById('shift').value = '';
+                    document.getElementById('NoZones').value = '';
+                    document.getElementById('stationid').value = '';
+                    document.getElementById('DeviceID').value = '';
+                    document.getElementById('Connection').value = '';
+                    document.getElementById('style').value = '';
+                    document.getElementById('mode').value = '';
+                    fetchDataTable();
+                },
+                error: function (error) {
+                    if (error.status === 409) {
+                        alert('ChipID already exists.');
+                    } else {
+                        console.error('Error adding new data:', error);
+                    }
+                }
+            });
+           
+        }
+ 
+
+
+      
+
+
+    </script>
+
+ 
+
+   
+
+</body>
+
+
+</html>

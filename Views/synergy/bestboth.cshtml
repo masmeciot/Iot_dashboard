@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kreeda-IoT</title>
+    <!-- Load dependencies -->
+    <!-- Your custom styles and scripts -->
+    <link rel="stylesheet" href="~/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+
+    <link rel="shortcut icon" href="~/icon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        .chartjs-plugin-datalabels span {
+            color: white !important;
+        }
+
+    </style>
+    <style>
+        .chartjs-render-monitor .chartjs-legend ul li span {
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-wrapper">
+        <div id="charts-container" class="row"></div>
+    </div>
+
+
+
+    <script>
+             document.addEventListener('DOMContentLoaded', function () {
+            Chart.register(ChartDataLabels);
+            let chartInstance; // Store the single chart instance
+
+            function createOrUpdateChart(data) {
+                const usernames = data.map(item => item.userName);
+                const handSewValues = data.map(item => [item.hand, item.sew]);
+                const deltaRunValues = data.map(item => [item.deltaAvg, item.runAvg]);
+
+                if (!chartInstance) {
+                    // Create chart container if it doesn't exist
+                    const container = document.createElement('div');
+                    container.classList.add('col-lg-12', 'grid-margin');
+                    container.style.height = '320px';
+
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.style.height = '320px';
+
+                    const cardBody = document.createElement('div');
+                    cardBody.classList.add('card-body');
+                    cardBody.style.height = '180px';
+
+                    const title = document.createElement('h4');
+                    title.classList.add('card-title', 'text-warning');
+                    title.innerText = 'SYN26';
+
+                    const canvas = document.createElement('canvas');
+                    canvas.id = 'syn26Chart';
+                    canvas.style.height = '90%';
+                    canvas.style.width = '100%';
+
+                    cardBody.appendChild(title);
+                    cardBody.appendChild(canvas);
+                    card.appendChild(cardBody);
+                    container.appendChild(card);
+
+                    document.getElementById('charts-container').appendChild(container);
+
+                    // Create a new chart
+                    chartInstance = new Chart(canvas, {
+                        type: 'bar',
+                        data: {
+                            labels: usernames,
+                            datasets: [
+                                {
+                                    label: 'SMV Machine Time(Sec)',
+                                    backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                    borderColor: 'rgba(255, 191, 0,1)',
+                                    borderWidth: 2,
+                                    data: handSewValues.map(values => values[1]),
+                                    stack: 'Stack 1',
+                                },
+                                {
+                                    label: 'SMV Man Time(Sec)',
+                                    backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                                    borderColor: 'rgba(255, 191, 0,1)',
+                                    borderWidth: 2,
+                                    data: handSewValues.map(values => values[0]),
+                                    stack: 'Stack 1',
+                                },
+                                {
+                                    label: 'Actual Machine Time(Sec)',
+                                    backgroundColor: 'rgba(150, 255, 150, 0.4)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 2,
+                                    data: deltaRunValues.map(values => values[1]),
+                                    stack: 'Stack 2',
+                                },
+                                {
+                                    label: 'Actual Man Time(Sec)',
+                                    backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 2,
+                                    data: deltaRunValues.map(values => values[0]),
+                                    stack: 'Stack 2',
+                                },
+                                {
+                                    type: 'line',
+                                    backgroundColor: 'red',
+                                    label: 'TaktTime',
+                                    fill: false,
+                                }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    ticks: { color: 'white' }
+                                },
+                                y: {
+                                    stacked: true,
+                                    display: true,
+                                    beginAtZero: true,
+                                    ticks: { min: 0, mirror: true, color: 'white' }
+                                }
+                            },
+                            plugins: {
+                                datalabels: {
+                                    align: 'center',
+                                    anchor: 'center',
+                                    labels: { value: { color: 'white' } }
+                                },
+                                legend: {
+                                    labels: { color: 'white' }
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y',
+                                        value: 32,
+                                        borderColor: 'red',
+                                        borderWidth: 1,
+                                        label: {
+                                            enabled: true,
+                                            content: 'Target Line'
+                                        }
+                                    }]
+                                }
+                            },
+                            elements: {
+                                bar: { borderWidth: 1, borderColor: 'white' }
+                            },
+                            legend: { labels: { color: 'white' } }
+                        }
+                    });
+                } else {
+                    // Update existing chart data
+                    chartInstance.data.labels = usernames;
+                    chartInstance.data.datasets[0].data = handSewValues.map(values => values[1]);
+                    chartInstance.data.datasets[1].data = handSewValues.map(values => values[0]);
+                    chartInstance.data.datasets[2].data = deltaRunValues.map(values => values[1]);
+                    chartInstance.data.datasets[3].data = deltaRunValues.map(values => values[0]);
+                    chartInstance.update();
+                }
+            }
+
+            function fetchDataAndUpdateCharts() {
+                fetch('/bestboth/Data')
+                    .then(response => response.json())
+                    .then(responseData => {
+                        console.log(responseData);
+                        if (responseData.latestData && Array.isArray(responseData.latestData)) {
+                            createOrUpdateChart(responseData.latestData);
+                        } else {
+                            console.error('Invalid data structure:', responseData);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+            fetchDataAndUpdateCharts();
+            setInterval(fetchDataAndUpdateCharts, 180000);
+        });
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
