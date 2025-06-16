@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+Properties/ServiceDependencies/KRE-SEA-KRE-IOT-APP - Web Deploy2/profile.arm.json
+Properties/ServiceDependencies/KRE-SEA-KRE-IOT-APP - Web Deploy1/profile.arm.json
