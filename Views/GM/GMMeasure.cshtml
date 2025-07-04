@@ -46,6 +46,43 @@
         #trolly tbody td {
             color: white;
         }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            min-height: 0;
+        }
+        #measurementCards {
+            flex: 0 0 auto;
+            min-height: 110px;
+            margin: 20px 0;
+        }
+        #graphsArea {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: stretch;
+            min-height: 0;
+            height: 0;
+        }
+        #graphsContainer {
+            flex: 1 1 0;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+        }
+        #measurementNav {
+            flex: 0 0 auto;
+            min-height: 60px;
+            margin: 30px 0 10px 0;
+        }
     </style>
 
 </head>
@@ -81,83 +118,82 @@
                                 <input type="text" class="form-control" id="EPF" name="EPF" placeholder="Enter EPF">
                         </div>
                         <div class="form-group"></div>
-                            <label">Station</label>
-                                <input type="text" class="form-control" id="station" name="station" placeholder="Enter EPF">
+                        <label">Station</label>
+                            <input type="text" class="form-control" id="station" name="station" placeholder="Enter EPF">
+                    </div>
+                    <div class="form-group">
+                        <label>Style</label>
+                        <select class="form-control" id="styleSelector" placeholder="Select Style">
+                            <option value="" disabled selected>Loading styles...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display:none;" id="sizeSelectDIV">
+                        <label>Size</label>
+                        <select class="form-control" id="sizeSelector" placeholder="Select Size">
+                            <option value="" disabled selected>Select a size...</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="button-container">
+                            <button type="button" onclick="nextBtn()" class="btn-sm btn-inverse-primary btn-fw"
+                                style="width: 80px;">Next</button>
                         </div>
-                        <div class="form-group">
-                            <label>Style</label>
-                            <select class="form-control" id="styleSelector" placeholder="Select Style">
-                                <option value="" disabled selected>Loading styles...</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="display:none;" id="sizeSelectDIV">
-                            <label>Size</label>
-                            <select class="form-control" id="sizeSelector" placeholder="Select Size">
-                                <option value="" disabled selected>Select a size...</option>
-                            </select>
-                        </div>
-                        <div class="row">
-                            <div class="button-container">
-                                <button type="button" onclick="nextBtn()" class="btn-sm btn-inverse-primary btn-fw"
-                                    style="width: 80px;">Next</button>
-                            </div>
-                            <div class="button-container">
-                                <button type="button" onclick="window.location.href='@Url.Action("Index", "GM")'"
-                                    class="btn-sm btn-inverse-primary btn-fw" style="width: 80px;">Back</button>
-                            </div>
+                        <div class="button-container">
+                            <button type="button" onclick="window.location.href='@Url.Action("Index", "GM")'"
+                                class="btn-sm btn-inverse-primary btn-fw" style="width: 80px;">Back</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+    </div>
+    </section>
 
 
 
-        <section id="MeasureInterface" class="MeasureInterface"
-            style="display:none; min-height: 100vh; flex-direction: column; justify-content: space-between;">
-            <!-- Top Cards -->
-            <div id="measurementCards"
-                style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0; flex-wrap: wrap;">
-                <div class="card measurement-card" id="cardMeasurement"
-                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                    <h5>Measurement</h5>
-                    <div id="measurementName">-</div>
-                </div>
-                <div class="card measurement-card" id="cardMeasuredValue"
-                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                    <h5>Measured Value</h5>
-                    <div id="measuredValue">-</div>
-                </div>
-                <div class="card measurement-card" id="cardTolerance"
-                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                    <h5>Reference</h5>
-                    <div id="reference">-</div>
-                </div>
-                <div class="card measurement-card" id="cardStatus"
-                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                    <h5>Status</h5>
-                    <div id="passFailStatus">-</div>
-                </div>
-                <div class="card measurement-card" id="cardCurrentSize"
-                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                    <h5>Current Size</h5>
-                    <div id="currentSize">-</div>
-                </div>
+    <section id="MeasureInterface" class="MeasureInterface"
+        style="display:none; min-height: 100vh; flex-direction: column; justify-content: space-between;">
+        <!-- Top Cards -->
+        <div id="measurementCards"
+            style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0; flex-wrap: wrap;">
+            <div class="card measurement-card" id="cardMeasurement"
+                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <h5>Measurement</h5>
+                <div id="measurementName">-</div>
             </div>
-            <!-- Graphs Area -->
-            <div id="graphsArea"
-                style="flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 350px;">
-                <div id="graphsContainer"
-                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 20px;"></div>
+            <div class="card measurement-card" id="cardMeasuredValue"
+                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <h5>Measured Value</h5>
+                <div id="measuredValue">-</div>
             </div>
-            <!-- Bottom Buttons -->
-            <div id="measurementNav"
-                style="display: flex; justify-content: center; align-items: center; margin: 30px 0 10px 0; gap: 30px;">
-                <button type="button" class="btn btn-secondary" onclick="showDetailForm()">Back</button>
-                <button type="button" class="btn btn-primary" onclick="prevMeasurement()">Previous Measurement</button>
-                <button type="button" class="btn btn-primary" onclick="nextMeasurement()">Next Measurement</button>
+            <div class="card measurement-card" id="cardTolerance"
+                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <h5>Reference</h5>
+                <div id="reference">-</div>
             </div>
-        </section>
+            <div class="card measurement-card" id="cardStatus"
+                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <h5>Status</h5>
+                <div id="passFailStatus">-</div>
+            </div>
+            <div class="card measurement-card" id="cardCurrentSize"
+                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <h5>Current Size</h5>
+                <div id="currentSize">-</div>
+            </div>
+        </div>
+        <!-- Graphs Area -->
+        <div id="graphsArea"
+            style="flex: 1 1 auto; display: flex; flex-direction: column; align-items: stretch; justify-content: stretch; min-height: 350px;">
+            <div id="graphsContainer" style="flex: 1 1 auto; display: flex; width: 100%; height: 100%;"></div>
+        </div>
+        <!-- Bottom Buttons -->
+        <div id="measurementNav"
+            style="display: flex; justify-content: center; align-items: center; margin: 30px 0 10px 0; gap: 30px;">
+            <button type="button" class="btn btn-secondary" onclick="showDetailForm()">Back</button>
+            <button type="button" class="btn btn-primary" onclick="prevMeasurement()">Previous Measurement</button>
+            <button type="button" class="btn btn-primary" onclick="nextMeasurement()">Next Measurement</button>
+        </div>
+    </section>
     </div>
 
     <!-- content-wrapper ends -->
@@ -487,7 +523,7 @@
                 referenceMap[m.measurement] = { ref: m.reference, tol: m.tolerance };
             });
             // For each measurement, collect measured values for all garments
-            var graphData = measurementNames.map(function(name) {
+            var graphData = measurementNames.map(function (name) {
                 var ref = referenceMap[name].ref;
                 var tol = referenceMap[name].tol;
                 var measuredVals = allGarmentMeasurements
@@ -524,7 +560,7 @@
 
             // Destroy old charts
             if (window.chartInstances && Array.isArray(window.chartInstances)) {
-                window.chartInstances.forEach(c => { try { c.destroy(); } catch {} });
+                window.chartInstances.forEach(c => { try { c.destroy(); } catch { } });
             }
             window.chartInstances = [];
 
@@ -540,29 +576,36 @@
             function showGroup(page) {
                 graphsContainer.innerHTML = '';
                 const group = groups[page] || [];
-                // Create a 2x2 grid
+                // Create a 2x2 grid that fills the available area
                 const grid = document.createElement('div');
                 grid.style.display = 'grid';
                 grid.style.gridTemplateColumns = '1fr 1fr';
                 grid.style.gridTemplateRows = '1fr 1fr';
-                grid.style.gap = '20px';
+                grid.style.gap = '32px';
                 grid.style.width = '100%';
-                grid.style.justifyItems = 'center';
+                grid.style.height = '100%';
+                grid.style.minHeight = 0;
+                grid.style.justifyItems = 'stretch';
+                grid.style.alignItems = 'stretch';
                 group.forEach((m, idx) => {
                     const graphDiv = document.createElement('div');
                     graphDiv.id = 'graph_' + idx;
-                    graphDiv.style.width = '320px';
-                    graphDiv.style.height = '240px';
-                    graphDiv.innerHTML = `<canvas id="chart_${idx}" width="300" height="180"></canvas><div style="margin-top:8px; font-weight:600;">${m.name || 'Measurement'}</div>`;
+                    graphDiv.style.width = '100%';
+                    graphDiv.style.height = '100%';
+                    graphDiv.style.minHeight = 0;
+                    graphDiv.style.display = 'flex';
+                    graphDiv.style.flexDirection = 'column';
+                    graphDiv.style.alignItems = 'center';
+                    graphDiv.style.justifyContent = 'center';
+                    graphDiv.innerHTML = `<canvas id="chart_${idx}" style="width:100%;height:100%;max-width:100%;max-height:100%;"></canvas><div style="margin-top:8px; font-weight:600;">${m.name || 'Measurement'}</div>`;
                     grid.appendChild(graphDiv);
-                    // Wait for the canvas to be in the DOM
                     setTimeout(() => {
                         var ctx = document.getElementById(`chart_${idx}`);
                         if (ctx) {
                             var chart = new Chart(ctx, {
                                 type: 'line',
                                 data: {
-                                    labels: m.measuredVals.map((_, i) => `G${i+1}`),
+                                    labels: m.measuredVals.map((_, i) => `G${i + 1}`),
                                     datasets: [
                                         {
                                             label: 'Measured',
@@ -577,7 +620,7 @@
                                             label: 'Reference',
                                             data: m.measuredVals.map(() => m.reference),
                                             borderColor: '#ffc107',
-                                            borderDash: [5,5],
+                                            borderDash: [5, 5],
                                             fill: false,
                                             pointRadius: 0
                                         },
@@ -585,7 +628,7 @@
                                             label: '+Tolerance',
                                             data: m.measuredVals.map(() => m.plusTol),
                                             borderColor: '#28a745',
-                                            borderDash: [2,2],
+                                            borderDash: [2, 2],
                                             fill: false,
                                             pointRadius: 0
                                         },
@@ -593,14 +636,15 @@
                                             label: '-Tolerance',
                                             data: m.measuredVals.map(() => m.minusTol),
                                             borderColor: '#dc3545',
-                                            borderDash: [2,2],
+                                            borderDash: [2, 2],
                                             fill: false,
                                             pointRadius: 0
                                         }
                                     ]
                                 },
                                 options: {
-                                    responsive: false,
+                                    maintainAspectRatio: false,
+                                    responsive: true,
                                     plugins: { legend: { display: true } },
                                     scales: {
                                         x: { title: { display: true, text: 'Garment' } },
