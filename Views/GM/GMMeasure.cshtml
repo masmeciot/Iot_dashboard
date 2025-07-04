@@ -80,6 +80,10 @@
                             <label">EPF</label>
                                 <input type="text" class="form-control" id="EPF" name="EPF" placeholder="Enter EPF">
                         </div>
+                        <div class="form-group"></div>
+                            <label">Station</label>
+                                <input type="text" class="form-control" id="station" name="station" placeholder="Enter EPF">
+                        </div>
                         <div class="form-group">
                             <label>Style</label>
                             <select class="form-control" id="styleSelector" placeholder="Select Style">
@@ -109,36 +113,46 @@
 
 
 
-        <section id="MeasureInterface" class="MeasureInterface" style="display:none; min-height: 100vh; flex-direction: column; justify-content: space-between;">
+        <section id="MeasureInterface" class="MeasureInterface"
+            style="display:none; min-height: 100vh; flex-direction: column; justify-content: space-between;">
             <!-- Top Cards -->
-            <div id="measurementCards" style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0; flex-wrap: wrap;">
-                <div class="card measurement-card" id="cardMeasurement" style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+            <div id="measurementCards"
+                style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0; flex-wrap: wrap;">
+                <div class="card measurement-card" id="cardMeasurement"
+                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
                     <h5>Measurement</h5>
                     <div id="measurementName">-</div>
                 </div>
-                <div class="card measurement-card" id="cardMeasuredValue" style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <div class="card measurement-card" id="cardMeasuredValue"
+                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
                     <h5>Measured Value</h5>
                     <div id="measuredValue">-</div>
                 </div>
-                <div class="card measurement-card" id="cardTolerance" style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <div class="card measurement-card" id="cardTolerance"
+                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
                     <h5>Reference</h5>
                     <div id="reference">-</div>
                 </div>
-                <div class="card measurement-card" id="cardStatus" style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <div class="card measurement-card" id="cardStatus"
+                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
                     <h5>Status</h5>
                     <div id="passFailStatus">-</div>
                 </div>
-                <div class="card measurement-card" id="cardCurrentSize" style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
+                <div class="card measurement-card" id="cardCurrentSize"
+                    style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
                     <h5>Current Size</h5>
                     <div id="currentSize">-</div>
                 </div>
             </div>
             <!-- Graphs Area -->
-            <div id="graphsArea" style="flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 350px;">
-                <div id="graphsContainer" style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 20px;"></div>
+            <div id="graphsArea"
+                style="flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 350px;">
+                <div id="graphsContainer"
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 20px;"></div>
             </div>
             <!-- Bottom Buttons -->
-            <div id="measurementNav" style="display: flex; justify-content: center; align-items: center; margin: 30px 0 10px 0; gap: 30px;">
+            <div id="measurementNav"
+                style="display: flex; justify-content: center; align-items: center; margin: 30px 0 10px 0; gap: 30px;">
                 <button type="button" class="btn btn-secondary" onclick="showDetailForm()">Back</button>
                 <button type="button" class="btn btn-primary" onclick="prevMeasurement()">Previous Measurement</button>
                 <button type="button" class="btn btn-primary" onclick="nextMeasurement()">Next Measurement</button>
@@ -168,6 +182,10 @@
         var currentMeasurementIdx = 0;
         var measuredValues = {}; // { size: { measurement: value } }
         var lastInputTime = 0;
+        var garmentSession = '';
+        var plant = '@(ViewBag.plant?.ToString() ?? "")';
+        var username = '@(ViewBag.account?.ToString() ?? "")';
+        var prvlg = '@Html.Raw(Json.Serialize(ViewBag.prvlgtyp))';
 
         document.addEventListener('DOMContentLoaded', function () {
             loadStyles();
@@ -193,6 +211,9 @@
         });
         function loadStyles() {
             console.log("Loading styles...");
+            console.log(username);
+            console.log(station);
+            console.log(prvlg);
             $.ajax({
                 url: '/GM/getStyles',
                 method: 'POST',
@@ -222,19 +243,31 @@
         function styleSelected() {
             document.getElementById('styleSelectDIV').style.display = 'flex';
         }
+        function generateSession() {
+            // Generate a cryptographically strong random string of at least 25 characters (base64url)
+            const array = new Uint8Array(20); // 20 bytes = 160 bits ~ 27 base64url chars
+            window.crypto.getRandomValues(array);
+            // Convert to base64url
+            let base64 = btoa(String.fromCharCode.apply(null, array));
+            base64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            return username + '_' + base64;
+        }
         function nextBtn() {
             var soli = document.getElementById('SOLI').value.trim();
-            var epf = document.getElementById('EPF').value.trim();
+            var epf = Number(document.getElementById('EPF').value.trim());
             var style = document.getElementById('styleSelector').value;
             var size = document.getElementById('sizeSelector').value;
-
             if (!soli || !epf || !style || !size) {
                 alert("Please fill in all fields: SOLI, EPF, Style, and Size.");
                 return;
             }
-
+            garmentSession = generateSession();
             document.getElementById('DetailForm').style.display = 'none';
             document.getElementById('MeasureInterface').style.display = 'flex';
+            // Reset measured values for new garment
+            if (!measuredValues[size]) measuredValues[size] = {};
+            currentMeasurementIdx = 0;
+            showMeasurement(currentMeasurementIdx);
         }
 
         function getMeasureData() {
@@ -305,7 +338,7 @@
             if (measuredValues[size] && measuredValues[size][m.measurement]) {
                 input.value = measuredValues[size][m.measurement];
             }
-            input.oninput = function(e) {
+            input.oninput = function (e) {
                 var now = Date.now();
                 if (now - lastInputTime > 2000) {
                     input.value = e.target.value.slice(-1); // Only keep the last entered digit
@@ -363,10 +396,78 @@
             if (currentMeasurementIdx < currentSizeObj.measurements.length - 1) {
                 currentMeasurementIdx++;
                 showMeasurement(currentMeasurementIdx);
+            } else {
+                // At last measurement, check overall status
+                checkOverallStatusAndPrompt();
             }
         }
+        function checkOverallStatusAndPrompt() {
+            var size = document.getElementById('sizeSelector').value;
+            var measurements = (currentSizeObj && currentSizeObj.measurements) ? currentSizeObj.measurements : [];
+            var allPass = true;
+            var measurementResults = [];
+            measurements.forEach(function (m) {
+                var val = measuredValues[size] && measuredValues[size][m.measurement] ? Number(measuredValues[size][m.measurement]) : null;
+                var offset = val !== null ? val - Number(m.reference) : null;
+                var mStatus = (val !== null && val >= (m.reference - m.tolerance) && val <= (m.reference + m.tolerance)) ? 'Pass' : 'Fail';
+                if (mStatus === 'Fail') allPass = false;
+                measurementResults.push({
+                    Measurement: m.measurement,
+                    Value: val,
+                    Offset: offset,
+                    mStatus: mStatus
+                });
+            });
+            var status = allPass ? 'Pass' : 'Fail';
+            if (!allPass) {
+                if (confirm('Garment failed. Would you like to save or retry? (OK = Save, Cancel = Retry)')) {
+                    saveGarment(status, measurementResults);
+                } else {
+                    // Retry: clear values for this size and go to first measurement
+                    measuredValues[size] = {};
+                    currentMeasurementIdx = 0;
+                    showMeasurement(currentMeasurementIdx);
+                }
+            } else {
+                saveGarment(status, measurementResults);
+            }
+        }
+        function saveGarment(status, measurementResults) {
+            var soli = document.getElementById('SOLI').value.trim();
+            var epf = Number(document.getElementById('EPF').value.trim());
+            var style = document.getElementById('styleSelector').value;
+            var size = document.getElementById('sizeSelector').value;
+            var payload = {
+                Session: garmentSession,
+                Style: style,
+                Size: size,
+                SOLI: soli,
+                EPF: epf,
+                Status: status,
+                DateTime: new Date().toISOString().replace('T', ' ').substring(0, 23),
+                Station: (plant + "_" + (document.getElementById('station').value)).toUpperCase(),
+                Measurements: measurementResults
+            };
+            $.ajax({
+                url: '/GM/saveMData',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    alert('Garment data saved!');
+                    // Optionally reset for next garment
+                    measuredValues[size] = {};
+                    currentMeasurementIdx = 0;
+                    showMeasurement(currentMeasurementIdx);
+                },
+                error: function () {
+                    alert('Error saving garment data.');
+                }
+            });
+
+        }
         // Global key capture for measured value and navigation
-        window.addEventListener('keydown', function(e) {
+        window.addEventListener('keydown', function (e) {
             var input = document.getElementById('measuredValueInput');
             if (!input) return;
             // Only allow number keys, backspace, delete, arrows, dot
@@ -414,7 +515,7 @@
                             labels: ['A', 'B', 'C', 'D'],
                             datasets: [{
                                 label: m.name || 'Value',
-                                data: m.values || [0,0,0,0],
+                                data: m.values || [0, 0, 0, 0],
                                 backgroundColor: '#007bff88',
                             }]
                         },

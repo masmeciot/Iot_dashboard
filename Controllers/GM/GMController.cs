@@ -25,6 +25,7 @@ namespace Iot_dashboard.Controllers.GM
             ViewBag.prvlgtyp = prvlgtyp;
             ViewBag.account = HttpContext.Session.GetString("account");
             ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.station = HttpContext.Session.GetString("station");
             return View("GMIndex");
         }
     [HttpPost]
@@ -133,12 +134,43 @@ namespace Iot_dashboard.Controllers.GM
     [HttpGet]
     public IActionResult GMMeasure()
     {
-        // var token = HttpContext.Session.GetString("accessToken");
-        // if (string.IsNullOrEmpty(token))
-        // {
-        //     return RedirectToAction("Index");
-        // }
+        var token = HttpContext.Session.GetString("accessToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            return RedirectToAction("Index");
+        }
+        ViewBag.account = HttpContext.Session.GetString("account");
+        ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+        ViewBag.plant = HttpContext.Session.GetString("plant");
+        ViewBag.prvlgtyp = HttpContext.Session.GetString("type");
         return View("GMMeasure");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> saveMData([FromBody] object payload)
+    {
+        var token = HttpContext.Session.GetString("accessToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            HttpContext.Session.Clear();
+            return Json(new { success = false, message = "Session expired" });
+        }
+        using (var http = new HttpClient())
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/saveMData");
+            request.Headers.Add("Authorization", "Bearer " + token);
+            request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
+            try
+            {
+                var response = await http.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
     }
 }
