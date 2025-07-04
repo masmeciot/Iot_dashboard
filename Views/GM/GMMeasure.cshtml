@@ -186,6 +186,10 @@
         var plant = '@(ViewBag.plant?.ToString() ?? "")';
         var username = '@(ViewBag.account?.ToString() ?? "")';
         var prvlg = '@Html.Raw(Json.Serialize(ViewBag.prvlgtyp))';
+        var allGarmentMeasurements = [];
+        var graphPage = 0;
+        var graphInterval = null;
+        var chartInstances = [];
 
         document.addEventListener('DOMContentLoaded', function () {
             loadStyles();
@@ -347,6 +351,7 @@
                 if (!measuredValues[size]) measuredValues[size] = {};
                 measuredValues[size][m.measurement] = input.value;
                 updatePassFail(input.value, m);
+                updateGraphsForCurrentGarment();
             };
             // Reference ± Tolerance
             document.getElementById('reference').innerText = `${m.reference} ± ${m.tolerance}`;
@@ -354,6 +359,8 @@
             updatePassFail(input.value, m);
             // Focus input on show
             setTimeout(() => { input.focus(); }, 100);
+            // Update graphs on show
+            updateGraphsForCurrentGarment();
         }
 
         function updatePassFail(val, m) {
@@ -448,6 +455,9 @@
                 Station: (plant + "_" + (document.getElementById('station').value)).toUpperCase(),
                 Measurements: measurementResults
             };
+            // Add this garment's measurements to the global array for graphing
+            allGarmentMeasurements.push({ size, measurements: measurementResults });
+            updateGraphsForCurrentGarment();
             $.ajax({
                 url: '/GM/saveMData',
                 method: 'POST',
@@ -455,7 +465,6 @@
                 data: JSON.stringify(payload),
                 success: function (res) {
                     alert('Garment data saved!');
-                    // Optionally reset for next garment
                     measuredValues[size] = {};
                     currentMeasurementIdx = 0;
                     showMeasurement(currentMeasurementIdx);
@@ -464,7 +473,158 @@
                     alert('Error saving garment data.');
                 }
             });
+        }
+        function updateGraphsForCurrentGarment() {
+            var size = document.getElementById('sizeSelector').value;
+            if (!currentSizeObj || !Array.isArray(currentSizeObj.measurements)) {
+                renderGraphs([]);
+                return;
+            }
+            // Build graph data for each measurement name
+            var measurementNames = currentSizeObj.measurements.map(m => m.measurement);
+            var referenceMap = {};
+            currentSizeObj.measurements.forEach(m => {
+                referenceMap[m.measurement] = { ref: m.reference, tol: m.tolerance };
+            });
+            // For each measurement, collect measured values for all garments
+            var graphData = measurementNames.map(function(name) {
+                var ref = referenceMap[name].ref;
+                var tol = referenceMap[name].tol;
+                var measuredVals = allGarmentMeasurements
+                    .filter(g => g.size === size)
+                    .map(g => {
+                        var m = g.measurements.find(x => x.Measurement === name);
+                        return m ? m.Value : null;
+                    });
+                // Add current in-progress value if not yet saved
+                var currentVal = measuredValues[size] && measuredValues[size][name] ? Number(measuredValues[size][name]) : null;
+                if (currentVal !== null && (measuredVals.length === 0 || measuredVals.length < allGarmentMeasurements.length + 1)) {
+                    measuredVals.push(currentVal);
+                }
+                return {
+                    name: name,
+                    measuredVals: measuredVals,
+                    reference: ref,
+                    plusTol: ref + tol,
+                    minusTol: ref - tol
+                };
+            });
+            renderGraphs(graphData);
+        }
+        function showDetailForm() {
+            document.getElementById('DetailForm').style.display = 'flex';
+            document.getElementById('MeasureInterface').style.display = 'none';
+            // Reset/clear graphs and all garment data
+            allGarmentMeasurements = [];
+            renderGraphs([]);
+        }
+        function renderGraphs(measurements) {
+            const graphsContainer = document.getElementById('graphsContainer');
+            graphsContainer.innerHTML = '';
 
+            // Destroy old charts
+            if (window.chartInstances && Array.isArray(window.chartInstances)) {
+                window.chartInstances.forEach(c => { try { c.destroy(); } catch {} });
+            }
+            window.chartInstances = [];
+
+            if (!Array.isArray(measurements) || measurements.length === 0) {
+                graphsContainer.innerHTML = '<div>No measurement data available.</div>';
+                return;
+            }
+            // Group measurements in sets of 4
+            const groups = [];
+            for (let i = 0; i < measurements.length; i += 4) {
+                groups.push(measurements.slice(i, i + 4));
+            }
+            function showGroup(page) {
+                graphsContainer.innerHTML = '';
+                const group = groups[page] || [];
+                // Create a 2x2 grid
+                const grid = document.createElement('div');
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = '1fr 1fr';
+                grid.style.gridTemplateRows = '1fr 1fr';
+                grid.style.gap = '20px';
+                grid.style.width = '100%';
+                grid.style.justifyItems = 'center';
+                group.forEach((m, idx) => {
+                    const graphDiv = document.createElement('div');
+                    graphDiv.id = 'graph_' + idx;
+                    graphDiv.style.width = '320px';
+                    graphDiv.style.height = '240px';
+                    graphDiv.innerHTML = `<canvas id="chart_${idx}" width="300" height="180"></canvas><div style="margin-top:8px; font-weight:600;">${m.name || 'Measurement'}</div>`;
+                    grid.appendChild(graphDiv);
+                    // Wait for the canvas to be in the DOM
+                    setTimeout(() => {
+                        var ctx = document.getElementById(`chart_${idx}`);
+                        if (ctx) {
+                            var chart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: m.measuredVals.map((_, i) => `G${i+1}`),
+                                    datasets: [
+                                        {
+                                            label: 'Measured',
+                                            data: m.measuredVals,
+                                            borderColor: '#007bff',
+                                            backgroundColor: 'rgba(0,123,255,0.1)',
+                                            fill: false,
+                                            tension: 0.2,
+                                            pointRadius: 4
+                                        },
+                                        {
+                                            label: 'Reference',
+                                            data: m.measuredVals.map(() => m.reference),
+                                            borderColor: '#ffc107',
+                                            borderDash: [5,5],
+                                            fill: false,
+                                            pointRadius: 0
+                                        },
+                                        {
+                                            label: '+Tolerance',
+                                            data: m.measuredVals.map(() => m.plusTol),
+                                            borderColor: '#28a745',
+                                            borderDash: [2,2],
+                                            fill: false,
+                                            pointRadius: 0
+                                        },
+                                        {
+                                            label: '-Tolerance',
+                                            data: m.measuredVals.map(() => m.minusTol),
+                                            borderColor: '#dc3545',
+                                            borderDash: [2,2],
+                                            fill: false,
+                                            pointRadius: 0
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: false,
+                                    plugins: { legend: { display: true } },
+                                    scales: {
+                                        x: { title: { display: true, text: 'Garment' } },
+                                        y: { title: { display: true, text: 'Value' } }
+                                    }
+                                }
+                            });
+                            window.chartInstances.push(chart);
+                        }
+                    }, 0);
+                });
+                graphsContainer.appendChild(grid);
+            }
+            showGroup(graphPage);
+            if (groups.length > 1) {
+                if (graphInterval) clearInterval(graphInterval);
+                graphInterval = setInterval(() => {
+                    graphPage = (graphPage + 1) % groups.length;
+                    showGroup(graphPage);
+                }, 5000);
+            } else if (graphInterval) {
+                clearInterval(graphInterval);
+                graphInterval = null;
+            }
         }
         // Global key capture for measured value and navigation
         window.addEventListener('keydown', function (e) {
@@ -486,56 +646,6 @@
                 prevMeasurement();
             }
         });
-        // Graph cycling logic
-        let graphPage = 0;
-        let graphInterval = null;
-        function renderGraphs(measurements) {
-            const graphsContainer = document.getElementById('graphsContainer');
-            graphsContainer.innerHTML = '';
-            if (!Array.isArray(measurements) || measurements.length === 0) {
-                graphsContainer.innerHTML = '<div>No measurement data available.</div>';
-                return;
-            }
-            // Group measurements in sets of 4
-            const groups = [];
-            for (let i = 0; i < measurements.length; i += 4) {
-                groups.push(measurements.slice(i, i + 4));
-            }
-            function showGroup(page) {
-                graphsContainer.innerHTML = '';
-                (groups[page] || []).forEach((m, idx) => {
-                    const graphDiv = document.createElement('div');
-                    graphDiv.id = 'graph_' + idx;
-                    graphDiv.innerHTML = `<canvas id="chart_${idx}" width="300" height="180"></canvas><div style="margin-top:8px; font-weight:600;">${m.name || 'Measurement'}</div>`;
-                    graphsContainer.appendChild(graphDiv);
-                    // Example: render a dummy chart (replace with real data)
-                    new Chart(document.getElementById(`chart_${idx}`), {
-                        type: 'bar',
-                        data: {
-                            labels: ['A', 'B', 'C', 'D'],
-                            datasets: [{
-                                label: m.name || 'Value',
-                                data: m.values || [0, 0, 0, 0],
-                                backgroundColor: '#007bff88',
-                            }]
-                        },
-                        options: { responsive: false, plugins: { legend: { display: false } } }
-                    });
-                });
-            }
-            showGroup(graphPage);
-            if (groups.length > 1) {
-                if (graphInterval) clearInterval(graphInterval);
-                graphInterval = setInterval(() => {
-                    graphPage = (graphPage + 1) % groups.length;
-                    showGroup(graphPage);
-                }, 5000);
-            } else if (graphInterval) {
-                clearInterval(graphInterval);
-                graphInterval = null;
-            }
-        }
-        // Call renderGraphs(measData) after loading measurement data
     </script>
 
     <!-- container-scroller -->
