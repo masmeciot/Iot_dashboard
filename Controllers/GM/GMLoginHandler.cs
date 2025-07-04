@@ -78,6 +78,8 @@ namespace Iot_dashboard.Controllers.GM
                     HttpContext.Session.SetString("station", loginJson.GetProperty("station").GetString());
                     HttpContext.Session.SetString("plant", loginJson.GetProperty("plant").GetString());
                     HttpContext.Session.SetString("type", loginJson.GetProperty("type").GetString());
+                    // Store account/username for logout
+                    HttpContext.Session.SetString("account", model.Username);
 
                     // Return redirect instruction to client
                     return Json(new { success = true, redirectUrl = Url.Action("", "GM", new { area = "" }) });

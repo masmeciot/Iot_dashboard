@@ -119,6 +119,11 @@
 </head>
 
 <body> 
+    <div style="position: absolute; top: 20px; right: 30px; z-index: 1000;">
+        <form method="post" action="/GM/Logout" style="display:inline;">
+            <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+    </div>
 
     <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
         <ul class="navbar-nav w-100">
@@ -131,8 +136,11 @@
     <div class="content-wrapper">
       
             <div class="btn-container">
-            <button type="button" class="btn-large btn-inverse-primary btn-fw" onclick="window.location.href='/iotconfig'">Measure</button>
-            <button type="button" class="btn-large btn-inverse-success btn-fw" onclick="window.location.href='/machine'">Dashboard</button>
+            <a href="/GM/GMMeasure" class="btn-large btn-inverse-primary btn-fw" style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Measure</a>
+            @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 0)
+            {
+                <button type="button" class="btn-large btn-inverse-success btn-fw" onclick="window.location.href='/machine'">Dashboard</button>
+            }
           <!--  <button type="button" class="btn-large btn-inverse-ou btn-fw" onclick="window.location.href='/IoTZone'">Zone Data</button>-->
             @*  <button type="button" class="btn-large btn-inverse-info btn-fw" onclick="window.location.href='/iotdash'">Real Time Data</button>
             <button type="button" class="btn-large btn-inverse-warning btn-fw" onclick="window.location.href='/iotbest'">Best Repeat Dashboard</button>
