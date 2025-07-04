@@ -451,6 +451,13 @@ builder.Services.AddCors(options =>
         builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(1);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Add SignalR
 builder.Services.AddSignalR();
 var app = builder.Build();
@@ -469,6 +476,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthorization();
+app.UseSession();
 app.UseStaticFiles();
 
 app.UseEndpoints(endpoints =>

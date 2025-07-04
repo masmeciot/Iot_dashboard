@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Measuring යාළුවා | Menu</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
+       <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
+ 
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/icon.png" />
+
+    <style>
+        .btn-large {
+            width: 170px;
+            height: 170px; 
+            margin: 10px;
+            font-size: 25px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px; 
+        }
+
+        .btn-container {
+            display: flex;  
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .navbar-menu-wrapper {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .btn-inverse-pink {
+            background-color: rgba(255, 105, 180, 0.2); 
+            border: 1px solid rgba(255, 105, 180, 0.1); 
+            color: rgba(255, 105, 180, 1); 
+        }
+
+            .btn-inverse-pink:hover {
+                background-color: rgba(255, 105, 180, 1);
+                color:white;
+            }
+
+        .btn-inverse-bl {
+            background-color: rgba(250, 128, 114, 0.2);
+            border: 1px solid rgba(250, 128, 114, 0.1);
+            color: rgba(250, 128, 114, 1); 
+        }
+
+            .btn-inverse-bl:hover {
+                background-color: rgba(250, 128, 114, 1);
+                color: white;
+            }
+
+
+        .btn-inverse-fl {
+            background-color: rgba(0, 128, 128, 0.2); /* Teal */
+            border: 1px solid rgba(0, 128, 128, 0.1);
+            color: rgba(0, 128, 128, 1);
+        }
+
+            .btn-inverse-fl:hover {
+                background-color: rgba(0, 128, 128, 1);
+                color: white;
+            }
+
+        .btn-inverse-ou {
+            background-color: rgba(255, 215, 0, 0.2); /* Gold */
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            color: rgba(255, 215, 0, 1);
+        }
+
+            .btn-inverse-ou:hover {
+                background-color: rgba(255, 215, 0, 1);
+                color: white;
+            }
+
+
+        .btn-inverse-de {
+            background-color: rgba(255, 215, 0, 0.2); 
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            color: navajowhite;
+        }
+
+            .btn-inverse-de:hover {
+                background-color: navajowhite;
+                color: white;
+            }
+
+        .btn-inverse-de1 {
+            background-color: rgba(137, 216, 230, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            color: lightblue;
+        }
+
+            .btn-inverse-de1:hover {
+                background-color: lightblue;
+                color: white;
+            }
+
+
+    </style>
+</head>
+
+<body> 
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+                <h3 style="text-align: center;">Measuring යාළුවා | Menu</h3>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+      
+            <div class="btn-container">
+            <button type="button" class="btn-large btn-inverse-primary btn-fw" onclick="window.location.href='/iotconfig'">Measure</button>
+            <button type="button" class="btn-large btn-inverse-success btn-fw" onclick="window.location.href='/machine'">Dashboard</button>
+          <!--  <button type="button" class="btn-large btn-inverse-ou btn-fw" onclick="window.location.href='/IoTZone'">Zone Data</button>-->
+            @*  <button type="button" class="btn-large btn-inverse-info btn-fw" onclick="window.location.href='/iotdash'">Real Time Data</button>
+            <button type="button" class="btn-large btn-inverse-warning btn-fw" onclick="window.location.href='/iotbest'">Best Repeat Dashboard</button>
+            <button type="button" class="btn-large btn-inverse-bl btn-fw" onclick="window.location.href='/iotout'">IoT Output</button>
+            <button type="button" class="btn-large btn-inverse-ou btn-fw" onclick="window.location.href='/manualOutput'">Manual Output</button> *@
+       
+            </div>
+        @* <div class="btn-container">
+       
+
+            <button type="button" class="btn-large btn-inverse-de btn-fw" onclick="window.location.href='/iotdevice'">Device Status</button>
+            <!----<button type="button" class="btn-large btn-inverse-danger btn-fw" onclick="window.location.href='/andonreport'">Andon Report</button>
+            <button type="button" class="btn-large btn-inverse-pink btn-fw" onclick="window.location.href='/andon'">Andon Dashboard</button>-->
+
+            <button type="button" class="btn-large btn-inverse-bl btn-fw" onclick="window.location.href='/ChangebyModule'">Change By Module</button>
+            <button type="button" class="btn-large btn-inverse-secondary btn-fw" onclick="window.location.href='/iotpast/'">Past Data</button>
+            <button type="button" class="btn-large btn-inverse-fl btn-fw" onclick="window.location.href='/iotoutfl'">Filter IoT Output</button>
+            <button type="button" class="btn-large btn-inverse-pink btn-fw" onclick="window.location.href='/outAnalyze'">IoT Output Analyze</button>
+
+        </div> *@
+    </div>
+
+
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">© Kreeda FOF</span>
+        </div>
+    </footer>
+
+    <!-- main-panel ends -->
+    <!-- page-body-wrapper ends -->
+    </div>
+
+   
+</body>
+
+</html>

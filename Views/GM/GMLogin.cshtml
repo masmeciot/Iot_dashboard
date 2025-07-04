@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Measuring යාළුවා | Login</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="images/logo3.png" />
+  </head>
+  <body>
+    <div class="container-scroller">
+      <div class="container-fluid page-body-wrapper full-page-wrapper">
+        <div class="row w-100 m-0">
+          <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+            <div class="card col-lg-4 mx-auto">
+              <div class="card-body px-5 py-5">
+                <div class="form-pic">
+                  <img src="assets/images/MASLogo.png" style="width: 70%;">
+                </div>
+                <br>
+                <h3 class="card-title text-center mb-3">LOGIN</h3>
+                <form id="loginForm">
+                  <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control p_input" id="username" name="username">
+                  </div>
+                  <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control p_input" id="password" name="password">
+                  </div>
+                  <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-block enter-btn">Login</button>
+                  </div>
+                </form>
+                <div id="loginResult" class="mt-2"></div>
+              </div>
+            </div>
+          </div>
+          <!-- content-wrapper ends -->
+        </div>
+        <!-- row ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="assets/js/off-canvas.js"></script>
+    <script src="assets/js/hoverable-collapse.js"></script>
+    <script src="assets/js/misc.js"></script>
+    <script src="assets/js/settings.js"></script>
+    <script src="assets/js/todolist.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/GM/GMLoginHandler/Login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                // Redirect to GMIndex on success
+                window.location.href = result.redirectUrl;
+            } else {
+                // Show error popup (see previous answer for modal code)
+                document.getElementById('loginMessageModalBody').textContent = result.message || 'Unknown error';
+                $('#loginMessageModal').modal('show');
+            }
+        });
+    </script>
+    <!-- endinject -->
+    <!-- Modal for login messages -->
+    <div class="modal fade" id="loginMessageModal" tabindex="-1" role="dialog" aria-labelledby="loginMessageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginMessageModalLabel">Login Message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="loginMessageModalBody">
+                    <!-- Message will be injected here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
