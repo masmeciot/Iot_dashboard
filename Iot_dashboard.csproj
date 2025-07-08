@@ -35,6 +35,7 @@
   <ItemGroup>
     <None Include="Views\GM\GMLogin.cshtml" />
     <None Include="Views\GM\GMIndex.cshtml" />
+    <None Include="Views\GM\GMDashboard.cshtml" />
     <None Include="Views\Home\outanalyze.cshtml" />
     <None Include="Views\SynBest.cshtml" />
     <None Include="Views\synergy\synbest.cshtml" />

@@ -28,149 +28,204 @@ namespace Iot_dashboard.Controllers.GM
             ViewBag.station = HttpContext.Session.GetString("station");
             return View("GMIndex");
         }
-    [HttpPost]
-    public async Task<IActionResult> Logout()
-    {
-        var account = HttpContext.Session.GetString("account");
-        var token = HttpContext.Session.GetString("accessToken");
-
-        if (string.IsNullOrEmpty(account) || string.IsNullOrEmpty(token))
+        [HttpPost]
+        public async Task<IActionResult> Logout()
         {
-            // Just clear session and redirect if missing info
+            var account = HttpContext.Session.GetString("account");
+            var token = HttpContext.Session.GetString("accessToken");
+
+            if (string.IsNullOrEmpty(account) || string.IsNullOrEmpty(token))
+            {
+                // Just clear session and redirect if missing info
+                HttpContext.Session.Clear();
+                return RedirectToAction("Index");
+            }
+
+            using (var http = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/logout");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                request.Content = new StringContent($"{{\"account\":\"{account}\"}}", Encoding.UTF8, "application/json");
+
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    // Ignore response details for now
+                }
+                catch
+                {
+                    // Optionally log error
+                }
+            }
+
             HttpContext.Session.Clear();
             return RedirectToAction("Index");
         }
 
-        using (var http = new HttpClient())
+        [HttpPost]
+        public async Task<IActionResult> getStyles()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/logout");
-            request.Headers.Add("Authorization", "Bearer " + token);
-            request.Content = new StringContent($"{{\"account\":\"{account}\"}}", Encoding.UTF8, "application/json");
-
-            try
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
             {
-                var response = await http.SendAsync(request);
-                // Ignore response details for now
+                HttpContext.Session.Clear();
+                return Json(new { styles = new string[0] });
             }
-            catch
+            using (var http = new HttpClient())
             {
-                // Optionally log error
-            }
-        }
-
-        HttpContext.Session.Clear();
-        return RedirectToAction("Index");
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> getStyles()
-    {
-        var token = HttpContext.Session.GetString("accessToken");
-        if (string.IsNullOrEmpty(token))
-        {
-            HttpContext.Session.Clear();
-            return Json(new { styles = new string[0] });
-        }
-        using (var http = new HttpClient())
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/getStyles");
-            request.Headers.Add("Authorization", "Bearer " + token);
-            try
-            {
-                var response = await http.SendAsync(request);
-                var json = await response.Content.ReadAsStringAsync();
-                // Parse the response and return the styles array
-                var doc = JsonDocument.Parse(json);
-                if (doc.RootElement.TryGetProperty("styles", out var stylesProp) && stylesProp.ValueKind == JsonValueKind.Array)
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/getStyles");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                try
                 {
-                    var styles = new System.Collections.Generic.List<string>();
-                    foreach (var item in stylesProp.EnumerateArray())
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    // Parse the response and return the styles array
+                    var doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("styles", out var stylesProp) && stylesProp.ValueKind == JsonValueKind.Array)
                     {
-                        styles.Add(item.GetString());
+                        var styles = new System.Collections.Generic.List<string>();
+                        foreach (var item in stylesProp.EnumerateArray())
+                        {
+                            styles.Add(item.GetString());
+                        }
+                        return Json(new { styles });
                     }
-                    return Json(new { styles });
+                    else
+                    {
+                        return Json(new { styles = new string[0] });
+                    }
                 }
-                else
+                catch
                 {
                     return Json(new { styles = new string[0] });
                 }
             }
-            catch
-            {
-                return Json(new { styles = new string[0] });
-            }
         }
-    }
 
-    [HttpPost]
-    public async Task<IActionResult> getMeasurements(string style)
-    {
-        var token = HttpContext.Session.GetString("accessToken");
-        if (string.IsNullOrEmpty(token))
+        [HttpGet]
+        public async Task<IActionResult> getLiveStatus()
         {
-            HttpContext.Session.Clear();
-            return Json(new { measurements = new[] { "Session expired or missing token." } });
-        }
-        using (var http = new HttpClient())
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/loadMData");
-            request.Headers.Add("Authorization", "Bearer " + token);
-            request.Content = new StringContent($"{{\"Style\":\"{style}\"}}", Encoding.UTF8, "application/json");
-            try
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
             {
-                var response = await http.SendAsync(request);
-                var json = await response.Content.ReadAsStringAsync();
-                // Parse the received JSON string and wrap it in a 'measurements' property
-                var doc = System.Text.Json.JsonDocument.Parse(json);
-                return Json(new { measurements = doc.RootElement });
+                HttpContext.Session.Clear();
+                return Json(new { LIVE = new[] { "Session expired or missing token." } });
             }
-            catch (System.Exception ex)
+            using (var http = new HttpClient())
             {
-                return Json(new { measurements = new[] { $"Error: {ex.Message}" } });
+                var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5003/liveStatus");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(json))
+                    {
+                        return Json(new { LIVE = new[] { "No data received from external server." } });
+                    }
+                    try
+                    {
+                        var doc = System.Text.Json.JsonDocument.Parse(json);
+                        return Json(new { LIVE = doc.RootElement });
+                    }
+                    catch (System.Exception ex)
+                    {
+                        return Json(new { LIVE = new[] { $"Error parsing JSON: {ex.Message}", $"Raw: {json}" } });
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    return Json(new { LIVE = new[] { $"Error: {ex.Message}" } });
+                }
             }
         }
-    }
 
-    [HttpGet]
-    public IActionResult GMMeasure()
-    {
-        var token = HttpContext.Session.GetString("accessToken");
-        if (string.IsNullOrEmpty(token))
-        {
-            return RedirectToAction("Index");
-        }
-        ViewBag.account = HttpContext.Session.GetString("account");
-        ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
-        ViewBag.plant = HttpContext.Session.GetString("plant");
-        ViewBag.prvlgtyp = HttpContext.Session.GetString("type");
-        return View("GMMeasure");
-    }
 
-    [HttpPost]
-    public async Task<IActionResult> saveMData([FromBody] object payload)
-    {
-        var token = HttpContext.Session.GetString("accessToken");
-        if (string.IsNullOrEmpty(token))
+        [HttpPost]
+        public async Task<IActionResult> getMeasurements(string style)
         {
-            HttpContext.Session.Clear();
-            return Json(new { success = false, message = "Session expired" });
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                HttpContext.Session.Clear();
+                return Json(new { measurements = new[] { "Session expired or missing token." } });
+            }
+            using (var http = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/loadMData");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                request.Content = new StringContent($"{{\"Style\":\"{style}\"}}", Encoding.UTF8, "application/json");
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    // Parse the received JSON string and wrap it in a 'measurements' property
+                    var doc = System.Text.Json.JsonDocument.Parse(json);
+                    return Json(new { measurements = doc.RootElement });
+                }
+                catch (System.Exception ex)
+                {
+                    return Json(new { measurements = new[] { $"Error: {ex.Message}" } });
+                }
+            }
         }
-        using (var http = new HttpClient())
+
+        [HttpGet]
+        public IActionResult GMMeasure()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/saveMData");
-            request.Headers.Add("Authorization", "Bearer " + token);
-            request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
-            try
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
             {
-                var response = await http.SendAsync(request);
-                var json = await response.Content.ReadAsStringAsync();
-                return Content(json, "application/json");
+                return RedirectToAction("Index");
             }
-            catch (Exception ex)
+            ViewBag.account = HttpContext.Session.GetString("account");
+            ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.plant = HttpContext.Session.GetString("plant");
+            ViewBag.prvlgtyp = HttpContext.Session.GetString("type");
+            return View("GMMeasure");
+        }
+
+        [HttpGet]
+
+        public IActionResult GMDashboard()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
             {
-                return Json(new { success = false, message = ex.Message });
+                return RedirectToAction("Index");
+            }
+            ViewBag.account = HttpContext.Session.GetString("account");
+            ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.plant = HttpContext.Session.GetString("plant");
+            ViewBag.prvlgtyp = HttpContext.Session.GetString("type");
+            return View("GMDashboard");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> saveMData([FromBody] object payload)
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                HttpContext.Session.Clear();
+                return Json(new { success = false, message = "Session expired" });
+            }
+            using (var http = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/saveMData");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    return Content(json, "application/json");
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
             }
         }
-    }
     }
 }

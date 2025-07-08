@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Measuring යාළුවා | Menu</title>
+    <title>Measuring යාළුවා</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -360,7 +360,8 @@
 <body>
     <!-- Fixed Navbar -->
     <div class="navbar">
-        <h3>Measuring යාළුවා</h3>
+        <img src="~/images/MASLogo.png" alt="Logo" style="height: 40px; vertical-align: middle; margin-right: 12px;">
+        @* <h3 style="display: inline-block; vertical-align: middle; margin: 0;">Measuring යාළුවා</h3> *@
     </div>
 
     <!-- Content Wrapper -->
@@ -398,7 +399,7 @@
                     <button type="button" class="btn btn-primary" onclick="nextBtn()">
                         <i class="fas fa-arrow-right"></i> Next
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='#'">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='@Url.Action("Index", "GM")'">
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
                 </div>
