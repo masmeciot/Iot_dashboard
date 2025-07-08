@@ -2,216 +2,428 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Measuring යාළුවා | Menu</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="~/vendors/jvectormap/jquery-jvectormap.css">
-    <link rel="stylesheet" href="~/vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.carousel.min.css">
-    <link rel="stylesheet" href="~/vendors/owl-carousel-2/owl.theme.default.min.css">
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link rel="stylesheet" href="~/css/green.css" />
-    <!-- End layout styles -->
-    <link rel="shortcut icon" href="~/icon.png" />
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Change text color of table header */
-        #park thead th {
-            color: steelblue;
-        }
-
-        /* Change text color of table body */
-        #park tbody td {
-            color: white;
-        }
-
-
-        #trolly thead th {
-            color: steelblue;
-        }
-
-        /* Change text color of table body */
-        #trolly tbody td {
-            color: white;
-        }
-
-        html, body {
-            height: 100%;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        .content-wrapper {
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            min-height: 0;
+            overflow: hidden;
         }
-        #measurementCards {
-            flex: 0 0 auto;
-            min-height: 110px;
-            margin: 20px 0;
+
+        /* Fixed Navbar */
+        .navbar {
+            background: rgba(0, 15, 46, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
         }
-        #graphsArea {
-            flex: 1 1 0;
+
+        .navbar h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Content Wrapper */
+        .content-wrapper {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: stretch;
-            justify-content: stretch;
-            min-height: 0;
-            height: 0;
+            margin-top: 60px;
+            overflow: auto;
+            padding: 15px;
         }
-        #graphsContainer {
-            flex: 1 1 0;
+
+        /* Form Section */
+        #DetailForm {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 15px;
+        }
+
+        .form-container {
+            background: rgba(0, 20, 50, 0.8);
+            border-radius: 12px;
+            padding: 20px;
             width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 180, 255, 0.3);
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #4facfe;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #a0d2ff;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(0, 30, 60, 0.7);
+            color: #fff;
+            font-size: 0.95rem;
+            border: 1px solid rgba(100, 180, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: #001f3f;
+        }
+
+        .btn-secondary {
+            background: rgba(100, 100, 150, 0.5);
+            color: #fff;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Measurement Section */
+        #MeasureInterface {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            gap: 15px;
+        }
+
+        /* Cards */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .measurement-card {
+            background: rgba(0, 20, 50, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 180, 255, 0.2);
+        }
+
+        .measurement-card h5 {
+            font-size: 0.9rem;
+            color: #a0d2ff;
+            margin-bottom: 8px;
+        }
+
+        .measurement-card div {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* Status Colors */
+        .status-pass {
+            color: #2ecc71;
+        }
+
+        .status-fail {
+            color: #e74c3c;
+        }
+
+        /* Graphs Area */
+        #graphsArea {
+            flex: 1;
+            background: rgba(0, 20, 50, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 180, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .graph-header h4 {
+            color: #a0d2ff;
+            font-size: 1rem;
+        }
+
+        .graph-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 30, 60, 0.6);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .graph-placeholder {
+            color: rgba(160, 210, 255, 0.5);
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Navigation Buttons */
+        #measurementNav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            #measurementNav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container {
+                padding: 15px;
+            }
+
+            .navbar h3 {
+                font-size: 1.3rem;
+            }
+
+            .form-container h2 {
+                font-size: 1.3rem;
+            }
+        }
+
+        #graphsArea, .graph-container, #graphsContainer {
             height: 100%;
             min-height: 0;
         }
-        #measurementNav {
-            flex: 0 0 auto;
-            min-height: 60px;
-            margin: 30px 0 10px 0;
+        #graphsContainer {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+        }
+        .graphs-row {
+            display: flex;
+            flex: 1 1 0;
+            gap: 15px;
+            min-height: 0;
+        }
+        .graphs-row > div {
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .graphs-row canvas {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 0;
+            min-width: 0;
+            display: block;
         }
     </style>
-
 </head>
 
 <body>
-
-
-    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
-
-        <ul class="navbar-nav w-100">
-            <li class="nav-item w-100">
-                <h3 style="text-align: center;">Measuring යාළුවා</h3>
-            </li>
-        </ul>
-
-
+    <!-- Fixed Navbar -->
+    <div class="navbar">
+        <h3>Measuring යාළුවා</h3>
     </div>
 
-
-
+    <!-- Content Wrapper -->
     <div class="content-wrapper">
-        <section id="DetailForm" class="DetailForm" style="display: flex;">
-            <div class="grid-margin">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label>SOLI</label>
-                            <input type="text" class="form-control" id="SOLI" name="SOLI"
-                                placeholder="Enter Sales Order Line Item">
-                        </div>
-                        <div class="form-group">
-                            <label">EPF</label>
-                                <input type="text" class="form-control" id="EPF" name="EPF" placeholder="Enter EPF">
-                        </div>
-                        <div class="form-group"></div>
-                        <label">Station</label>
-                            <input type="text" class="form-control" id="station" name="station" placeholder="Enter EPF">
-                    </div>
-                    <div class="form-group">
-                        <label>Style</label>
-                        <select class="form-control" id="styleSelector" placeholder="Select Style">
-                            <option value="" disabled selected>Loading styles...</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="display:none;" id="sizeSelectDIV">
-                        <label>Size</label>
-                        <select class="form-control" id="sizeSelector" placeholder="Select Size">
-                            <option value="" disabled selected>Select a size...</option>
-                        </select>
-                    </div>
-                    <div class="row">
-                        <div class="button-container">
-                            <button type="button" onclick="nextBtn()" class="btn-sm btn-inverse-primary btn-fw"
-                                style="width: 80px;">Next</button>
-                        </div>
-                        <div class="button-container">
-                            <button type="button" onclick="window.location.href='@Url.Action("Index", "GM")'"
-                                class="btn-sm btn-inverse-primary btn-fw" style="width: 80px;">Back</button>
-                        </div>
+        <!-- Form Section -->
+        <section id="DetailForm" class="DetailForm">
+            <div class="form-container">
+                <h2>Garment Details</h2>
+                <div class="form-group">
+                    <label for="SOLI">SOLI</label>
+                    <input type="text" class="form-control" id="SOLI" name="SOLI"
+                        placeholder="Enter Sales Order Line Item">
+                </div>
+                <div class="form-group">
+                    <label for="EPF">EPF</label>
+                    <input type="text" class="form-control" id="EPF" name="EPF" placeholder="Enter EPF">
+                </div>
+                <div class="form-group">
+                    <label for="station">Station</label>
+                    <input type="text" class="form-control" id="station" name="station" placeholder="Enter Station">
+                </div>
+                <div class="form-group">
+                    <label for="styleSelector">Style</label>
+                    <select class="form-control" id="styleSelector">
+                        <option value="" disabled selected>Loading styles...</option>
+                    </select>
+                </div>
+                <div class="form-group" id="sizeSelectDIV" style="display: none;">
+                    <label for="sizeSelector">Sizesss</label>
+                    <select class="form-control" id="sizeSelector">
+                        <option value="" disabled selected>Select a size...</option>
+                    </select>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="btn btn-primary" onclick="nextBtn()">
+                        <i class="fas fa-arrow-right"></i> Next
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='#'">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Measurement Section -->
+        <section id="MeasureInterface" class="MeasureInterface">
+            <!-- Measurement Cards -->
+            <div class="cards-container" id="measurementCards">
+                <div class="measurement-card" id="cardMeasurement">
+                    <h5>Measurement</h5>
+                    <div id="measurementName">-</div>
+                </div>
+                <div class="measurement-card" id="cardMeasuredValue">
+                    <h5>Measured Value</h5>
+                    <div id="measuredValue">-</div>
+                </div>
+                <div class="measurement-card" id="cardTolerance">
+                    <h5>Reference</h5>
+                    <div id="reference">-</div>
+                </div>
+                <div class="measurement-card" id="cardStatus">
+                    <h5>Status</h5>
+                    <div id="passFailStatus">-</div>
+                </div>
+                <div class="measurement-card" id="cardCurrentSize">
+                    <h5>Current Size</h5>
+                    <div id="currentSize">-</div>
+                </div>
+            </div>
+
+            <!-- Graphs Area -->
+            <div id="graphsArea">
+                <div class="graph-container">
+                    <div id="graphsContainer" class="graph-placeholder">
+                        <i class="fas fa-chart-line" style="font-size: 2.5rem; margin-bottom: 8px;"></i>
+                        <p>Measurement graphs will appear here</p>
                     </div>
                 </div>
             </div>
-    </div>
-    </section>
 
-
-
-    <section id="MeasureInterface" class="MeasureInterface"
-        style="display:none; min-height: 100vh; flex-direction: column; justify-content: space-between;">
-        <!-- Top Cards -->
-        <div id="measurementCards"
-            style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0; flex-wrap: wrap;">
-            <div class="card measurement-card" id="cardMeasurement"
-                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                <h5>Measurement</h5>
-                <div id="measurementName">-</div>
+            <!-- Navigation Buttons -->
+            <div id="measurementNav">
+                <button type="button" class="btn btn-secondary" onclick="showDetailForm()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button type="button" class="btn btn-primary" onclick="prevMeasurement()">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <button type="button" class="btn btn-primary" onclick="nextMeasurement()">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
-            <div class="card measurement-card" id="cardMeasuredValue"
-                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                <h5>Measured Value</h5>
-                <div id="measuredValue">-</div>
-            </div>
-            <div class="card measurement-card" id="cardTolerance"
-                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                <h5>Reference</h5>
-                <div id="reference">-</div>
-            </div>
-            <div class="card measurement-card" id="cardStatus"
-                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                <h5>Status</h5>
-                <div id="passFailStatus">-</div>
-            </div>
-            <div class="card measurement-card" id="cardCurrentSize"
-                style="flex:1; min-width: 180px; margin: 10px; text-align:center;">
-                <h5>Current Size</h5>
-                <div id="currentSize">-</div>
-            </div>
-        </div>
-        <!-- Graphs Area -->
-        <div id="graphsArea"
-            style="flex: 1 1 auto; display: flex; flex-direction: column; align-items: stretch; justify-content: stretch; min-height: 350px;">
-            <div id="graphsContainer" style="flex: 1 1 auto; display: flex; width: 100%; height: 100%;"></div>
-        </div>
-        <!-- Bottom Buttons -->
-        <div id="measurementNav"
-            style="display: flex; justify-content: center; align-items: center; margin: 30px 0 10px 0; gap: 30px;">
-            <button type="button" class="btn btn-secondary" onclick="showDetailForm()">Back</button>
-            <button type="button" class="btn btn-primary" onclick="prevMeasurement()">Previous Measurement</button>
-            <button type="button" class="btn btn-primary" onclick="nextMeasurement()">Next Measurement</button>
-        </div>
-    </section>
+        </section>
     </div>
 
-    <!-- content-wrapper ends -->
-    <!-- partial:partials/_footer.html -->
-    <footer class="footer">
-        <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © MAS KREEDA</span>
-
-        </div>
-    </footer>
-
-
-    <!-- main-panel ends -->
-    <!-- page-body-wrapper ends -->
-    </div>
-
-
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         var measData = [];
         var currentSizeObj = null;
@@ -219,9 +431,9 @@
         var measuredValues = {}; // { size: { measurement: value } }
         var lastInputTime = 0;
         var garmentSession = '';
-        var plant = '@(ViewBag.plant?.ToString() ?? "")';
-        var username = '@(ViewBag.account?.ToString() ?? "")';
-        var prvlg = '@Html.Raw(Json.Serialize(ViewBag.prvlgtyp))';
+        var plant = '';
+        var username = '';
+        var prvlg = '';
         var allGarmentMeasurements = [];
         var graphPage = 0;
         var graphInterval = null;
@@ -238,7 +450,6 @@
             });
             styleSelector.addEventListener('click', function () {
                 console.log("Clicked on the style selector");
-                @* sizeSelectDIV.style.display = 'none'; *@
                 var sizeSelector = document.getElementById('sizeSelector');
                 sizeSelector.innerHTML = '';
                 var placeholderOption = document.createElement('option');
@@ -249,10 +460,10 @@
                 sizeSelector.appendChild(placeholderOption);
             });
         });
+
         function loadStyles() {
             console.log("Loading styles...");
             console.log(username);
-            console.log(station);
             console.log(prvlg);
             $.ajax({
                 url: '/GM/getStyles',
@@ -280,30 +491,30 @@
                 }
             });
         }
-        function styleSelected() {
-            document.getElementById('styleSelectDIV').style.display = 'flex';
-        }
+
         function generateSession() {
-            // Generate a cryptographically strong random string of at least 25 characters (base64url)
-            const array = new Uint8Array(20); // 20 bytes = 160 bits ~ 27 base64url chars
+            const array = new Uint8Array(20);
             window.crypto.getRandomValues(array);
-            // Convert to base64url
             let base64 = btoa(String.fromCharCode.apply(null, array));
             base64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
             return username + '_' + base64;
         }
+
         function nextBtn() {
             var soli = document.getElementById('SOLI').value.trim();
-            var epf = Number(document.getElementById('EPF').value.trim());
+            var epf = document.getElementById('EPF').value.trim();
             var style = document.getElementById('styleSelector').value;
             var size = document.getElementById('sizeSelector').value;
+
             if (!soli || !epf || !style || !size) {
                 alert("Please fill in all fields: SOLI, EPF, Style, and Size.");
                 return;
             }
+
             garmentSession = generateSession();
             document.getElementById('DetailForm').style.display = 'none';
             document.getElementById('MeasureInterface').style.display = 'flex';
+
             // Reset measured values for new garment
             if (!measuredValues[size]) measuredValues[size] = {};
             currentMeasurementIdx = 0;
@@ -318,25 +529,26 @@
                 method: 'POST',
                 data: { style: style },
                 success: function (response) {
-                    console.log("Recevived Data")
+                    console.log("Received Data")
                     measData = response.measurements;
                     console.log(measData);
                     loadSizes();
                 }
             });
-
         }
+
         function loadSizes() {
             console.log("Getting sizes...");
-            @* console.log(measData); *@
             var sizeSelector = document.getElementById('sizeSelector');
             sizeSelector.innerHTML = '';
+
             var placeholderOption = document.createElement('option');
             placeholderOption.value = '';
             placeholderOption.text = 'Select a size';
             placeholderOption.disabled = true;
             placeholderOption.selected = true;
             sizeSelector.appendChild(placeholderOption);
+
             if (Array.isArray(measData)) {
                 measData.forEach(function (item) {
                     if (item.size) {
@@ -354,11 +566,13 @@
             var size = document.getElementById('sizeSelector').value;
             currentSizeObj = (measData || []).find(x => x.size === size);
             currentMeasurementIdx = 0;
+
             if (currentSizeObj && Array.isArray(currentSizeObj.measurements) && currentSizeObj.measurements.length > 0) {
                 showMeasurement(currentMeasurementIdx);
             } else {
                 clearMeasurementCards();
             }
+
             document.getElementById('currentSize').innerText = size || '-';
         }
 
@@ -367,35 +581,42 @@
                 clearMeasurementCards();
                 return;
             }
+
             var m = currentSizeObj.measurements[idx];
             document.getElementById('measurementName').innerText = m.measurement || '-';
+
             // Measured value input
             var measuredValueDiv = document.getElementById('measuredValue');
-            measuredValueDiv.innerHTML = `<input id="measuredValueInput" type="number" style="width:90px; text-align:center; font-size:1.2em;" autocomplete="off" />`;
+            measuredValueDiv.innerHTML = `<input id="measuredValueInput" type="number" class="form-control" style="width: 120px; margin: 0 auto; text-align: center; font-size: 1.2em;" autocomplete="off" />`;
+
             var input = document.getElementById('measuredValueInput');
-            // Set value if already entered
             var size = document.getElementById('sizeSelector').value;
+
             if (measuredValues[size] && measuredValues[size][m.measurement]) {
                 input.value = measuredValues[size][m.measurement];
             }
+
             input.oninput = function (e) {
                 var now = Date.now();
                 if (now - lastInputTime > 2000) {
-                    input.value = e.target.value.slice(-1); // Only keep the last entered digit
+                    input.value = e.target.value.slice(-1);
                 }
                 lastInputTime = now;
+
                 if (!measuredValues[size]) measuredValues[size] = {};
                 measuredValues[size][m.measurement] = input.value;
                 updatePassFail(input.value, m);
                 updateGraphsForCurrentGarment();
             };
+
             // Reference ± Tolerance
             document.getElementById('reference').innerText = `${m.reference} ± ${m.tolerance}`;
+
             // Status
             updatePassFail(input.value, m);
+
             // Focus input on show
             setTimeout(() => { input.focus(); }, 100);
-            // Update graphs on show
             updateGraphsForCurrentGarment();
         }
 
@@ -404,17 +625,19 @@
             var ref = Number(m.reference);
             var tol = Number(m.tolerance);
             var num = Number(val);
+
             if (!val) {
                 statusDiv.innerText = '-';
-                statusDiv.style.color = '';
+                statusDiv.className = '';
                 return;
             }
+
             if (num >= (ref - tol) && num <= (ref + tol)) {
                 statusDiv.innerText = 'PASS';
-                statusDiv.style.color = 'green';
+                statusDiv.className = 'status-pass';
             } else {
                 statusDiv.innerText = 'FAIL';
-                statusDiv.style.color = 'red';
+                statusDiv.className = 'status-fail';
             }
         }
 
@@ -423,7 +646,7 @@
             document.getElementById('measuredValue').innerHTML = '-';
             document.getElementById('reference').innerText = '-';
             document.getElementById('passFailStatus').innerText = '-';
-            document.getElementById('passFailStatus').style.color = '';
+            document.getElementById('passFailStatus').className = '';
             document.getElementById('currentSize').innerText = '-';
         }
 
@@ -434,16 +657,17 @@
                 showMeasurement(currentMeasurementIdx);
             }
         }
+
         function nextMeasurement() {
             if (!currentSizeObj || !currentSizeObj.measurements) return;
             if (currentMeasurementIdx < currentSizeObj.measurements.length - 1) {
                 currentMeasurementIdx++;
                 showMeasurement(currentMeasurementIdx);
             } else {
-                // At last measurement, check overall status
                 checkOverallStatusAndPrompt();
             }
         }
+
         function checkOverallStatusAndPrompt() {
             var size = document.getElementById('sizeSelector').value;
             var measurements = (currentSizeObj && currentSizeObj.measurements) ? currentSizeObj.measurements : [];
@@ -475,6 +699,7 @@
                 saveGarment(status, measurementResults);
             }
         }
+
         function saveGarment(status, measurementResults) {
             var soli = document.getElementById('SOLI').value.trim();
             var epf = Number(document.getElementById('EPF').value.trim());
@@ -510,6 +735,7 @@
                 }
             });
         }
+
         function updateGraphsForCurrentGarment() {
             var size = document.getElementById('sizeSelector').value;
             if (!currentSizeObj || !Array.isArray(currentSizeObj.measurements)) {
@@ -547,153 +773,238 @@
             });
             renderGraphs(graphData);
         }
+
         function showDetailForm() {
             document.getElementById('DetailForm').style.display = 'flex';
             document.getElementById('MeasureInterface').style.display = 'none';
-            // Reset/clear graphs and all garment data
-            allGarmentMeasurements = [];
-            renderGraphs([]);
+            // Clear graph interval
+            if (graphInterval) {
+                clearInterval(graphInterval);
+                graphInterval = null;
+            }
         }
         function renderGraphs(measurements) {
             const graphsContainer = document.getElementById('graphsContainer');
             graphsContainer.innerHTML = '';
 
             // Destroy old charts
-            if (window.chartInstances && Array.isArray(window.chartInstances)) {
-                window.chartInstances.forEach(c => { try { c.destroy(); } catch { } });
+            if (chartInstances && Array.isArray(chartInstances)) {
+                chartInstances.forEach(c => {
+                    if (c && typeof c.destroy === 'function') {
+                        try {
+                            c.destroy();
+                        } catch (e) {
+                            console.error("Error destroying chart:", e);
+                        }
+                    }
+                });
             }
-            window.chartInstances = [];
+            chartInstances = [];
 
             if (!Array.isArray(measurements) || measurements.length === 0) {
-                graphsContainer.innerHTML = '<div>No measurement data available.</div>';
+                graphsContainer.innerHTML = '<div class="graph-placeholder"><i class="fas fa-chart-line" style="font-size: 2.5rem; margin-bottom: 8px;"></i><p>No measurement data available</p></div>';
                 return;
             }
-            // Group measurements in sets of 4
+
+            // Group measurements in sets of 4 (for 2x2 grid)
             const groups = [];
             for (let i = 0; i < measurements.length; i += 4) {
                 groups.push(measurements.slice(i, i + 4));
             }
+
+            // Clear any existing interval
+            if (graphInterval) {
+                clearInterval(graphInterval);
+                graphInterval = null;
+            }
+
             function showGroup(page) {
                 graphsContainer.innerHTML = '';
                 const group = groups[page] || [];
-                // Create a 2x2 grid that fills the available area
-                const grid = document.createElement('div');
-                grid.style.display = 'grid';
-                grid.style.gridTemplateColumns = '1fr 1fr';
-                grid.style.gridTemplateRows = '1fr 1fr';
-                grid.style.gap = '32px';
-                grid.style.width = '100%';
-                grid.style.height = '100%';
-                grid.style.minHeight = 0;
-                grid.style.justifyItems = 'stretch';
-                grid.style.alignItems = 'stretch';
-                group.forEach((m, idx) => {
+
+                // Create a flex column container for two rows
+                const flexContainer = document.createElement('div');
+                flexContainer.id = 'graphsContainer';
+                flexContainer.className = '';
+                flexContainer.style.display = 'flex';
+                flexContainer.style.flexDirection = 'column';
+                flexContainer.style.width = '100%';
+                flexContainer.style.height = '100%';
+                flexContainer.style.gap = '15px';
+
+                // First row (first 2 graphs)
+                const row1 = document.createElement('div');
+                row1.className = 'graphs-row';
+                // Second row (next 2 graphs)
+                const row2 = document.createElement('div');
+                row2.className = 'graphs-row';
+
+                function createGraphDiv(m, idx) {
                     const graphDiv = document.createElement('div');
-                    graphDiv.id = 'graph_' + idx;
-                    graphDiv.style.width = '100%';
-                    graphDiv.style.height = '100%';
-                    graphDiv.style.minHeight = 0;
+                    graphDiv.id = `graph_${idx}`;
+                    graphDiv.style.flex = '1 1 0';
+                    graphDiv.style.minWidth = '0';
+                    graphDiv.style.minHeight = '0';
                     graphDiv.style.display = 'flex';
                     graphDiv.style.flexDirection = 'column';
                     graphDiv.style.alignItems = 'center';
                     graphDiv.style.justifyContent = 'center';
-                    graphDiv.innerHTML = `<canvas id="chart_${idx}" style="width:100%;height:100%;max-width:100%;max-height:100%;"></canvas><div style="margin-top:8px; font-weight:600;">${m.name || 'Measurement'}</div>`;
-                    grid.appendChild(graphDiv);
-                    setTimeout(() => {
+                    graphDiv.innerHTML = `
+                        <div style="flex: 1; min-height: 0; width: 100%; height: 100%; position: relative; display: flex; align-items: stretch; justify-content: stretch;">
+                            <canvas id="chart_${idx}" style="width:100%;height:100%;display:block;"></canvas>
+                        </div>
+                        <div style="flex-shrink: 0; text-align: center; margin-top: 6px; font-weight: 600; font-size: 0.9rem;">${m.name || 'Measurement'}</div>
+                    `;
+                    return graphDiv;
+                }
+
+                // Add up to 2 graphs to the first row
+                if (group.length > 0) row1.appendChild(createGraphDiv(group[0], 0));
+                if (group.length > 1) row1.appendChild(createGraphDiv(group[1], 1));
+                // Add up to 2 graphs to the second row
+                if (group.length > 2) row2.appendChild(createGraphDiv(group[2], 2));
+                if (group.length > 3) row2.appendChild(createGraphDiv(group[3], 3));
+
+                flexContainer.appendChild(row1);
+                flexContainer.appendChild(row2);
+                graphsContainer.appendChild(flexContainer);
+
+                // Chart.js rendering
+                setTimeout(() => {
+                    group.forEach((m, idx) => {
                         var ctx = document.getElementById(`chart_${idx}`);
                         if (ctx) {
-                            var chart = new Chart(ctx, {
-                                type: 'line',
-                                data: {
-                                    labels: m.measuredVals.map((_, i) => `G${i + 1}`),
-                                    datasets: [
-                                        {
-                                            label: 'Measured',
-                                            data: m.measuredVals,
-                                            borderColor: '#007bff',
-                                            backgroundColor: 'rgba(0,123,255,0.1)',
-                                            fill: false,
-                                            tension: 0.2,
-                                            pointRadius: 4
+                            try {
+                                var chart = new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        labels: m.measuredVals.map((_, i) => `G${i + 1}`),
+                                        datasets: [
+                                            {
+                                                label: 'Measured',
+                                                data: m.measuredVals,
+                                                borderColor: '#007bff',
+                                                backgroundColor: 'rgba(0,123,255,0.1)',
+                                                fill: false,
+                                                tension: 0.2,
+                                                pointRadius: 4
+                                            },
+                                            {
+                                                label: 'Reference',
+                                                data: m.measuredVals.map(() => m.reference),
+                                                borderColor: '#ffc107',
+                                                borderDash: [5, 5],
+                                                fill: false,
+                                                pointRadius: 0
+                                            },
+                                            {
+                                                label: '+Tolerance',
+                                                data: m.measuredVals.map(() => m.plusTol),
+                                                borderColor: '#28a745',
+                                                borderDash: [2, 2],
+                                                fill: false,
+                                                pointRadius: 0
+                                            },
+                                            {
+                                                label: '-Tolerance',
+                                                data: m.measuredVals.map(() => m.minusTol),
+                                                borderColor: '#dc3545',
+                                                borderDash: [2, 2],
+                                                fill: false,
+                                                pointRadius: 0
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        maintainAspectRatio: false,
+                                        responsive: true,
+                                        plugins: {
+                                            legend: {
+                                                display: true,
+                                                labels: {
+                                                    font: {
+                                                        size: 10
+                                                    }
+                                                }
+                                            }
                                         },
-                                        {
-                                            label: 'Reference',
-                                            data: m.measuredVals.map(() => m.reference),
-                                            borderColor: '#ffc107',
-                                            borderDash: [5, 5],
-                                            fill: false,
-                                            pointRadius: 0
-                                        },
-                                        {
-                                            label: '+Tolerance',
-                                            data: m.measuredVals.map(() => m.plusTol),
-                                            borderColor: '#28a745',
-                                            borderDash: [2, 2],
-                                            fill: false,
-                                            pointRadius: 0
-                                        },
-                                        {
-                                            label: '-Tolerance',
-                                            data: m.measuredVals.map(() => m.minusTol),
-                                            borderColor: '#dc3545',
-                                            borderDash: [2, 2],
-                                            fill: false,
-                                            pointRadius: 0
+                                        scales: {
+                                            x: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Garment',
+                                                    font: {
+                                                        size: 10
+                                                    }
+                                                },
+                                                ticks: {
+                                                    font: {
+                                                        size: 9
+                                                    }
+                                                }
+                                            },
+                                            y: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Value',
+                                                    font: {
+                                                        size: 10
+                                                    }
+                                                },
+                                                ticks: {
+                                                    font: {
+                                                        size: 9
+                                                    }
+                                                }
+                                            }
                                         }
-                                    ]
-                                },
-                                options: {
-                                    maintainAspectRatio: false,
-                                    responsive: true,
-                                    plugins: { legend: { display: true } },
-                                    scales: {
-                                        x: { title: { display: true, text: 'Garment' } },
-                                        y: { title: { display: true, text: 'Value' } }
                                     }
-                                }
-                            });
-                            window.chartInstances.push(chart);
+                                });
+                                chartInstances.push(chart);
+                            } catch (e) {
+                                console.error("Error creating chart:", e);
+                            }
                         }
-                    }, 0);
-                });
-                graphsContainer.appendChild(grid);
+                    });
+                }, 0);
             }
+
+            // Show initial group
+            graphPage = 0;
             showGroup(graphPage);
+
+            // Set interval for cycling groups if needed
             if (groups.length > 1) {
-                if (graphInterval) clearInterval(graphInterval);
                 graphInterval = setInterval(() => {
                     graphPage = (graphPage + 1) % groups.length;
                     showGroup(graphPage);
-                }, 5000);
-            } else if (graphInterval) {
-                clearInterval(graphInterval);
-                graphInterval = null;
+                }, 10000); // 10 seconds
             }
         }
+
         // Global key capture for measured value and navigation
         window.addEventListener('keydown', function (e) {
             var input = document.getElementById('measuredValueInput');
             if (!input) return;
-            // Only allow number keys, backspace, delete, arrows, dot
-            if ((e.key >= '0' && e.key <= '9') || e.key === '.' || e.key === 'Backspace' || e.key === 'Delete' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Tab') {
+
+            if ((e.key >= '0' && e.key <= '9') || e.key === '.' || e.key === 'Backspace' || e.key === 'Delete' ||
+                e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Tab') {
                 if (document.activeElement !== input) {
                     input.focus();
                 }
             }
-            // Navigation
+
             if (e.key.toLowerCase() === 'd' || e.key === 'ArrowDown') {
                 e.preventDefault();
                 nextMeasurement();
             }
+
             if (e.key === '=' || e.key.toLowerCase() === 'a') {
                 e.preventDefault();
                 prevMeasurement();
             }
         });
     </script>
-
-    <!-- container-scroller -->
-    <!-- plugins:js -->
     <script src="~/vendors/js/vendor.bundle.base.js"></script>
     <!-- endinject -->
     <!-- Plugin js for this page -->
@@ -709,14 +1020,6 @@
     <script src="~/js/misc.js"></script>
     <script src="~/js/settings.js"></script>
     <script src="~/js/todolist.js"></script>
-    <!-- <script src="~/js/chart.js"></script> -->
-    <!-- endinject -->
-    <!-- Custom js for this page -->
-    <!-- End custom js for this page -->
-
-
-
 </body>
-
 
 </html>
