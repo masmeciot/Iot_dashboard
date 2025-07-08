@@ -321,6 +321,39 @@
             min-width: 0;
             display: block;
         }
+
+        #savingOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        #savingOverlay.active {
+            display: flex;
+        }
+        .saving-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4facfe;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 18px;
+        }
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .saving-message {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 2px 8px #000;
+        }
     </style>
 </head>
 
@@ -356,9 +389,9 @@
                     </select>
                 </div>
                 <div class="form-group" id="sizeSelectDIV" style="display: none;">
-                    <label for="sizeSelector">Sizesss</label>
+                    <label for="sizeSelector">Size</label>
                     <select class="form-control" id="sizeSelector">
-                        <option value="" disabled selected>Select a size...</option>
+                        <option value="" disabled selected>Loading sizes...</option>
                     </select>
                 </div>
                 <div class="button-container">
@@ -381,11 +414,11 @@
                     <div id="measurementName">-</div>
                 </div>
                 <div class="measurement-card" id="cardMeasuredValue">
-                    <h5>Measured Value</h5>
+                    <h5>Measured Value (mm)</h5>
                     <div id="measuredValue">-</div>
                 </div>
                 <div class="measurement-card" id="cardTolerance">
-                    <h5>Reference</h5>
+                    <h5>Reference (mm)</h5>
                     <div id="reference">-</div>
                 </div>
                 <div class="measurement-card" id="cardStatus">
@@ -395,6 +428,14 @@
                 <div class="measurement-card" id="cardCurrentSize">
                     <h5>Current Size</h5>
                     <div id="currentSize">-</div>
+                </div>
+                <div class="measurement-card" id="cardPassPercentage">
+                    <h5>Pass Percentage</h5>
+                    <div id="passPercentageValue">-</div>
+                </div>
+                <div class="measurement-card" id="cardMostDefective">
+                    <h5>Most Defective Measurement</h5>
+                    <div id="mostDefectiveValue">-</div>
                 </div>
             </div>
 
@@ -423,6 +464,14 @@
         </section>
     </div>
 
+    <!-- Saving Overlay -->
+    <div id="savingOverlay">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="saving-spinner"></div>
+            <div class="saving-message">Saving...</div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         var measData = [];
@@ -446,7 +495,7 @@
             styleSelector.addEventListener('change', function () {
                 console.log("Style selected..Loading sizes...")
                 getMeasureData();
-                sizeSelectDIV.style.display = 'flex';
+                sizeSelectDIV.style.display = '';
             });
             styleSelector.addEventListener('click', function () {
                 console.log("Clicked on the style selector");
@@ -716,30 +765,62 @@
                 Station: (plant + "_" + (document.getElementById('station').value)).toUpperCase(),
                 Measurements: measurementResults
             };
-            // Add this garment's measurements to the global array for graphing
-            allGarmentMeasurements.push({ size, measurements: measurementResults });
-            updateGraphsForCurrentGarment();
+
+            // --- UI Lock: disable navigation and input during save ---
+            setUILock(true);
+
             $.ajax({
                 url: '/GM/saveMData',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(payload),
                 success: function (res) {
-                    alert('Garment data saved!');
+                    // Only add this garment's measurements to the global array for graphing after successful save
+                    allGarmentMeasurements.push({ size, measurements: measurementResults });
+                    updateGraphsForCurrentGarment();
+                    @* alert('Garment data saved!'); *@
                     measuredValues[size] = {};
                     currentMeasurementIdx = 0;
                     showMeasurement(currentMeasurementIdx);
+                    setUILock(false);
                 },
                 error: function () {
-                    alert('Error saving garment data.');
+                    // On error, prompt user to retry or ignore
+                    setUILock(false);
+                    if (confirm('Error saving garment data. Would you like to retry? (OK = Retry, Cancel = Ignore garment)')) {
+                        saveGarment(status, measurementResults);
+                    } else {
+                        // Ignore/cancel: do not add to allGarmentMeasurements, clear measured values for this size
+                        measuredValues[size] = {};
+                        currentMeasurementIdx = 0;
+                        showMeasurement(currentMeasurementIdx);
+                    }
                 }
             });
+        }
+
+        // Helper to lock/unlock UI during save
+        var isUILocked = false;
+        function setUILock(lock) {
+            isUILocked = lock;
+            // Disable/enable navigation buttons
+            var navBtns = document.querySelectorAll('#measurementNav button');
+            navBtns.forEach(btn => btn.disabled = lock);
+            // Disable/enable measured value input
+            var input = document.getElementById('measuredValueInput');
+            if (input) input.disabled = lock;
+            // Show/hide saving overlay
+            var overlay = document.getElementById('savingOverlay');
+            if (overlay) overlay.className = lock ? 'active' : '';
         }
 
         function updateGraphsForCurrentGarment() {
             var size = document.getElementById('sizeSelector').value;
             if (!currentSizeObj || !Array.isArray(currentSizeObj.measurements)) {
                 renderGraphs([]);
+                // Also update summary cards to blank
+                document.getElementById('passPercentageValue').innerText = '-';
+                document.getElementById('mostDefectiveValue').innerText = '-';
                 return;
             }
             // Build graph data for each measurement name
@@ -772,6 +853,33 @@
                 };
             });
             renderGraphs(graphData);
+
+            // --- Update Pass Percentage and Most Defective Measurement ---
+            // Calculate pass/total for this size
+            var garments = allGarmentMeasurements.filter(g => g.size === size);
+            var total = garments.length;
+            var passed = garments.filter(g => (g.measurements.every(m => m.mStatus === 'Pass'))).length;
+            var percent = total > 0 ? Math.round((passed / total) * 100) : 0;
+            document.getElementById('passPercentageValue').innerText = total > 0 ? `${passed} / ${total} (${percent}%)` : '-';
+
+            // Calculate most defective measurement
+            var failCounts = {};
+            garments.forEach(g => {
+                g.measurements.forEach(m => {
+                    if (m.mStatus === 'Fail') {
+                        failCounts[m.Measurement] = (failCounts[m.Measurement] || 0) + 1;
+                    }
+                });
+            });
+            var mostDefective = '-';
+            var maxFails = 0;
+            for (var key in failCounts) {
+                if (failCounts[key] > maxFails) {
+                    maxFails = failCounts[key];
+                    mostDefective = key + (maxFails > 1 ? ` (${maxFails})` : '');
+                }
+            }
+            document.getElementById('mostDefectiveValue').innerText = mostDefective;
         }
 
         function showDetailForm() {
@@ -984,6 +1092,7 @@
 
         // Global key capture for measured value and navigation
         window.addEventListener('keydown', function (e) {
+            if (window.isUILocked) return; // Ignore shortcuts if UI is locked
             var input = document.getElementById('measuredValueInput');
             if (!input) return;
 
