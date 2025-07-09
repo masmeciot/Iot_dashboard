@@ -1,358 +1,427 @@
 document.addEventListener('DOMContentLoaded', function () {
-  var styleSel// = "DA0481"
-  var sizeSel// = "XL"
-  var strDateSel = "2023-01-07T00:10:38"
-  var endDateSel = "2023-06-08T10:47:57"
-  var modulesSel = "All"
-  var recData
-  var loadingCharts = false;
-  const sizeErrorElement = document.getElementById('size-error');
+  // DOM elements
+  const styleInput = document.querySelector('#style .typeahead');
+  const sizeInput = document.querySelector('#size .typeahead');
+  const dateFilterCheckbox = document.getElementById('dateFilterActive');
+  const startDateInput = document.getElementById('strDate');
+  const endDateInput = document.getElementById('endDate');
+  const searchBtn = document.getElementById('searchBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const measurementsContainer = document.getElementById('measurements');
 
-  function toLocalISOString(date) {
-    var dateVal = []
-    const localDate = new Date(date - date.getTimezoneOffset() * 60000);
-    localDate.setMilliseconds(null);
-    localDate.setSeconds(null)
-    console.log(localDate)
-    dateVal[0] = localDate.toISOString().slice(0, -1)
-    localDate.setHours(5)
-    localDate.setMinutes(30)
-    dateVal[1] = localDate.toISOString().slice(0, -1)
-    console.log(dateVal)
-    return dateVal;
+  // State variables
+  let selectedStyle = '';
+  let selectedSize = '';
+  let reportData = [];
+  let referenceData = {};
+
+  // Initialize date inputs with default values (last 7 days)
+  const now = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(now.getDate() - 7);
+
+  startDateInput.value = formatDateTimeLocal(sevenDaysAgo);
+  endDateInput.value = formatDateTimeLocal(now);
+
+  // Fetch styles on load
+  fetchStyles();
+
+  // Event listeners
+  searchBtn.addEventListener('click', handleSearch);
+  exportBtn.addEventListener('click', handleExport);
+  dateFilterCheckbox.addEventListener('change', toggleDateFilter);
+  styleInput.addEventListener('change', handleStyleChange);
+
+  function formatDateTimeLocal(date) {
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
   }
 
-  $('#strDate').prop('value', toLocalISOString(new Date())[1])
-  $('#endDate').prop('value', toLocalISOString(new Date())[0])
-
-  function styleLoader(query, syncResults, asyncResults) {
-    jQuery.ajax({
-      url: 'phpscripts/report/styleLoader.php',
-      type: 'POST',
-      dataType: 'json',
-      success: function (data) {
-        console.log('Styles fetched:', data);
-        var style = new Bloodhound({
-          datumTokenizer: Bloodhound.tokenizers.whitespace,
-          queryTokenizer: Bloodhound.tokenizers.whitespace,
-          local: data
-        });
-
-        $('#style .typeahead').typeahead({
-          hint: true,
-          highlight: true,
-          minLength: 1
-        }, {
-          source: style
-        }).on('typeahead:selected', function (event, selection) {
-          loadSizes(selection)
-          $('#style-error').prop('hidden', true)
-        }).on('blur', function () {
-          var inputVal = $(this).typeahead('val');
-          style.search(inputVal, function (suggestions) {
-            if (!suggestions.length) {
-              $('#style-error').prop('hidden', false)
-            } else {
-              $('#style-error').prop('hidden', true)
-              loadSizes(inputVal)
-              styleSel = inputVal
-            }
-          });
-        });
-      }
-    });
+  function toggleDateFilter() {
+    startDateInput.disabled = !dateFilterCheckbox.checked;
+    endDateInput.disabled = !dateFilterCheckbox.checked;
   }
 
-  var styles = ['null']
-  styleLoader();
-
-  function loadSizes(selection) {
-    $('#size .typeahead').typeahead('val', '')
-    $('#size .typeahead').typeahead('destroy')
-    console.log("Style selected")
-    console.log(selection)
-    jQuery.ajax({
-      url: 'phpscripts/report/sizeLoader.php',
-      type: 'POST',
-      data: { style: selection },
-      dataType: 'json',
-      success: function (data) {
-        console.log(data)
-        var size = new Bloodhound({
-          datumTokenizer: Bloodhound.tokenizers.whitespace,
-          queryTokenizer: Bloodhound.tokenizers.whitespace,
-          local: data
-        });
-
-        $('#size .typeahead').prop('disabled', false).typeahead({
-          hint: true,
-          highlight: true,
-          minLength: 1
-        }, {
-          source: size
-        }).on('typeahead:selected', function (event, selection) {
-          $('#size-error').prop('hidden', true)
-        }).on('blur', function () {
-          var inputVal = $(this).typeahead('val');
-          size.search(inputVal, function (suggestions) {
-            if (!suggestions.length) {
-              $('#size-error').prop('hidden', false)
-            } else {
-              $('#size-error').prop('hidden', true)
-              sizeSel = inputVal
-              strDateSel = $('input[name=strDate]').val()
-              endDateSel = $('input[name=endDate]').val()
-              console.log(strDateSel < endDateSel)
-              if (strDateSel < endDateSel) {
-                const measChart = document.getElementById('chartMea');
-                if (measChart) {
-                  measChart.destroy()
-                }
-                if (!loadingCharts) {
-                  loadingCharts = true;
-                  console.log("Loading charts")
-                  loadCharts()
-                }
-              }
-            }
-          });
-        });
-      }
-    });
-  }
-
-  $('input[name="strDate"]').change(function () {
-    strDateSel = $('input[name=strDate]').val()
-    endDateSel = $('input[name=endDate]').val()
-    console.log(strDateSel)
-    if (strDateSel < endDateSel) {
-      const measChart = document.getElementById('chartMea');
-      // console.log(strDateSel)
-      // console.log(endDateSel)
-      // console.log(styleSel)
-      // console.log(sizeSel)
-      // console.log(modulesSel)
-                if (measChart) {
-                  measChart.destroy()
-                }
-                if (!loadingCharts) {
-                  loadingCharts = true;
-                  console.log("Loading charts")
-                  loadCharts()
-                }
-    }
-  })
-
-  $('input[name="endDate"]').change(function () {
-    strDateSel = $('input[name=strDate]').val()
-    endDateSel = $('input[name=endDate]').val()
-    // console.log(strDateInp < endDateInp)
-    if (strDateSel < endDateSel) {
-      const measChart = document.getElementById('chartMea');
-                if (measChart) {
-                  measChart.destroy()
-                }
-                if (!loadingCharts) {
-                  loadingCharts = true;
-                  console.log("Loading charts")
-                  loadCharts()
-                }
-    }
-  })
-
-  function loadCharts() {
-    var sendData = JSON.stringify({
-      style: styleSel,
-      size: sizeSel,
-      strDate: strDateSel+":00",
-      endDate: endDateSel+":00",
-      modules: modulesSel
-    })
-    console.log(sendData)
-    fetch('phpscripts/report/chartLoader.php', {
+  function fetchStyles() {
+    $.ajax({
+      url: '/GM/getStyles',
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+      success: function (data) {
+        const styles = new Bloodhound({
+          datumTokenizer: Bloodhound.tokenizers.whitespace,
+          queryTokenizer: Bloodhound.tokenizers.whitespace,
+          local: data.styles
+        });
+
+        $(styleInput).typeahead({
+          hint: true,
+          highlight: true,
+          minLength: 1
+        }, {
+          source: styles
+        }).on('typeahead:select', function (e, style) {
+          selectedStyle = style;
+          fetchSizes(style);
+        });
       },
-      body: sendData
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error('Error loading styles:', textStatus, errorThrown);
+      }
+    });
+  }
+
+  function fetchSizes(style) {
+    $.ajax({
+      url: '/GM/getAvailSizes',
+      method: 'POST',
+      data: { style: style },
+      success: function (data) {
+        let sizeList = [];
+        if (Array.isArray(data)) {
+          sizeList = data;
+        } else if (data && Array.isArray(data.sizes)) {
+          sizeList = data.sizes;
         }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Chart Data:', data);
-        recData = data
-        const measurementsContainer = document.getElementById('measurements');
-        measurementsContainer.innerHTML = ''; // Clear previous measurements
 
-        Object.keys(data).forEach(key => {
-          if (!isNaN(key)) {
-            const measurement = data[key];
-            console.log("xss")
-            console.log(key)
-            console.log(measurement)
-            const totalMea = Object.values(measurement.Results).reduce((acc, result) => acc + result.Total, 0);
-            const passedMea = Object.values(measurement.Results).reduce((acc, result) => acc + result.Pass, 0);
-            const failedMea = totalMea - passedMea;
-            const percMea = ((passedMea / totalMea) * 100).toFixed(2);
+        if (!sizeList.length) {
+          sizeInput.value = '';
+          sizeInput.disabled = true;
+          return;
+        }
 
-            // Create a card for each measurement
-            const measurementCard = document.createElement('div');
-            measurementCard.className = 'col-lg-6 grid-margin stretch-card';
-            measurementCard.innerHTML = `
-            <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">${measurement.Measurement}</h4>
-                <div class="row d-flex justify-content-center">
-                  <div class="card">
-                    <div class="card-body">
-                      <h6 class="text-primary">Total</h6>
-                      <h3 class="display-3">${totalMea}</h3>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="card-body">
-                      <h6 class="text-primary">Passed</h6>
-                      <h3 class="display-3">${passedMea}</h3>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="card-body">
-                      <h6 class="text-primary">Failed</h6>
-                      <h3 class="display-3">${failedMea}</h3>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="card-body">
-                      <h6 class="text-primary">Percentage</h6>
-                      <h3 class="display-3">${percMea}%</h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body">
-                <canvas id="chartMea-${key}" style="height:250px"></canvas>
-              </div>
-              <div class="card-body">
-                <h4 class="card-title">Trend</h4>
-                <div class="row d-flex justify-content-center">
-                  <div class="table-responsive">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th>Station</th>
-                          <th>Passed</th>
-                          <th>Failed Low</th>
-                          <th>Failed High</th>
-                          <th>Pass Percentage</th>
-                          <th>Current Trend</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${Object.keys(measurement.Results).map(resultKey => {
-              const result = measurement.Results[resultKey];
-              const passPercentage = ((result.Pass / result.Total) * 100).toFixed(2);
-              return `
-                            <tr>
-                              <td>${resultKey}</td>
-                              <td>${result.Pass}</td>
-                              <td>${result.FailLow || 0}</td>
-                              <td>${result.FailHigh || 0}</td>
-                              <td>${passPercentage}%</td>
-                              <td>${result.Trend}</td>
-                            </tr>
-                          `;
-            }).join('')}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-            measurementsContainer.appendChild(measurementCard);
+        try { $(sizeInput).typeahead('destroy'); } catch (e) {}
 
-            // Chart.js setup
-            function getTimeUnit(data) {
-              const start = new Date(data[0].x).getTime();
-              const end = new Date(data[data.length - 1].x).getTime();
-              const diff = end - start;
+        const sizes = new Bloodhound({
+          datumTokenizer: Bloodhound.tokenizers.whitespace,
+          queryTokenizer: Bloodhound.tokenizers.whitespace,
+          local: sizeList
+        });
 
-              const oneMinute = 60 * 1000;
-              const oneHour = 60 * oneMinute;
-              const oneDay = 24 * oneHour;
+        $(sizeInput).typeahead({
+          hint: true,
+          highlight: true,
+          minLength: 0
+        }, {
+          source: sizes
+        }).on('typeahead:select', function (e, size) {
+          selectedSize = size;
+          sizeInput.disabled = false;
+        });
 
-              if (diff < oneDay) {
-                return { unit: 'minute', format: 'yyyy-MM-dd HH:mm:ss' };
-              } else if (diff < oneDay * 2) {
-                return { unit: 'hour', format: 'yyyy-MM-dd HH:mm:ss' };
-              } else {
-                return { unit: 'day', format: 'yyyy-MM-dd' };
-              }
-            }
-            var timeUnit
-            const ctx = document.getElementById(`chartMea-${key}`).getContext('2d');
-            const datasets = Object.keys(measurement.Values).map(valueKey => {
-              const value = measurement.Values[valueKey];
-              if (value.Label == 'Reference') {
-                timeUnit = getTimeUnit(value.data.map(item => ({ x: item[1], y: item[0] })));
-              }
-              return {
-                label: value.Label,
-                data: value.data.map(item => ({ x: item[1], y: item[0] })),
-                borderColor: value.borderColor || 'rgba(0,0,0,1)',
-                fill: value.fill || false
-              };
-            });
+        sizeInput.disabled = false;
+        sizeInput.value = '';
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error('Error loading sizes:', textStatus, errorThrown);
+        sizeInput.value = '';
+        sizeInput.disabled = true;
+      }
+    });
+  }
 
-            new Chart(ctx, {
-              type: 'line',
-              data: {
-                datasets: datasets
-              },
-              options: {
-                scales: {
-                  x: {
-                    type: 'time',
-                    time: {
-                      unit: timeUnit.unit,
-                      tooltipFormat: 'yyyy-MM-DD HH:mm:ss',
-                      displayFormats: {
-                        day: 'yy-MM-dd HH:mm:ss',
-                        hour: 'MM-dd HH:mm:ss',
-                        minute: 'MM-dd HH:mm:ss',
-                      }
-                    },
-                    title: {
-                      display: true,
-                      text: 'Date and Time'
-                    }
-                  },
-                  y: {
-                    title: {
-                      display: true,
-                      text: 'mm'
-                    }
-                  }
-                },
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: 'top'
-                  }
-                }
-              }
-            });
+  async function handleStyleChange() {
+    if (!styleInput.value) {
+      sizeInput.value = '';
+      sizeInput.disabled = true;
+      selectedSize = '';
+    }
+  }
+
+  function handleSearch() {
+    if (!selectedStyle || !selectedSize) {
+      alert('Please select both style and size');
+      return;
+    }
+
+    let startDate, endDate;
+    if (dateFilterCheckbox.checked) {
+      startDate = new Date(startDateInput.value).toISOString();
+      endDate = new Date(endDateInput.value).toISOString();
+    } else {
+      const now = new Date().toISOString();
+      startDate = now;
+      endDate = now;
+    }
+    const params = {
+      Style: selectedStyle,
+      Size: selectedSize,
+      DateFilter: dateFilterCheckbox.checked ? "Yes" : "No",
+      StartDate: startDate,
+      EndDate: endDate
+    };
+
+    // Fetch report data using $.ajax
+    $.ajax({
+      url: '/GM/getReport',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(params),
+      success: function (reportResult) {
+        reportData = reportResult.report || reportResult.Report || [];
+        // Fetch reference measurements after report data is loaded
+        $.ajax({
+          url: '/GM/getMeasurements',
+          method: 'POST',
+          data: { style: selectedStyle },
+          success: function (response) {
+            referenceData = response.measurements;
+            buildDashboard();
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.error('Error loading reference measurements:', textStatus, errorThrown);
+            alert('Error loading reference measurements.');
           }
         });
-        loadingCharts = false; // Reset the flag once charts are loaded
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        loadingCharts = false; // Reset the flag in case of error
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error('Error loading report data:', textStatus, errorThrown);
+        alert('Error loading report data. Please try again.');
+      }
+    });
+  }
+
+  function buildDashboard() {
+    measurementsContainer.innerHTML = '';
+
+    // Group measurements by type
+    const measurementsMap = new Map();
+
+    reportData.forEach(entry => {
+      entry.measurements.forEach(measurement => {
+        if (!measurementsMap.has(measurement.measurement)) {
+          measurementsMap.set(measurement.measurement, []);
+        }
+        measurementsMap.get(measurement.measurement).push({
+          ...measurement,
+          garmentId: entry.garmentId,
+          dateTime: entry.dateTime,
+          station: entry.station,
+          epf: entry.epf,
+          soli: entry.soli
+        });
       });
+    });
+
+    // Create cards for each measurement type
+    measurementsMap.forEach((entries, measurementName) => {
+      const card = createMeasurementCard(measurementName, entries);
+      measurementsContainer.appendChild(card);
+    });
+  }
+
+  function createMeasurementCard(measurementName, entries) {
+    // Calculate stats
+    const total = entries.length;
+    const passed = entries.filter(e => e.result === 'Pass').length;
+    const failed = total - passed;
+    const passPercentage = total > 0 ? ((passed / total) * 100).toFixed(2) : 0;
+
+    // Group by station for table
+    const stationsMap = new Map();
+
+    entries.forEach(entry => {
+      if (!stationsMap.has(entry.station)) {
+        stationsMap.set(entry.station, {
+          passed: 0,
+          failedLow: 0,
+          failedHigh: 0,
+          total: 0,
+          values: []
+        });
+      }
+
+      const station = stationsMap.get(entry.station);
+      station.total++;
+      station.values.push(entry.value);
+
+      if (entry.result === 'Pass') {
+        station.passed++;
+      } else if (entry.offset < 0) {
+        station.failedLow++;
+      } else {
+        station.failedHigh++;
+      }
+    });
+
+    // Create card HTML
+    const card = document.createElement('div');
+    card.className = 'col-lg-6 grid-margin stretch-card';
+    card.innerHTML = `
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">${measurementName}</h4>
+          <div class="row d-flex justify-content-center">
+            <div class="card col-md-3 m-2">
+              <div class="card-body">
+                <h6 class="text-primary">Total</h6>
+                <h3 class="display-3">${total}</h3>
+              </div>
+            </div>
+            <div class="card col-md-3 m-2">
+              <div class="card-body">
+                <h6 class="text-primary">Passed</h6>
+                <h3 class="display-3">${passed}</h3>
+              </div>
+            </div>
+            <div class="card col-md-3 m-2">
+              <div class="card-body">
+                <h6 class="text-primary">Failed</h6>
+                <h3 class="display-3">${failed}</h3>
+              </div>
+            </div>
+            <div class="card col-md-3 m-2">
+              <div class="card-body">
+                <h6 class="text-primary">Percentage</h6>
+                <h3 class="display-3">${passPercentage}%</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <canvas id="chart-${measurementName.replace(/\s+/g, '-')}"></canvas>
+        </div>
+        <div class="card-body">
+          <h4 class="card-title">Trend</h4>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Station</th>
+                  <th>Passed</th>
+                  <th>Failed Low</th>
+                  <th>Failed High</th>
+                  <th>Pass Percentage</th>
+                  <th>Current Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${Array.from(stationsMap).map(([station, data]) => {
+      const stationPassPercentage = data.total > 0 ?
+        ((data.passed / data.total) * 100).toFixed(2) : 0;
+      const average = data.values.reduce((a, b) => a + b, 0) / data.values.length;
+
+      return `
+                    <tr>
+                      <td>${station}</td>
+                      <td>${data.passed}</td>
+                      <td>${data.failedLow}</td>
+                      <td>${data.failedHigh}</td>
+                      <td>${stationPassPercentage}%</td>
+                      <td>${average.toFixed(2)}</td>
+                    </tr>
+                  `;
+    }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Render chart after DOM insertion
+    setTimeout(() => {
+      renderChart(measurementName, entries);
+    }, 100);
+
+    return card;
+  }
+
+  function renderChart(measurementName, entries) {
+    const canvas = document.getElementById(`chart-${measurementName.replace(/\s+/g, '-')}`);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const referenceValue = getReferenceValue(measurementName);
+
+    const data = {
+      datasets: [
+        {
+          label: 'Actual Measurements',
+          data: entries.map(entry => ({
+            x: new Date(entry.dateTime),
+            y: entry.value
+          })),
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }
+      ]
+    };
+
+    if (referenceValue) {
+      data.datasets.push({
+        label: 'Reference',
+        data: entries.map(entry => ({
+          x: new Date(entry.dateTime),
+          y: referenceValue
+        })),
+        borderColor: 'rgb(255, 99, 132)',
+        borderWidth: 1,
+        borderDash: [5, 5],
+        pointRadius: 0,
+        fill: false
+      });
+    }
+
+    new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'day',
+              tooltipFormat: 'yyyy-MM-dd HH:mm'
+            },
+            title: {
+              display: true,
+              text: 'Date and Time'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Measurement Value (mm)'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function getReferenceValue(measurementName) {
+    // Find reference value from measurement data
+    const refMeasurement = referenceData.find(m => m.measurement === measurementName);
+    return refMeasurement ? refMeasurement.value : null;
+  }
+
+  function handleExport() {
+    if (reportData.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    let csvContent = 'Garment ID,EPF,SOLI,Station,Date Time,Measurement,Value,Offset,Result\n';
+
+    reportData.forEach(entry => {
+      entry.measurements.forEach(measurement => {
+        csvContent += `"${entry.garmentId}","${entry.epf}","${entry.soli}","${entry.station}",`;
+        csvContent += `"${entry.dateTime}","${measurement.measurement}",`;
+        csvContent += `${measurement.value},${measurement.offset},"${measurement.result}"\n`;
+      });
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `report_${selectedStyle}_${selectedSize}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 });

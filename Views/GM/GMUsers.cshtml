@@ -1,15 +1,3 @@
-<?php
-require "phpscripts/dbconnect.php";
-session_start();
-if ($_SESSION['sid'] == session_id()) {
-    $activePage = basename($_SERVER['PHP_SELF'], ".php");
-} else {
-    header("location:phpscripts/logout.php");
-}
-$_SESSION['LAST_ACTIVITY'] = time();
-session_write_close();
-print_r($_SESSION);
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,7 +5,7 @@ print_r($_SESSION);
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Measuring යාළුවා | Styles</title>
+  <title>Measuring යාළුවා | Users</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
@@ -35,192 +23,32 @@ print_r($_SESSION);
   <!-- End layout styles -->
   <link rel="shortcut icon" href="/assets/images/favicon.ico" />
   <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
-  <script>
-    $(document).ready(function () {
-      function checkSession() {
-        $.ajax({
-          url: 'phpscripts/sessiontimecheck.php',
-          method: 'GET',
-          success: function (data) {
-            console.log(data)
-            if (data == 'timeout') {
-              window.location.href = 'phpscripts/logout.php';
-            }
-          }
-        });
-      }
-      // Check session every minute
-      setInterval(checkSession, 60000);
-    });
-  </script>
+  <style>
+    .container-fluid.page-body-wrapper,
+    .main-panel,
+    .content-wrapper {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100vw;
+      max-width: 100vw;
+    }
+
+    body,
+    html {
+      overflow-x: hidden;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container-scroller">
-    <!-- partial:partials/_sidebar.html -->
-    <nav class="sidebar sidebar-offcanvas" id="sidebar">
-      <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-        <a class="sidebar-brand brand-logo" href="home.html"><img src="images/MASLogo.svg" alt="logo" /></a>
-        <a class="sidebar-brand brand-logo-mini" href="index.html"><img src="images/MASLogoMini.svg" alt="logo" /></a>
-      </div>
-      <ul class="nav">
-        <li class="nav-item profile">
-        </li>
-        <li class="nav-item nav-category">
-          <span class="nav-link">Navigation</span>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="home.html">
-            <span class="menu-icon">
-              <i class="mdi mdi-speedometer"></i>
-            </span>
-            <span class="menu-title">Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="report.html">
-            <span class="menu-icon">
-              <i class="mdi mdi-file-document"></i>
-            </span>
-            <span class="menu-title">Report</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="export.html">
-            <span class="menu-icon">
-              <i class="mdi mdi-download"></i>
-            </span>
-            <span class="menu-title">Export</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="styles.html">
-            <span class="menu-icon">
-              <i class="mdi mdi-tshirt-v"></i>
-            </span>
-            <span class="menu-title">Styles</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="measurements.html">
-            <span class="menu-icon">
-              <i class="mdi mdi-ruler"></i>
-            </span>
-            <span class="menu-title">Measurements</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="settings.html">
-            <span class="menu-icon">
-              <i class="mdi mdi-settings"></i>
-            </span>
-            <span class="menu-title">Settings</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="about.html">
-            <span class="menu-icon">
-              <i class="mdi mdi-information"></i>
-            </span>
-            <span class="menu-title">About</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-      <!-- partial:partials/_navbar.html -->
-      <nav class="navbar p-0 fixed-top d-flex flex-row">
-        <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-          <a class="navbar-brand brand-logo-mini" href="index.html"><img src="images/MASLogo.svg" alt="logo" /></a>
-        </div>
-        <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
-          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
-            <span class="mdi mdi-menu"></span>
-          </button>
-          <ul class="navbar-nav w-100">
-          </ul>
-          <ul class="navbar-nav navbar-nav-right">
-
-            <li class="nav-item dropdown border-left">
-              <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
-                data-toggle="dropdown">
-                <i class="mdi mdi-bell"></i>
-                <span class="count bg-danger"></span>
-              </a>
-              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
-                aria-labelledby="notificationDropdown">
-                <h6 class="p-3 mb-0">Notifications</h6>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item preview-item">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-calendar text-success"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject mb-1">Event today</p>
-                    <p class="text-muted ellipsis mb-0"> Just a reminder that you have an event today </p>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item preview-item">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-settings text-danger"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject mb-1">Settings</p>
-                    <p class="text-muted ellipsis mb-0"> Update dashboard </p>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item preview-item">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-link-variant text-warning"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject mb-1">Launch Admin</p>
-                    <p class="text-muted ellipsis mb-0"> New admin wow! </p>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <p class="p-3 mb-0 text-center">See all notifications</p>
-              </div>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
-                <div class="navbar-profile">
-                  <img class="img-xs rounded-circle" src="/assets/images/faces/face15.jpg" alt="">
-                  <p class="mb-0 d-none d-sm-block navbar-profile-name">Henry Klein</p>
-                  <i class="mdi mdi-menu-down d-none d-sm-block"></i>
-                </div>
-              </a>
-              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
-                aria-labelledby="profileDropdown">
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item preview-item" href="phpscripts/logout.php">
-                  <div class="preview-thumbnail">
-                    <div class="preview-icon bg-dark rounded-circle">
-                      <i class="mdi mdi-logout text-danger"></i>
-                    </div>
-                  </div>
-                  <div class="preview-item-content">
-                    <p class="preview-subject mb-1" href="phpscripts/logout.php">Log out</p>
-                  </div>
-                </a>
-            </li>
-          </ul>
-          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-            data-toggle="offcanvas">
-            <span class="mdi mdi-format-line-spacing"></span>
-          </button>
-        </div>
-      </nav>
+      <a href="/GM" class="btn btn-outline-primary"
+        style="position: absolute; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
+        <i class="mdi mdi-arrow-left"></i> Back
+      </a>
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
@@ -244,37 +72,39 @@ print_r($_SESSION);
                         </ul>
                       </div>
                       <input type="hidden" name="usrtyp" id="usrtyp" value="addusrs">
-          
-                        <div class="form-group">
-                          <div class="search-box">
-                            <label for="cc-payment" class="control-label mb-1">Username</label>
-                            <input autocomplete="off" name="usrnme" id="usrnme" type="text" class="form-control" aria-required="true" aria-invalid="false" value="">
-                            <div class="result"></div>
-                          </div>
+
+                      <div class="form-group">
+                        <div class="search-box">
+                          <label for="cc-payment" class="control-label mb-1">Username</label>
+                          <input autocomplete="off" name="usrnme" id="usrnme" type="text" class="form-control"
+                            aria-required="true" aria-invalid="false" value="">
+                          <div class="result"></div>
                         </div>
-          
-                        <div class="form-group has-success">
-                          <div class="search-box">
-                            <label for="cc-name" class="control-label mb-1">Password</label>
-                            <input name="psswd" autocomplete="off" id="psswd" type="password" class="form-control cc-name valid" data-val="false" >
-                          </div>
-                        </div>
-          
-                        <div class="form-group">
-                          <div>
-                            <label for="x_card_code" class="control-label mb-1">User Type</label>
-                            <div class="input-group">
-                              <select name="prvlgtyp" id="prvlgtyp">
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-          
                       </div>
+
+                      <div class="form-group has-success">
+                        <div class="search-box">
+                          <label for="cc-name" class="control-label mb-1">Password</label>
+                          <input name="psswd" autocomplete="off" id="psswd" type="password"
+                            class="form-control cc-name valid" data-val="false">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <div>
+                          <label for="x_card_code" class="control-label mb-1">User Type</label>
+                          <div class="input-group">
+                            <select name="prvlgtyp" id="prvlgtyp">
+                              <option value="user">User</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
+                </div>
                 <div>
                   <button id="add_update" type="submit" class="btn btn-lg btn-info btn-block">
                     <span id="payment-button-amount">Insert</span>
@@ -335,81 +165,81 @@ print_r($_SESSION);
     <!-- endinject -->
     <!-- Custom js for this page -->
     <script>
-      jQuery(document).ready(function() {
-          jQuery('.search-box input[type="text"]').on("keyup input", function() {
-              /* Get input value on change */
-              var inputVal = jQuery(this).val();
-              var columnname = jQuery(this).attr('id')
-              //console.log(jQuery(this).attr('id'));
-              console.log(inputVal);
-              var resultDropdown = jQuery(this).siblings(".result");
-              if (inputVal.length) {
-                  jQuery.get("phpscripts/users/searchUnme.php", {
-                      term: inputVal,
-                      columnname: columnname
-                  }).done(function(data) {
-                      // Display the returned data in browser
-                      //console.log(data);
-                      resultDropdown.html(data);
-                      if(!data.includes("Not")){
-                         // console.log('not issue')
-                          jQuery('#add_update').prop('disabled', false);
-                      }else{
-                          jQuery('#add_update').prop('disabled', true);
-                        //  console.log('issue')
-                      }
-                  });
+      jQuery(document).ready(function () {
+        jQuery('.search-box input[type="text"]').on("keyup input", function () {
+          /* Get input value on change */
+          var inputVal = jQuery(this).val();
+          var columnname = jQuery(this).attr('id')
+          //console.log(jQuery(this).attr('id'));
+          console.log(inputVal);
+          var resultDropdown = jQuery(this).siblings(".result");
+          if (inputVal.length) {
+            jQuery.get("phpscripts/users/searchUnme.php", {
+              term: inputVal,
+              columnname: columnname
+            }).done(function (data) {
+              // Display the returned data in browser
+              //console.log(data);
+              resultDropdown.html(data);
+              if (!data.includes("Not")) {
+                // console.log('not issue')
+                jQuery('#add_update').prop('disabled', false);
               } else {
-                  resultDropdown.empty();
+                jQuery('#add_update').prop('disabled', true);
+                //  console.log('issue')
               }
-          });
-          // Set search input value on click of result item
-          jQuery(document).on("click", ".result p", function() {
-              jQuery(this).parents(".search-box").find('input[type="text"]').val(jQuery(this).text());
-              jQuery(this).parent(".result").empty();
-          });
-          //////Set Data Call For PHP SCRIPTS////////////////////////////////////////////////////////////////
-          jQuery(document).on('click', '#add_update', function() {
-              console.log("Clicked");
-              setdata();
-          })
-
-          function setdata() {
-              var sndData = {
-                  'usrnme': jQuery('input[name=usrnme]').val(),
-                  'psswd': jQuery('input[name=psswd]').val(),
-                  'prvlgtyp': jQuery('select[name=prvlgtyp]').val(),
-                  'token': jQuery('input[name=token]').val()
-              }
-              console.log(sndData);
-              jQuery.ajax({
-                      type: 'POST',
-                      url: 'phpscripts/users/insertusr.php',
-                      data: sndData,
-                      dataType: 'text',
-                      encode: true
-                  })
-                  .done(function(data) {
-                      console.log(data);
-                      jQuery('select[name=usrnme]').val("");
-                      jQuery('input[name=psswd]').val(""),
-                          jQuery('select[name=prvlgtrp]').val("")
-                      alert("Inserted");
-                  }).fail(function() {
-                      // jQuery('#product_info').html(data).show();
-                  });
+            });
+          } else {
+            resultDropdown.empty();
           }
+        });
+        // Set search input value on click of result item
+        jQuery(document).on("click", ".result p", function () {
+          jQuery(this).parents(".search-box").find('input[type="text"]').val(jQuery(this).text());
+          jQuery(this).parent(".result").empty();
+        });
+        //////Set Data Call For PHP SCRIPTS////////////////////////////////////////////////////////////////
+        jQuery(document).on('click', '#add_update', function () {
+          console.log("Clicked");
+          setdata();
+        })
+
+        function setdata() {
+          var sndData = {
+            'usrnme': jQuery('input[name=usrnme]').val(),
+            'psswd': jQuery('input[name=psswd]').val(),
+            'prvlgtyp': jQuery('select[name=prvlgtyp]').val(),
+            'token': jQuery('input[name=token]').val()
+          }
+          console.log(sndData);
+          jQuery.ajax({
+            type: 'POST',
+            url: 'phpscripts/users/insertusr.php',
+            data: sndData,
+            dataType: 'text',
+            encode: true
+          })
+            .done(function (data) {
+              console.log(data);
+              jQuery('select[name=usrnme]').val("");
+              jQuery('input[name=psswd]').val(""),
+                jQuery('select[name=prvlgtrp]').val("")
+              alert("Inserted");
+            }).fail(function () {
+              // jQuery('#product_info').html(data).show();
+            });
+        }
       });
-  </script>
-  <script>
-      jQuery(document).ready(function() {
-          jQuery(".standardSelect").chosen({
-              disable_search_threshold: 10,
-              no_results_text: "Oops, nothing found!",
-              width: "100%"
-          });
+    </script>
+    <script>
+      jQuery(document).ready(function () {
+        jQuery(".standardSelect").chosen({
+          disable_search_threshold: 10,
+          no_results_text: "Oops, nothing found!",
+          width: "100%"
+        });
       });
-  </script>
+    </script>
     <!-- <script src="/assets/js/getstylesize.js"></script> -->
     <!-- End custom js for this page -->
 </body>

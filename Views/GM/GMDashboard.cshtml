@@ -29,10 +29,12 @@
             min-height: 52px;
             height: 56px;
             padding: 0;
-            background: #181824 !important; /* dark color */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            background: #181824 !important;
+            /* dark color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
             border: none;
         }
+
         .navbar .btn {
             margin: 0;
             padding: 8px 18px;
@@ -40,18 +42,22 @@
             top: 0;
             left: 0;
         }
+
         .navbar-nav {
             margin: 0 !important;
             padding: 0 !important;
         }
+
         .navbar-nav-left {
             margin-left: 0 !important;
         }
+
         .navbar-menu-wrapper {
             padding: 0 !important;
             margin: 0 !important;
             align-items: flex-start !important;
         }
+
         /* Remove left/right padding from main content */
         .container-fluid.page-body-wrapper,
         .main-panel,
@@ -63,14 +69,17 @@
             width: 100vw;
             max-width: 100vw;
         }
-        body, html {
+
+        body,
+        html {
             overflow-x: hidden;
         }
-        
+
         /* Section styling */
         .dashboard-section {
             margin-bottom: 18px;
         }
+
         .section-header {
             display: flex;
             align-items: center;
@@ -87,15 +96,18 @@
             user-select: none;
             transition: background 0.2s;
         }
+
         .section-header:hover {
             background: #2d3136;
         }
+
         .section-header .section-title {
             font-weight: 700;
             font-size: 1rem;
             color: #fff;
             letter-spacing: 0.5px;
         }
+
         .section-header .toggle-icon {
             font-size: 1.5rem;
             font-weight: 900;
@@ -105,22 +117,27 @@
             display: flex;
             align-items: center;
         }
+
         .section-header.collapsed .toggle-icon {
             transform: rotate(0deg);
         }
+
         .section-header.expanded .toggle-icon {
             transform: rotate(180deg);
         }
+
         .section-content {
             transition: all 0.3s ease;
             overflow: hidden;
         }
+
         .section-content.collapsed {
             max-height: 0;
             opacity: 0;
             margin: 0;
             padding: 0;
         }
+
         .section-content.expanded {
             max-height: none;
             opacity: 1;
@@ -132,9 +149,8 @@
     <div class="container-scroller">
         <div class="container-fluid page-body-wrapper">
             <!-- partial:partials/_navbar.html -->
-            <a href="/GM" 
-               class="btn btn-outline-primary" 
-               style="position: fixed; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
+            <a href="/GM" class="btn btn-outline-primary"
+                style="position: absolute; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
                 <i class="mdi mdi-arrow-left"></i> Back
             </a>
             <!-- partial -->
@@ -142,7 +158,7 @@
                 <div class="content-wrapper">
                     <div class="row">
                     </div>
-                    
+
                     <!-- LIVE Section -->
                     <div class="dashboard-section">
                         <div class="section-header">
@@ -153,7 +169,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- ALL Section -->
                     <div class="dashboard-section">
                         <div class="section-header collapsible collapsed" onclick="toggleSection('all-section', this)">
@@ -165,7 +181,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- content-wrapper ends -->
                     <!-- partial:partials/_footer.html -->
                     <footer class="footer">
@@ -205,13 +221,13 @@
         <script src="/assets/js/livedash.js"></script>
         <!-- <script src="assets/js/dashData.js"></script> -->
         <!-- End custom js for this page -->
-        
+
         <script>
             function toggleSection(sectionId, headerEl) {
                 const section = document.getElementById(sectionId);
                 const header = headerEl;
                 const icon = header.querySelector('.toggle-icon');
-                
+
                 if (section.classList.contains('expanded')) {
                     section.classList.remove('expanded');
                     section.classList.add('collapsed');
