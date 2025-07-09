@@ -66,6 +66,65 @@
         body, html {
             overflow-x: hidden;
         }
+        
+        /* Section styling */
+        .dashboard-section {
+            margin-bottom: 18px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 38px;
+            padding: 0 18px;
+            background: #23272b;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            border-bottom: 2px solid #181a1b;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .section-header:hover {
+            background: #2d3136;
+        }
+        .section-header .section-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .section-header .toggle-icon {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fff;
+            margin-left: 12px;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .section-header.collapsed .toggle-icon {
+            transform: rotate(0deg);
+        }
+        .section-header.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .section-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .section-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
+        .section-content.expanded {
+            max-height: none;
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -83,15 +142,37 @@
                 <div class="content-wrapper">
                     <div class="row">
                     </div>
-                    <div class="row justify-content-center" id="livedash">
+                    
+                    <!-- LIVE Section -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <span class="section-title">LIVE</span>
+                        </div>
+                        <div class="section-content expanded">
+                            <div class="row justify-content-center" id="livedash">
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- ALL Section -->
+                    <div class="dashboard-section">
+                        <div class="section-header collapsible collapsed" onclick="toggleSection('all-section', this)">
+                            <span class="section-title">ALL</span>
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <div class="section-content collapsed" id="all-section">
+                            <div class="row justify-content-center" id="alldash">
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- content-wrapper ends -->
                     <!-- partial:partials/_footer.html -->
                     <footer class="footer">
                         <div class="d-sm-flex justify-content-center justify-content-sm-between">
                             <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © MAS
                                 KREEDA
-                                2024</span>
+                                2025</span>
                         </div>
                     </footer>
                     <!-- partial -->
@@ -124,6 +205,28 @@
         <script src="/assets/js/livedash.js"></script>
         <!-- <script src="assets/js/dashData.js"></script> -->
         <!-- End custom js for this page -->
+        
+        <script>
+            function toggleSection(sectionId, headerEl) {
+                const section = document.getElementById(sectionId);
+                const header = headerEl;
+                const icon = header.querySelector('.toggle-icon');
+                
+                if (section.classList.contains('expanded')) {
+                    section.classList.remove('expanded');
+                    section.classList.add('collapsed');
+                    header.classList.remove('expanded');
+                    header.classList.add('collapsed');
+                    if (icon) icon.textContent = '+';
+                } else {
+                    section.classList.remove('collapsed');
+                    section.classList.add('expanded');
+                    header.classList.remove('collapsed');
+                    header.classList.add('expanded');
+                    if (icon) icon.textContent = '–';
+                }
+            }
+        </script>
 </body>
 
 </html>

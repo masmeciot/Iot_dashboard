@@ -140,7 +140,6 @@ namespace Iot_dashboard.Controllers.GM
             }
         }
 
-
         [HttpPost]
         public async Task<IActionResult> getMeasurements(string style)
         {
@@ -187,13 +186,87 @@ namespace Iot_dashboard.Controllers.GM
             ViewBag.prvlgtyp = prvlgtyp;
             return View("GMMeasure");
         }
+       
+        [HttpGet]
+        public IActionResult GMUsers()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            var prvlgtypStr = HttpContext.Session.GetString("type");
+            int prvlgtyp = 0;
+            int.TryParse(prvlgtypStr, out prvlgtyp);
+            if (string.IsNullOrEmpty(token) || prvlgtyp < 2)
+            {
+                return RedirectToAction("Index");
+            }
+            ViewBag.account = HttpContext.Session.GetString("account");
+            ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.plant = HttpContext.Session.GetString("plant");
+            ViewBag.prvlgtyp = prvlgtyp;
+            return View("GMUsers");
+        }
+       
+        [HttpGet]
+        public IActionResult GMReferences()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            var prvlgtypStr = HttpContext.Session.GetString("type");
+            int prvlgtyp = 0;
+            int.TryParse(prvlgtypStr, out prvlgtyp);
+            if (string.IsNullOrEmpty(token) || prvlgtyp < 1)
+            {
+                return RedirectToAction("Index");
+            }
+            ViewBag.account = HttpContext.Session.GetString("account");
+            ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.plant = HttpContext.Session.GetString("plant");
+            ViewBag.prvlgtyp = prvlgtyp;
+            return View("GMReferences");
+        }
+        
+        [HttpGet]
+        public IActionResult GMReport()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            var prvlgtypStr = HttpContext.Session.GetString("type");
+            int prvlgtyp = 0;
+            int.TryParse(prvlgtypStr, out prvlgtyp);
+            if (string.IsNullOrEmpty(token) || prvlgtyp < 1)
+            {
+                return RedirectToAction("Index");
+            }
+            ViewBag.account = HttpContext.Session.GetString("account");
+            ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.plant = HttpContext.Session.GetString("plant");
+            ViewBag.prvlgtyp = prvlgtyp;
+            return View("GMReport");
+        }
+        
+        [HttpGet]
+        public IActionResult GMStyles()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            var prvlgtypStr = HttpContext.Session.GetString("type");
+            int prvlgtyp = 0;
+            int.TryParse(prvlgtypStr, out prvlgtyp);
+            if (string.IsNullOrEmpty(token) || prvlgtyp < 1)
+            {
+                return RedirectToAction("Index");
+            }
+            ViewBag.account = HttpContext.Session.GetString("account");
+            ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.plant = HttpContext.Session.GetString("plant");
+            ViewBag.prvlgtyp = prvlgtyp;
+            return View("GMStyles");
+        }
 
         [HttpGet]
-
         public IActionResult GMDashboard()
         {
             var token = HttpContext.Session.GetString("accessToken");
-            if (string.IsNullOrEmpty(token))
+            var prvlgtypStr = HttpContext.Session.GetString("type");
+            int prvlgtyp = 0;
+            int.TryParse(prvlgtypStr, out prvlgtyp);
+            if (string.IsNullOrEmpty(token) || prvlgtyp < 1)
             {
                 return RedirectToAction("Index");
             }

@@ -1,0 +1,682 @@
+<?php
+require "phpscripts/dbconnect.php";
+session_start();
+if ($_SESSION['sid'] == session_id()) {
+    $activePage = basename($_SERVER['PHP_SELF'], ".php");
+} else {
+    header("location:phpscripts/logout.php");
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+session_write_close();
+print_r($_SESSION);
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Measuring යාළුවා | Styles</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
+  <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+  <script src="/assets/js/react.production.min.js"></script>
+  <script src="/assets/js/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <!-- End Plugin css for this page -->
+  <!-- inject:css -->
+  <!-- endinject -->
+  <!-- Layout styles -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <!-- End layout styles -->
+  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+  <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+  <script>
+    $(document).ready(function () {
+      function checkSession() {
+        $.ajax({
+          url: 'phpscripts/sessiontimecheck.php',
+          method: 'GET',
+          success: function (data) {
+            console.log(data)
+            if (data == 'timeout') {
+              window.location.href = 'phpscripts/logout.php';
+            }
+          }
+        });
+      }
+      // Check session every minute
+      setInterval(checkSession, 60000);
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container-scroller">
+    <!-- partial:partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+        <a class="sidebar-brand brand-logo" href="home.html"><img src="images/MASLogo.svg" alt="logo" /></a>
+        <a class="sidebar-brand brand-logo-mini" href="index.html"><img src="images/MASLogoMini.svg"
+            alt="logo" /></a>
+      </div>
+      <ul class="nav">
+        <li class="nav-item profile">
+        </li>
+        <li class="nav-item nav-category">
+          <span class="nav-link">Navigation</span>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="home.html">
+            <span class="menu-icon">
+              <i class="mdi mdi-speedometer"></i>
+            </span>
+            <span class="menu-title">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="report.html">
+            <span class="menu-icon">
+              <i class="mdi mdi-file-document"></i>
+            </span>
+            <span class="menu-title">Report</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="export.html">
+            <span class="menu-icon">
+              <i class="mdi mdi-download"></i>
+            </span>
+            <span class="menu-title">Export</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="styles.html">
+            <span class="menu-icon">
+              <i class="mdi mdi-tshirt-v"></i>
+            </span>
+            <span class="menu-title">Styles</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="measurements.html">
+            <span class="menu-icon">
+              <i class="mdi mdi-ruler"></i>
+            </span>
+            <span class="menu-title">Measurements</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="settings.html">
+            <span class="menu-icon">
+              <i class="mdi mdi-settings"></i>
+            </span>
+            <span class="menu-title">Settings</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="about.html">
+            <span class="menu-icon">
+              <i class="mdi mdi-information"></i>
+            </span>
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:partials/_navbar.html -->
+      <nav class="navbar p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+          <a class="navbar-brand brand-logo-mini" href="index.html"><img src="images/MASLogo.svg"
+              alt="logo" /></a>
+        </div>
+        <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>
+          <ul class="navbar-nav w-100">
+          </ul>
+          <ul class="navbar-nav navbar-nav-right">
+
+            <!-- <li class="nav-item dropdown border-left">
+              <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
+                data-toggle="dropdown">
+                <i class="mdi mdi-bell"></i>
+                <span class="count bg-danger"></span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
+                aria-labelledby="notificationDropdown">
+                <h6 class="p-3 mb-0">Notifications</h6>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-calendar text-success"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Event today</p>
+                    <p class="text-muted ellipsis mb-0"> Just a reminder that you have an event today </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-settings text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Settings</p>
+                    <p class="text-muted ellipsis mb-0"> Update dashboard </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-link-variant text-warning"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Launch Admin</p>
+                    <p class="text-muted ellipsis mb-0"> New admin wow! </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <p class="p-3 mb-0 text-center">See all notifications</p>
+              </div>
+            </li> -->
+            <li class="nav-item dropdown">
+              <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+                <div class="navbar-profile">
+                  <img class="img-xs rounded-circle" src="images/user.png" alt="">
+                  <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+                </div>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
+                aria-labelledby="profileDropdown">
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item" href="phpscripts/logout.php">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-logout text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1" href="phpscripts/logout.php">Log out</p>
+                  </div>
+                </a>
+            </li>
+          </ul>
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+            data-toggle="offcanvas">
+            <span class="mdi mdi-format-line-spacing"></span>
+          </button>
+        </div>
+      </nav>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row">
+
+            <div class="col-xs-6 col-sm-6">
+              <div class="card">
+                <div class="card-body" <div class="form group">
+                  <form method="post" autocomplete="off" id="sug-form_style">
+                    <div class="card">
+                      <div class="card-header">
+                        <strong class="card-title">Select Style</strong>
+                      </div>
+                      <div class="card-body">
+
+                        <div class="chosen-container chosen-container-single" title="" style="width: 100%;"><a
+                            class="chosen-single chosen-default">
+
+                            <div><b></b></div>
+                          </a>
+                          <div class="chosen-drop_style">
+                            <div class="search-box_style">
+                              <input type="text" name="example" list="styleList" placeholder="Enter a Style"
+                                class="col-xs-6 col-sm-6">
+                              <datalist id="styleList">
+
+                              </datalist>
+                              </input>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Profile Card/ -->
+            <div class="col-lg-4 col-md-6" name="userprofile" id="userprofile"></div>
+
+
+          </div>
+
+          <div class="row">
+
+
+
+            <div class="col-xs-6 col-sm-6">
+
+            </div>
+
+
+          </div>
+
+          <div class="row">
+
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <strong class="card-title">Style Mesurements</strong>
+                </div>
+
+                <div class="card-body">
+                  <!-- <form class="" id="issueadd" name="issueadd" action="phpscripts/issue/addissue.php" method="post"> -->
+                  <?php
+                        if ($_SESSION['prvlg'] == 'admin') {
+                        ?>
+                  <div class="col-md-6">
+                    <button type="button" name="delStl" id="delStl" class="btn btn-danger"
+                      style="margin-right: 20px; margin-bottom: 10px; margin-left:15px " disabled>Delete</button>
+                  </div>
+                  <?php
+                        }
+                        ?>
+                  <div align="right">
+                    <button type="button" name="add" id="add" class="btn btn-info"
+                      style="margin-right: 20px; margin-bottom: 10px; margin-left:15px " disabled>Add
+                      Measurement</button>
+                  </div>
+                  <table id="user_data" Name="user_data" class="table table-striped table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Mesurement</th>
+                        <th>Type</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="invinfo">
+                    </tbody>
+                  </table>
+                  <!-- </form> -->
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+          <!-- content-wrapper ends -->
+          <!-- partial:partials/_footer.html -->
+          <footer class="footer">
+            <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © MAS KREEDA
+                2024</span>
+            </div>
+          </footer>
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="/assets/vendors/select2/select2.min.js"></script>
+    <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+    <script src="/assets/vendors/chart.js/chart.js"></script>
+    <script src="/assets/vendors/chart.js/chart.js@3.9.1"></script>
+    <script src="/assets/vendors/chart.js/luxon.min.js"></script>
+    <script src="/assets/vendors/chart.js/chartjs-adapter-luxon@1.0.0"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/assets/js/off-canvas.js"></script>
+    <script src="/assets/js/hoverable-collapse.js"></script>
+    <script src="/assets/js/misc.js"></script>
+    <script src="/assets/js/settings.js"></script>
+    <script src="/assets/js/todolist.js"></script>
+    <script src="/assets/js/select2.js"></script>
+    <script src="/assets/vendors2/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/vendors2/popper.js/dist/umd/popper.min.js"></script>
+    <script src="/assets/vendors2/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/assets/vendors2/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/assets/vendors2/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/assets/vendors2/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="/assets/vendors2/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="/assets/vendors2/jszip/dist/jszip.min.js"></script>
+    <script src="/assets/vendors2/pdfmake/build/pdfmake.min.js"></script>
+    <script src="/assets/vendors2/pdfmake/build/vfs_fonts.js"></script>
+    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="/assets/vendors2/js/init-scripts/data-table/datatables-init.js"></script>
+    <script src="/assets/vendors2/chosen/chosen.jquery.min.js"></script>
+    <script src="/assets/vendors2/jquery-validation/dist/jquery.validate.min.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script type="text/javascript">
+      jQuery(document).ready(function() {
+           console.log("table");
+          var table = jQuery('#table_data').DataTable();
+      });
+  </script>
+
+  <script>
+      jQuery(document).ready(function() {
+          console.log("Jquery Ok");
+          jQuery(".standardSelect").chosen({
+              disable_search_threshold: 10,
+              no_results_text: "Oops, nothing found!",
+              width: "100%"
+          });
+      });
+  </script>
+  <script type="text/javascript" language="javascript">
+    jQuery(document).ready(function() {
+
+        const yourDate = new Date();
+        var newdate = yourDate.toISOString().split('T')[0];
+
+        jQuery('.datePicker').val(newdate);
+
+        dataLoader();
+        testFunc();
+        styleLoader();
+        // reqlnsrh();
+        //partnamesugestion();
+        //getuserdata();
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        jQuery(document).on('click', '#srhtxt', function() {
+            console.log("Clicked");
+            // dataLoader();
+        })
+        jQuery(document).on('click', '#expbtn', function() {
+            console.log("Clicked");
+            dataSaver();
+        })
+
+        function styleLoader() {
+            jQuery('#styleList').empty();
+            jQuery.ajax({
+                    type: 'POST',
+                    url: 'phpscripts/styles/styleLoader.php',
+                    dataType: 'json',
+                    encode: true
+                })
+                .done(function(data) {
+                    console.log(data);
+                    for (let i = 0; i < data.length; i++) {
+                        console.log(data[i][0]);
+                        jQuery('#styleList').append(data[i][0])
+                    }
+                }).fail(function() {
+                    //  jQuery('#product_info').html(data).show();
+                });
+        }
+
+        function testFunc(selStl) {
+            var x = document.getElementById("styleList");
+            var stList = [];
+            var i;
+            for (i = 0; i < x.options.length; i++) {
+                stList.push(x.options[i].value);
+            }
+            return stList.includes(selStl)
+        }
+
+        function dataLoader() {
+            function isFirstCharacterNumber(str) {
+                return /^[0-9]/.test(str);
+            }
+            jQuery('.search-box_style input[type="text"]').change(function() {
+                jQuery('#user_data').DataTable().clear().destroy();
+                var inputVal = jQuery(this).val();
+                inputVal = inputVal.replace(/[^a-zA-Z0-9 ]/g, ''); // Remove non-alphanumeric characters
+                inputVal = inputVal.replace(/\s+/g, '_'); // Replace spaces with underscores
+                inputVal = inputVal.toUpperCase();
+                var formData = {
+                    'style': inputVal
+                };
+                var srhRes = testFunc(inputVal);
+                if (!srhRes) {
+                    if (confirm("Style entered is not on the databse, Do you want to add it?")) {
+                        console.log("ADD");
+
+                        if (isFirstCharacterNumber(inputVal)) {
+                            alert("ERROR!! 1st letter cannot be a number!")
+                        } else {
+                            jQuery.ajax({
+                                type: 'POST',
+                                url: 'phpscripts/styles/addStyle.php',
+                                data: formData,
+                                dataType: 'json',
+                                encode: true
+                            });
+                            jQuery('.search-box_style input[type="text"]').val(inputVal)
+                            tblUpdate()
+                            styleLoader();
+                            jQuery('#add').prop('disabled', false);
+                            jQuery('#delStl').prop('disabled', false);
+                        }
+
+
+                    } else {
+                        console.log("Yeet");
+                    }
+                } else {
+                    jQuery('#user_data').DataTable().clear().destroy();
+                    var dataTable = jQuery('#user_data').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        order: [],
+                        ajax: {
+                            url: 'phpscripts/styles/fetchInfo.php',
+                            type: 'POST',
+                            data: formData,
+                        } // Use the dynamically determined columns
+                    });
+                    jQuery('#add').prop('disabled', false);
+                    jQuery('#delStl').prop('disabled', false);
+                }
+            });
+
+        }
+
+        function tblUpdate() {
+            jQuery('#user_data').DataTable().clear().destroy();
+            var inputVal = jQuery('.search-box_style input[type="text"]').val();
+            var formData = {
+                'style': inputVal
+            };
+            console.log(formData);
+            var dataTable = jQuery('#user_data').DataTable({
+                processing: true,
+                serverSide: true,
+                order: [],
+                ajax: {
+                    url: 'phpscripts/styles/fetchInfo.php',
+                    type: 'POST',
+                    data: formData,
+                } // Use the dynamically determined columns
+            });
+            jQuery('#add').prop('disabled', false);
+            jQuery('#delStl').prop('disabled', false);
+        }
+
+
+        jQuery(document).on('change', '.update', function() {
+            var column_name = jQuery(this).data("column");
+            var value = jQuery(this).val();
+            var style = jQuery('.search-box_style input[type="text"]').val();
+            console.log("Value Inside the input", value);
+            update_data(style, column_name, value);
+        });
+
+        function update_data(style, column_name, value) {
+
+            console.log("Col Name:", column_name);
+            console.log("Value:", value);
+
+
+            jQuery.ajax({
+                url: "phpscripts/styles/update.php",
+                method: "POST",
+                data: {
+                    style: style,
+                    column_name: column_name,
+                    value: value
+                },
+                success: function(data) {
+                    console.log(data);
+                    jQuery('#alert_message').html('<div class="alert alert-success">' + data + '</div>');
+                    // jQuery('#user_data').DataTable().destroy();
+                    //fetch_data();
+                }
+            });
+            setInterval(function() {
+                jQuery('#alert_message').html('');
+            }, 5000);
+        }
+
+
+        jQuery(document).on('click', '.delete', function() {
+            var id = jQuery(this).attr('id');
+            var style = jQuery('.search-box_style input[type="text"]').val();
+            // var id = jQuery(this).attr("id");
+            console.log(id);
+            if (confirm("Are you sure you want to remove this? " + id + "\nRemoving this will delete all the measurment records of this measuement type")) {
+                console.log(id);
+                jQuery.ajax({
+                    url: "phpscripts/styles/deleteMeas.php",
+                    method: "POST",
+                    data: {
+                        id: id,
+                        style: style
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        jQuery('#alert_message').html('<div class="alert alert-success">' + data + '</div>');
+                        jQuery('#user_data').DataTable().destroy();
+                        tblUpdate();
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+                setInterval(function() {
+                    jQuery('#alert_message').html('');
+                }, 5000);
+            }
+        });
+
+
+        jQuery(document).on('click', '#delStl', function() {
+            var style = jQuery('.search-box_style input[type="text"]').val();
+            // var id = jQuery(this).attr("id");
+            if (confirm("Are you sure you want to remove this style? " + style + "\nRemoving this will delete all the measurements taken for this style...")) {
+                // console.log(id);
+                jQuery.ajax({
+                    url: "phpscripts/styles/deleteStyle.php",
+                    method: "POST",
+                    data: {
+                        style: style
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        jQuery('#alert_message').html('<div class="alert alert-success">' + data + '</div>');
+                        var table = jQuery('#user_data').DataTable();
+                        table.clear().destroy();
+                        jQuery('.search-box_style input[type="text"]').val("")
+
+                        styleLoader();
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+                setInterval(function() {
+                    jQuery('#alert_message').html('');
+                }, 5000);
+            }
+        });
+
+        /////Adding New Rows//////////////
+        jQuery('#add').click(function() {
+            var html = '<tr>';
+            html += '<td contenteditable id="data1"></td>';
+            html += '<td><select class="typinsert" data-placeholder="Choose a type" name="type" id="newDat" data-column="newDat"">"<option value="p2p" selected>p2p</option><option value="curve">curve</option><option value="p2pMulti">p2pMulti</option><option value="curveCnt">curveCnt</option>"</select></td>';
+            html += '<td><button type="button" name="insert" id="insert" class="btn btn-success btn-xs">Insert</button></td>';
+            html += '</tr>';
+            jQuery('#user_data tbody').prepend(html);
+            jQuery('#add').prop('disabled', true);
+        });
+
+        // ////Insert Function//////////////////////
+
+        jQuery(document).on('click', '#insert', function() {
+
+            console.log("Clicked Insert");
+
+            var meas = jQuery('#data1').text();
+            meas = meas.replace(/[^a-zA-Z0-9 ]/g, ''); // Remove non-alphanumeric characters
+            meas = meas.replace(/\s+/g, '_'); // Replace spaces with underscores
+            meas = meas.toUpperCase(); // Capitalize all characters
+            var type = jQuery('.typinsert').val();
+            var style = jQuery('.search-box_style input[type="text"]').val();
+
+            console.log(meas);
+            console.log(type);
+
+
+            if (meas != '') {
+                console.log("Inside AJAX");
+                jQuery.ajax({
+                    url: "phpscripts/styles/insertMea.php",
+                    method: "POST",
+                    data: {
+                        meas: meas,
+                        type: type,
+                        style: style
+                    },
+
+                    success: function(data) {
+                        console.log(data);
+                        jQuery('#add').prop('disabled', false);
+                        tblUpdate();
+                    }
+                });
+                setInterval(function() {
+                    jQuery('#alert_message').html('');
+                }, 5000);
+            } else {
+                alert("Please fill all the fields!");
+            }
+
+
+
+
+        });
+    })
+</script>
+    <!-- <script src="/assets/js/getstylesize.js"></script> -->
+    <!-- End custom js for this page -->
+</body>
+
+</html>
