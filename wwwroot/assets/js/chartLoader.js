@@ -249,50 +249,42 @@ document.addEventListener('DOMContentLoaded', function () {
     const card = document.createElement('div');
     card.className = 'col-lg-6 grid-margin stretch-card';
     card.innerHTML = `
-      <div class="card">
+      <div class="card measurement-card">
         <div class="card-body">
-          <h4 class="card-title">${measurementName}</h4>
-          <div class="row d-flex justify-content-center">
-            <div class="card col-md-3 m-2">
-              <div class="card-body">
-                <h6 class="text-primary">Total</h6>
-                <h3 class="display-3">${total}</h3>
-              </div>
+          <h4 class="card-title measurement-title">${measurementName}</h4>
+          <div class="row d-flex justify-content-center card-stats-row single-row-stats">
+            <div class="col-3 stat-col">
+              <div class="stat-label">Total</div>
+              <div class="stat-value"><strong>${total}</strong></div>
             </div>
-            <div class="card col-md-3 m-2">
-              <div class="card-body">
-                <h6 class="text-primary">Passed</h6>
-                <h3 class="display-3">${passed}</h3>
-              </div>
+            <div class="col-3 stat-col">
+              <div class="stat-label">Passed</div>
+              <div class="stat-value"><strong>${passed}</strong></div>
             </div>
-            <div class="card col-md-3 m-2">
-              <div class="card-body">
-                <h6 class="text-primary">Failed</h6>
-                <h3 class="display-3">${failed}</h3>
-              </div>
+            <div class="col-3 stat-col">
+              <div class="stat-label">Failed</div>
+              <div class="stat-value"><strong>${failed}</strong></div>
             </div>
-            <div class="card col-md-3 m-2">
-              <div class="card-body">
-                <h6 class="text-primary">Percentage</h6>
-                <h3 class="display-3">${passPercentage}%</h3>
-              </div>
+            <div class="col-3 stat-col">
+              <div class="stat-label">Percentage</div>
+              <div class="stat-value"><strong>${passPercentage}%</strong></div>
             </div>
           </div>
         </div>
-        <div class="card-body">
-          <canvas id="chart-${measurementName.replace(/\s+/g, '-')}"></canvas>
+        <div class="card-body card-chart-body">
+          <canvas id="chart-${measurementName.replace(/\s+/g, '-')}" class="measurement-chart"></canvas>
         </div>
         <div class="card-body">
-          <h4 class="card-title">Trend</h4>
-          <div class="table-responsive">
-            <table class="table">
+          <h4 class="card-title measurement-title">Trend</h4>
+          <div class="table-responsive measurement-table-scroll" style="max-height: 180px; overflow-y: auto;">
+            <table class="table table-sm">
               <thead>
                 <tr>
                   <th>Station</th>
                   <th>Passed</th>
                   <th>Failed Low</th>
                   <th>Failed High</th>
-                  <th>Pass Percentage</th>
+                  <th>Pass %</th>
                   <th>Current Trend</th>
                 </tr>
               </thead>
@@ -500,3 +492,70 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.removeChild(link);
   }
 });
+
+// Remove any previously injected style blocks for measurement-card to avoid duplicates
+const prevStyle = document.getElementById('measurement-card-style');
+if (prevStyle) prevStyle.remove();
+const style = document.createElement('style');
+style.id = 'measurement-card-style';
+style.innerHTML = `
+.measurement-card {
+  margin-bottom: 18px;
+  font-size: 0.97rem;
+}
+.measurement-title {
+  font-size: 1.08rem !important;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.card-stats-row.single-row-stats {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  margin-bottom: 8px !important;
+  gap: 0;
+}
+.stat-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+.stat-label {
+  font-size: 1.05rem !important;
+  margin-bottom: 2px !important;
+  color: #2196f3;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+}
+.stat-value {
+  font-size: 2.1rem !important;
+  font-weight: 900 !important;
+  margin-bottom: 0 !important;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  line-height: 1.1;
+}
+.card-chart-body {
+  margin-bottom: 8px !important;
+  padding: 8px 0 0 0 !important;
+}
+.measurement-chart {
+  height: 30vh !important;
+  max-height: 30vh !important;
+}
+.measurement-table-scroll {
+  max-height: 180px !important;
+  overflow-y: auto !important;
+}
+.table-sm th, .table-sm td {
+  padding: 0.35rem 0.5rem !important;
+  font-size: 0.93rem !important;
+}
+`;
+document.head.appendChild(style);
