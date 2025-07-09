@@ -216,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const passed = entries.filter(e => e.result === 'Pass').length;
     const failed = total - passed;
     const passPercentage = total > 0 ? ((passed / total) * 100).toFixed(2) : 0;
+    const refValues = getReferenceValues(measurementName);
 
     // Group by station for table
     const stationsMap = new Map();
@@ -330,10 +331,12 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderChart(measurementName, entries) {
     const canvas = document.getElementById(`chart-${measurementName.replace(/\s+/g, '-')}`);
     if (!canvas) return;
-
+    
     const ctx = canvas.getContext('2d');
-    const referenceValue = getReferenceValue(measurementName);
-
+    
+    // Get reference values for selected size
+    const refValues = getReferenceValues(measurementName);
+    
     const data = {
       datasets: [
         {
@@ -343,26 +346,73 @@ document.addEventListener('DOMContentLoaded', function () {
             y: entry.value
           })),
           borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
+          backgroundColor: 'rgba(75, 192, 192, 0.1)',
+          tension: 0.1,
+          pointRadius: 3
         }
       ]
     };
-
-    if (referenceValue) {
+    
+    if (refValues) {
+      // Add reference lines
       data.datasets.push({
-        label: 'Reference',
+        label: 'Target',
         data: entries.map(entry => ({
           x: new Date(entry.dateTime),
-          y: referenceValue
+          y: refValues.reference
         })),
         borderColor: 'rgb(255, 99, 132)',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: false
+      });
+      
+      data.datasets.push({
+        label: 'Max Limit',
+        data: entries.map(entry => ({
+          x: new Date(entry.dateTime),
+          y: refValues.reference + refValues.tolerance
+        })),
+        borderColor: 'rgb(0, 128, 0)',
         borderWidth: 1,
         borderDash: [5, 5],
         pointRadius: 0,
         fill: false
       });
+      
+      data.datasets.push({
+        label: 'Min Limit',
+        data: entries.map(entry => ({
+          x: new Date(entry.dateTime),
+          y: refValues.reference - refValues.tolerance
+        })),
+        borderColor: 'rgb(0, 128, 0)',
+        borderWidth: 1,
+        borderDash: [5, 5],
+        pointRadius: 0,
+        fill: false
+      });
+      
+      // Add fill between min and max
+      data.datasets.push({
+        label: 'Acceptable Range',
+        data: [
+          ...entries.map(entry => ({
+            x: new Date(entry.dateTime),
+            y: refValues.reference - refValues.tolerance
+          })),
+          ...entries.map(entry => ({
+            x: new Date(entry.dateTime),
+            y: refValues.reference + refValues.tolerance
+          })).reverse()
+        ],
+        backgroundColor: 'rgba(0, 128, 0, 0.1)',
+        borderWidth: 0,
+        pointRadius: 0,
+        fill: true
+      });
     }
-
+    
     new Chart(ctx, {
       type: 'line',
       data: data,
@@ -383,6 +433,22 @@ document.addEventListener('DOMContentLoaded', function () {
             title: {
               display: true,
               text: 'Measurement Value (mm)'
+            },
+            suggestedMin: refValues ? refValues.reference - refValues.tolerance * 2 : undefined,
+            suggestedMax: refValues ? refValues.reference + refValues.tolerance * 2 : undefined
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                if (label === 'Actual Measurements') {
+                  const entry = entries[context.dataIndex];
+                  return `${label}: ${context.parsed.y}mm (Offset: ${entry.offset}mm)`;
+                }
+                return `${label}: ${context.parsed.y}mm`;
+              }
             }
           }
         }
@@ -390,10 +456,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function getReferenceValue(measurementName) {
-    // Find reference value from measurement data
-    const refMeasurement = referenceData.find(m => m.measurement === measurementName);
-    return refMeasurement ? refMeasurement.value : null;
+  function getReferenceValues(measurementName) {
+    // Find reference value for selected size
+    const sizeRef = referenceData.find(s => s.size === selectedSize);
+    if (!sizeRef) return null;
+    
+    const refMeasurement = sizeRef.measurements.find(m => 
+      m.measurement === measurementName
+    );
+    
+    return refMeasurement ? {
+      reference: refMeasurement.reference,
+      tolerance: refMeasurement.tolerance
+    } : null;
   }
 
   function handleExport() {
