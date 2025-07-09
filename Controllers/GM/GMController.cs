@@ -181,7 +181,10 @@ namespace Iot_dashboard.Controllers.GM
             ViewBag.account = HttpContext.Session.GetString("account");
             ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
             ViewBag.plant = HttpContext.Session.GetString("plant");
-            ViewBag.prvlgtyp = HttpContext.Session.GetString("type");
+            var prvlgtypStr = HttpContext.Session.GetString("type");
+            int prvlgtyp = 0;
+            int.TryParse(prvlgtypStr, out prvlgtyp);
+            ViewBag.prvlgtyp = prvlgtyp;
             return View("GMMeasure");
         }
 
