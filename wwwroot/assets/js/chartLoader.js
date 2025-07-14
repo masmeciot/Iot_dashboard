@@ -454,32 +454,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // Get reference values for selected size
     const refValues = getReferenceValues(measurementName, size);
 
-    // In renderChart, update trend line calculation to use measurement value (entry.value) instead of offset
-    function calculateTrendLine(entries) {
+    // In renderChart, use exponential moving average (EMA) for the trend line
+    function calculateEMATrendLine(entries, alpha = 0.2) {
       if (entries.length < 2) return null;
-
-      const xs = Array.from({length: entries.length}, (_, i) => i);
-      const ys = entries.map(entry => entry.value); // Use measurement value, not offset
-
-      const n = ys.length;
-      const sumX = xs.reduce((a, b) => a + b, 0);
-      const sumY = ys.reduce((a, b) => a + b, 0);
-      const sumXY = xs.reduce((sum, x, i) => sum + x * ys[i], 0);
-      const sumX2 = xs.reduce((sum, x) => sum + x * x, 0);
-
-      const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-      const intercept = (sumY - slope * sumX) / n;
-
-      // Create trend line points (use garment index as X, value as Y)
-      const trendLineData = [
-        { x: new Date(entries[0].dateTime), y: slope * 0 + intercept },
-        { x: new Date(entries[entries.length - 1].dateTime), y: slope * (entries.length - 1) + intercept }
-      ];
-
-      return { slope, intercept, trendLineData };
+      const emaData = [];
+      let prevEMA = entries[0].value;
+      entries.forEach((entry, i) => {
+        const ema = i === 0 ? entry.value : alpha * entry.value + (1 - alpha) * prevEMA;
+        emaData.push({ x: new Date(entry.dateTime), y: ema });
+        prevEMA = ema;
+      });
+      return emaData;
     }
 
-    const trendLine = calculateTrendLine(entries);
+    const emaTrendLine = calculateEMATrendLine(entries);
 
     const data = {
       datasets: [
@@ -497,11 +485,11 @@ document.addEventListener('DOMContentLoaded', function () {
       ]
     };
 
-    // Add trend line if available
-    if (trendLine) {
+    // Add EMA trend line if available
+    if (emaTrendLine && emaTrendLine.length > 1) {
       data.datasets.push({
-        label: 'Trend Line',
-        data: trendLine.trendLineData,
+        label: 'EMA Trend',
+        data: emaTrendLine,
         borderColor: 'rgb(255, 165, 0)',
         borderWidth: 2,
         borderDash: [8, 4],
@@ -603,9 +591,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (label === 'Actual Measurements') {
                   const entry = entries[context.dataIndex];
                   return `${label}: ${context.parsed.y}mm (Offset: ${entry.offset}mm)`;
-                } else if (label === 'Trend Line') {
-                  const slope = trendLine ? (trendLine.slope * 3600000).toFixed(2) : 0;
-                  return `${label}: ${context.parsed.y}mm (Slope: ${slope}/garment)`;
+                } else if (label === 'EMA Trend') {
+                  return `${label}: ${context.parsed.y}mm`;
                 }
                 return `${label}: ${context.parsed.y}mm`;
               }
