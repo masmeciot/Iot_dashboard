@@ -27,13 +27,23 @@
     .container-fluid.page-body-wrapper,
     .main-panel,
     .content-wrapper {
-      padding-left: 0 !important;
-      padding-right: 0 !important;
+      @* padding-left: 0 !important; *@
+      @* padding-right: 0 !important; *@
       margin-left: 0 !important;
       margin-right: 0 !important;
       width: 100vw;
       max-width: 100vw;
     }
+    .content-wrapper {
+    background: #000000;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 1.1%;
+    padding-right: 1.1%;
+    width: 100%;
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+}
 
     body,
     html {
@@ -59,13 +69,19 @@
                     <div class="row justify-content-center">
                       <div id="style" name="style" style="margin: 1%;" class="col-2">
                         <div class="text-info">Style</div>
-                        <input class="typeahead" type="text" placeholder="Style">
-                        <div id="style-error" class="text-danger" hidden>Invalid Style</div>
+                        <div class="dropdown">
+                          <input class="typeahead form-control" type="text" placeholder="Loading Styles..." disabled autocomplete="off" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <div class="dropdown-menu w-100" id="style-dropdown"></div>
+                        </div>
+                        @* <div id="style-error" class="text-danger" hidden>Invalid Style</div> *@
                       </div>
-                      <div id="size" style="margin: 1%;" class="col-2">
+                      <div id="size" name="id" style="margin: 1%;" class="col-2">
                         <div class="text-info">Size</div>
-                        <input class="typeahead" type="text" placeholder="Size" disabled>
-                        <div id="size-error" class="text-danger" hidden>Invalid Size</div>
+                        <div class="dropdown">
+                          <input class="typeahead form-control" type="text" placeholder="Select a style 1st" disabled autocomplete="off" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <div class="dropdown-menu w-100" id="size-dropdown"></div>
+                        </div>
+                        @* <div id="size-error" class="text-danger" hidden>Invalid Size</div> *@
                       </div>
                       <div class="col-2 d-flex align-items-center" style="margin: 1%;">
                         <input type="checkbox" id="dateFilterActive" name="dateFilterActive" style="margin-right: 8px;">

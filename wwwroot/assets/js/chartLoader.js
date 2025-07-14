@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
   // DOM elements
   const styleInput = document.querySelector('#style .typeahead');
+  const styleDropdown = document.getElementById('style-dropdown');
   const sizeInput = document.querySelector('#size .typeahead');
+  const sizeDropdown = document.getElementById('size-dropdown');
   const dateFilterCheckbox = document.getElementById('dateFilterActive');
   const startDateInput = document.getElementById('strDate');
   const endDateInput = document.getElementById('endDate');
@@ -30,7 +32,8 @@ document.addEventListener('DOMContentLoaded', function () {
   searchBtn.addEventListener('click', handleSearch);
   exportBtn.addEventListener('click', handleExport);
   dateFilterCheckbox.addEventListener('change', toggleDateFilter);
-  styleInput.addEventListener('change', handleStyleChange);
+  // styleInput.addEventListener('change', handleStyleChange); // This is now handled by the new logic
+  // sizeInput.addEventListener('change', handleSizeChange); // This is now handled by the new logic
 
   function formatDateTimeLocal(date) {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
@@ -43,35 +46,76 @@ document.addEventListener('DOMContentLoaded', function () {
     endDateInput.disabled = !dateFilterCheckbox.checked;
   }
 
+  // Helper: filter and show dropdown
+  function showDropdown(input, dropdown, options) {
+    const value = input.value.trim().toLowerCase();
+    let filtered = options.filter(opt => opt.toLowerCase().includes(value));
+    filtered = filtered.slice(0, 5);
+    dropdown.innerHTML = '';
+    if (filtered.length === 0) {
+      dropdown.classList.remove('show');
+      return;
+    }
+    filtered.forEach(opt => {
+      const item = document.createElement('a');
+      item.className = 'dropdown-item';
+      item.textContent = opt;
+      item.href = '#';
+      item.onclick = (e) => {
+        e.preventDefault();
+        input.value = opt;
+        input.dispatchEvent(new Event('change'));
+        dropdown.classList.remove('show');
+      };
+      dropdown.appendChild(item);
+    });
+    dropdown.classList.add('show');
+  }
+
+  // Hide dropdown on blur
+  function setupDropdownBlur(input, dropdown) {
+    input.addEventListener('blur', () => {
+      setTimeout(() => dropdown.classList.remove('show'), 150);
+    });
+  }
+
+  // --- Style logic ---
+  let styleOptions = [];
   function fetchStyles() {
     $.ajax({
       url: '/GM/getStyles',
       method: 'POST',
       success: function (data) {
-        const styles = new Bloodhound({
-          datumTokenizer: Bloodhound.tokenizers.whitespace,
-          queryTokenizer: Bloodhound.tokenizers.whitespace,
-          local: data.styles
-        });
-
-        $(styleInput).typeahead({
-          hint: true,
-          highlight: true,
-          minLength: 1
-        }, {
-          source: styles
-        }).on('typeahead:select', function (e, style) {
-          selectedStyle = style;
-          fetchSizes(style);
-        });
+        styleInput.disabled = false;
+        styleInput.placeholder = "Select a style";
+        styleOptions = data.styles || [];
+        styleInput.value = '';
+        styleDropdown.innerHTML = '';
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.error('Error loading styles:', textStatus, errorThrown);
       }
     });
   }
+  styleInput.addEventListener('input', function () {
+    showDropdown(styleInput, styleDropdown, styleOptions);
+  });
+  styleInput.addEventListener('focus', function () {
+    showDropdown(styleInput, styleDropdown, styleOptions);
+  });
+  styleInput.addEventListener('change', function () {
+    selectedStyle = styleInput.value;
+    fetchSizes(selectedStyle);
+  });
+  setupDropdownBlur(styleInput, styleDropdown);
 
+  // --- Size logic ---
+  let sizeOptions = [];
   function fetchSizes(style) {
+    sizeInput.disabled = true;
+    sizeInput.value = '';
+    sizeDropdown.innerHTML = '';
+    sizeInput.placeholder = "Loading sizes...";
     $.ajax({
       url: '/GM/getAvailSizes',
       method: 'POST',
@@ -83,47 +127,51 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (data && Array.isArray(data.sizes)) {
           sizeList = data.sizes;
         }
-
         if (!sizeList.length) {
           sizeInput.value = '';
           sizeInput.disabled = true;
+          sizeInput.placeholder = "No sizes available";
+          sizeOptions = [];
+          sizeDropdown.innerHTML = '';
           return;
         }
-
-        try { $(sizeInput).typeahead('destroy'); } catch (e) {}
-
-        const sizes = new Bloodhound({
-          datumTokenizer: Bloodhound.tokenizers.whitespace,
-          queryTokenizer: Bloodhound.tokenizers.whitespace,
-          local: sizeList
-        });
-
-        $(sizeInput).typeahead({
-          hint: true,
-          highlight: true,
-          minLength: 0
-        }, {
-          source: sizes
-        }).on('typeahead:select', function (e, size) {
-          selectedSize = size;
-          sizeInput.disabled = false;
-        });
-
         sizeInput.disabled = false;
+        sizeInput.placeholder = "Select a size";
+        // Add "All" option at the beginning
+        sizeOptions = ['All', ...sizeList];
         sizeInput.value = '';
+        sizeDropdown.innerHTML = '';
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.error('Error loading sizes:', textStatus, errorThrown);
         sizeInput.value = '';
         sizeInput.disabled = true;
+        sizeInput.placeholder = "Error loading sizes";
+        sizeOptions = [];
+        sizeDropdown.innerHTML = '';
       }
     });
   }
+  sizeInput.addEventListener('input', function () {
+    showDropdown(sizeInput, sizeDropdown, sizeOptions);
+  });
+  sizeInput.addEventListener('focus', function () {
+    showDropdown(sizeInput, sizeDropdown, sizeOptions);
+  });
+  sizeInput.addEventListener('change', function () {
+    selectedSize = sizeInput.value;
+  });
+  setupDropdownBlur(sizeInput, sizeDropdown);
 
   async function handleStyleChange() {
     if (!styleInput.value) {
       sizeInput.value = '';
       sizeInput.disabled = true;
+      sizeInput.classList.remove('disabled'); // (optional, for Bootstrap)
+      sizeInput.style.backgroundColor = '';
+      sizeInput.style.color = '';
+      sizeInput.style.cursor = '';
+      sizeInput.placeholder = "Select a style 1st"
       selectedSize = '';
     }
   }
@@ -143,9 +191,10 @@ document.addEventListener('DOMContentLoaded', function () {
       startDate = now;
       endDate = now;
     }
+
     const params = {
       Style: selectedStyle,
-      Size: selectedSize,
+      Size: selectedSize, // Send the actual selected size value (including "All")
       DateFilter: dateFilterCheckbox.checked ? "Yes" : "No",
       StartDate: startDate,
       EndDate: endDate
@@ -184,39 +233,81 @@ document.addEventListener('DOMContentLoaded', function () {
   function buildDashboard() {
     measurementsContainer.innerHTML = '';
 
-    // Group measurements by type
-    const measurementsMap = new Map();
+    // If "All" is selected, group by size and create separate charts for each size
+    if (selectedSize === 'All') {
+      // Group report data by size
+      const sizeGroups = new Map();
 
-    reportData.forEach(entry => {
-      entry.measurements.forEach(measurement => {
-        if (!measurementsMap.has(measurement.measurement)) {
-          measurementsMap.set(measurement.measurement, []);
+      reportData.forEach(entry => {
+        const size = entry.size || 'Unknown';
+        if (!sizeGroups.has(size)) {
+          sizeGroups.set(size, []);
         }
-        measurementsMap.get(measurement.measurement).push({
-          ...measurement,
-          garmentId: entry.garmentId,
-          dateTime: entry.dateTime,
-          station: entry.station,
-          epf: entry.epf,
-          soli: entry.soli
+        sizeGroups.get(size).push(entry);
+      });
+
+      // Create measurement cards for each size
+      sizeGroups.forEach((sizeData, size) => {
+        // Group measurements by type for this size
+        const measurementsMap = new Map();
+
+        sizeData.forEach(entry => {
+          entry.measurements.forEach(measurement => {
+            if (!measurementsMap.has(measurement.measurement)) {
+              measurementsMap.set(measurement.measurement, []);
+            }
+            measurementsMap.get(measurement.measurement).push({
+              ...measurement,
+              garmentId: entry.garmentId,
+              dateTime: entry.dateTime,
+              station: entry.station,
+              epf: entry.epf,
+              soli: entry.soli
+            });
+          });
+        });
+
+        // Create cards for each measurement type in this size
+        measurementsMap.forEach((entries, measurementName) => {
+          const card = createMeasurementCard(measurementName, entries, size);
+          measurementsContainer.appendChild(card);
         });
       });
-    });
+    } else {
+      // Original logic for specific size selection
+      const measurementsMap = new Map();
 
-    // Create cards for each measurement type
-    measurementsMap.forEach((entries, measurementName) => {
-      const card = createMeasurementCard(measurementName, entries);
-      measurementsContainer.appendChild(card);
-    });
+      reportData.forEach(entry => {
+        entry.measurements.forEach(measurement => {
+          if (!measurementsMap.has(measurement.measurement)) {
+            measurementsMap.set(measurement.measurement, []);
+          }
+          measurementsMap.get(measurement.measurement).push({
+            ...measurement,
+            garmentId: entry.garmentId,
+            dateTime: entry.dateTime,
+            station: entry.station,
+            epf: entry.epf,
+            soli: entry.soli
+          });
+        });
+      });
+
+      // Create cards for each measurement type
+      measurementsMap.forEach((entries, measurementName) => {
+        const card = createMeasurementCard(measurementName, entries, selectedSize);
+        measurementsContainer.appendChild(card);
+      });
+    }
   }
 
-  function createMeasurementCard(measurementName, entries) {
+  function createMeasurementCard(measurementName, entries, size) {
     // Calculate stats
     const total = entries.length;
     const passed = entries.filter(e => e.result === 'Pass').length;
     const failed = total - passed;
     const passPercentage = total > 0 ? ((passed / total) * 100).toFixed(2) : 0;
-    const refValues = getReferenceValues(measurementName);
+    const refValues = getReferenceValues(measurementName, size);
 
     // Group by station for table
     const stationsMap = new Map();
@@ -228,13 +319,17 @@ document.addEventListener('DOMContentLoaded', function () {
           failedLow: 0,
           failedHigh: 0,
           total: 0,
-          values: []
+          values: [],
+          offsets: [],
+          timestamps: []
         });
       }
 
       const station = stationsMap.get(entry.station);
       station.total++;
       station.values.push(entry.value);
+      station.offsets.push(entry.offset);
+      station.timestamps.push(new Date(entry.dateTime).getTime());
 
       if (entry.result === 'Pass') {
         station.passed++;
@@ -245,6 +340,32 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
+    // Calculate linear regression trend for each station (per garment)
+    function calculateTrend(offsets) {
+      if (offsets.length < 2) return { slope: 0, trend: 'No trend' };
+      
+      const n = offsets.length;
+      const xs = Array.from({length: n}, (_, i) => i); // Garment indices
+      const sumX = xs.reduce((a, b) => a + b, 0);
+      const sumY = offsets.reduce((a, b) => a + b, 0);
+      const sumXY = xs.reduce((sum, x, i) => sum + x * offsets[i], 0);
+      const sumX2 = xs.reduce((sum, x) => sum + x * x, 0);
+      
+      const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+      const intercept = (sumY - slope * sumX) / n;
+      
+      let trend;
+      if (Math.abs(slope) < 0.01) {
+        trend = 'Stable';
+      } else if (slope > 0) {
+        trend = `↗ +${slope.toFixed(3)}/garment`;
+      } else {
+        trend = `↘ ${slope.toFixed(3)}/garment`;
+      }
+      
+      return { slope, trend };
+    }
+
     // Create card HTML
     const card = document.createElement('div');
     card.className = 'col-lg-6 grid-margin stretch-card';
@@ -253,26 +374,30 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="card-body">
           <h4 class="card-title measurement-title">${measurementName}</h4>
           <div class="row d-flex justify-content-center card-stats-row single-row-stats">
-            <div class="col-3 stat-col">
+            <div class="col stat-col">
+              <div class="stat-label">Size</div>
+              <div class="stat-value"><strong>${size}</strong></div>
+            </div>
+            <div class="col stat-col">
               <div class="stat-label">Total</div>
               <div class="stat-value"><strong>${total}</strong></div>
             </div>
-            <div class="col-3 stat-col">
+            <div class="col stat-col">
               <div class="stat-label">Passed</div>
               <div class="stat-value"><strong>${passed}</strong></div>
             </div>
-            <div class="col-3 stat-col">
+            <div class="col stat-col">
               <div class="stat-label">Failed</div>
               <div class="stat-value"><strong>${failed}</strong></div>
             </div>
-            <div class="col-3 stat-col">
+            <div class="col stat-col">
               <div class="stat-label">Percentage</div>
               <div class="stat-value"><strong>${passPercentage}%</strong></div>
             </div>
           </div>
         </div>
         <div class="card-body card-chart-body">
-          <canvas id="chart-${measurementName.replace(/\s+/g, '-')}" class="measurement-chart"></canvas>
+          <canvas id="chart-${measurementName.replace(/\s+/g, '-')}-${size.replace(/\s+/g, '-')}" class="measurement-chart"></canvas>
         </div>
         <div class="card-body">
           <h4 class="card-title measurement-title">Trend</h4>
@@ -292,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 ${Array.from(stationsMap).map(([station, data]) => {
       const stationPassPercentage = data.total > 0 ?
         ((data.passed / data.total) * 100).toFixed(2) : 0;
-      const average = data.values.reduce((a, b) => a + b, 0) / data.values.length;
+      const trend = calculateTrend(data.offsets);
 
       return `
                     <tr>
@@ -301,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       <td>${data.failedLow}</td>
                       <td>${data.failedHigh}</td>
                       <td>${stationPassPercentage}%</td>
-                      <td>${average.toFixed(2)}</td>
+                      <td>${trend.trend}</td>
                     </tr>
                   `;
     }).join('')}
@@ -314,21 +439,48 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Render chart after DOM insertion
     setTimeout(() => {
-      renderChart(measurementName, entries);
+      renderChart(measurementName, entries, size);
     }, 100);
 
     return card;
   }
 
-  function renderChart(measurementName, entries) {
-    const canvas = document.getElementById(`chart-${measurementName.replace(/\s+/g, '-')}`);
+  function renderChart(measurementName, entries, size) {
+    const canvas = document.getElementById(`chart-${measurementName.replace(/\s+/g, '-')}-${size.replace(/\s+/g, '-')}`);
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
-    
+
     // Get reference values for selected size
-    const refValues = getReferenceValues(measurementName);
-    
+    const refValues = getReferenceValues(measurementName, size);
+
+    // In renderChart, update trend line calculation to use measurement value (entry.value) instead of offset
+    function calculateTrendLine(entries) {
+      if (entries.length < 2) return null;
+
+      const xs = Array.from({length: entries.length}, (_, i) => i);
+      const ys = entries.map(entry => entry.value); // Use measurement value, not offset
+
+      const n = ys.length;
+      const sumX = xs.reduce((a, b) => a + b, 0);
+      const sumY = ys.reduce((a, b) => a + b, 0);
+      const sumXY = xs.reduce((sum, x, i) => sum + x * ys[i], 0);
+      const sumX2 = xs.reduce((sum, x) => sum + x * x, 0);
+
+      const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+      const intercept = (sumY - slope * sumX) / n;
+
+      // Create trend line points (use garment index as X, value as Y)
+      const trendLineData = [
+        { x: new Date(entries[0].dateTime), y: slope * 0 + intercept },
+        { x: new Date(entries[entries.length - 1].dateTime), y: slope * (entries.length - 1) + intercept }
+      ];
+
+      return { slope, intercept, trendLineData };
+    }
+
+    const trendLine = calculateTrendLine(entries);
+
     const data = {
       datasets: [
         {
@@ -344,7 +496,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       ]
     };
-    
+
+    // Add trend line if available
+    if (trendLine) {
+      data.datasets.push({
+        label: 'Trend Line',
+        data: trendLine.trendLineData,
+        borderColor: 'rgb(255, 165, 0)',
+        borderWidth: 2,
+        borderDash: [8, 4],
+        pointRadius: 0,
+        fill: false
+      });
+    }
+
     if (refValues) {
       // Add reference lines
       data.datasets.push({
@@ -358,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pointRadius: 0,
         fill: false
       });
-      
+
       data.datasets.push({
         label: 'Max Limit',
         data: entries.map(entry => ({
@@ -371,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pointRadius: 0,
         fill: false
       });
-      
+
       data.datasets.push({
         label: 'Min Limit',
         data: entries.map(entry => ({
@@ -384,7 +549,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pointRadius: 0,
         fill: false
       });
-      
+
       // Add fill between min and max
       data.datasets.push({
         label: 'Acceptable Range',
@@ -404,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fill: true
       });
     }
-    
+
     new Chart(ctx, {
       type: 'line',
       data: data,
@@ -433,11 +598,14 @@ document.addEventListener('DOMContentLoaded', function () {
         plugins: {
           tooltip: {
             callbacks: {
-              label: function(context) {
+              label: function (context) {
                 const label = context.dataset.label || '';
                 if (label === 'Actual Measurements') {
                   const entry = entries[context.dataIndex];
                   return `${label}: ${context.parsed.y}mm (Offset: ${entry.offset}mm)`;
+                } else if (label === 'Trend Line') {
+                  const slope = trendLine ? (trendLine.slope * 3600000).toFixed(2) : 0;
+                  return `${label}: ${context.parsed.y}mm (Slope: ${slope}/garment)`;
                 }
                 return `${label}: ${context.parsed.y}mm`;
               }
@@ -448,15 +616,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function getReferenceValues(measurementName) {
-    // Find reference value for selected size
-    const sizeRef = referenceData.find(s => s.size === selectedSize);
+  function getReferenceValues(measurementName, size) {
+    // Find reference value for the specific size
+    const sizeRef = referenceData.find(s => s.size === size);
     if (!sizeRef) return null;
-    
-    const refMeasurement = sizeRef.measurements.find(m => 
+
+    const refMeasurement = sizeRef.measurements.find(m =>
       m.measurement === measurementName
     );
-    
+
     return refMeasurement ? {
       reference: refMeasurement.reference,
       tolerance: refMeasurement.tolerance
@@ -469,27 +637,90 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    let csvContent = 'Garment ID,EPF,SOLI,Station,Date Time,Measurement,Value,Offset,Result\n';
-
+    // Get all unique measurement names for column headers
+    const measurementNames = new Set();
     reportData.forEach(entry => {
       entry.measurements.forEach(measurement => {
-        csvContent += `"${entry.garmentId}","${entry.epf}","${entry.soli}","${entry.station}",`;
-        csvContent += `"${entry.dateTime}","${measurement.measurement}",`;
-        csvContent += `${measurement.value},${measurement.offset},"${measurement.result}"\n`;
+        measurementNames.add(measurement.measurement);
+      });
+    });
+    const sortedMeasurementNames = Array.from(measurementNames).sort();
+
+    // Create CSV header
+    let csvContent = 'Garment ID,Station,EPF,Session,DateTime,Size,SOLI,Overall Status';
+
+    // Add measurement columns (3 columns per measurement: value, offset, status)
+    sortedMeasurementNames.forEach(measurementName => {
+      csvContent += `,${measurementName},${measurementName} Offset,${measurementName} Status`;
+    });
+    csvContent += '\n';
+
+    // Group data by garment ID
+    const garmentGroups = new Map();
+    reportData.forEach(entry => {
+      if (!garmentGroups.has(entry.garmentId)) {
+        garmentGroups.set(entry.garmentId, {
+          garmentId: entry.garmentId,
+          station: entry.station,
+          epf: entry.epf,
+          session: entry.session || '',
+          dateTime: entry.dateTime,
+          size: entry.size || selectedSize,
+          soli: entry.soli,
+          measurements: new Map()
+        });
+      }
+
+      const garment = garmentGroups.get(entry.garmentId);
+      entry.measurements.forEach(measurement => {
+        garment.measurements.set(measurement.measurement, {
+          value: measurement.value,
+          offset: measurement.offset,
+          result: measurement.result
+        });
       });
     });
 
+    // Calculate overall status for each garment
+    garmentGroups.forEach(garment => {
+      const allMeasurements = Array.from(garment.measurements.values());
+      const allPassed = allMeasurements.every(m => m.result === 'Pass');
+      garment.overallStatus = allPassed ? 'Pass' : 'Fail';
+    });
+
+    // Create CSV rows
+    garmentGroups.forEach(garment => {
+      // Basic garment info
+      csvContent += `"${garment.garmentId}","${garment.station}","${garment.epf}","${garment.session}","${garment.dateTime}","${garment.size}","${garment.soli}","${garment.overallStatus}"`;
+
+      // Add measurement data for each measurement type
+      sortedMeasurementNames.forEach(measurementName => {
+        const measurement = garment.measurements.get(measurementName);
+        if (measurement) {
+          csvContent += `,"${measurement.value}","${measurement.offset}","${measurement.result}"`;
+        } else {
+          csvContent += `,"","",""`; // Empty values if measurement not found
+        }
+      });
+
+      csvContent += '\n';
+    });
+
+    // Create and download the file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
 
     link.setAttribute('href', url);
-    link.setAttribute('download', `report_${selectedStyle}_${selectedSize}.csv`);
+    link.setAttribute('download', `report_${selectedStyle}_${selectedSize}_${new Date().toISOString().slice(0, 10)}.csv`);
     link.style.visibility = 'hidden';
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
   }
 });
 
@@ -548,6 +779,8 @@ style.innerHTML = `
 .measurement-chart {
   height: 30vh !important;
   max-height: 30vh !important;
+  padding-left: 1.5%;
+  padding-right: 1.5%;
 }
 .measurement-table-scroll {
   max-height: 180px !important;
