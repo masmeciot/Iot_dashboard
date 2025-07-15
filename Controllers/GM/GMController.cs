@@ -272,6 +272,54 @@ namespace Iot_dashboard.Controllers.GM
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> deleteSize([FromBody] JsonElement payload)
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                HttpContext.Session.Clear();
+                return Json(new { success = false, message = "Session expired" });
+            }
+            string style = payload.GetProperty("style").GetString();
+            string size = payload.GetProperty("size").GetString();
+            using (var http = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/deleteSize");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                request.Content = new StringContent($"{{\"style\":\"{style}\",\"size\":\"{size}\"}}", Encoding.UTF8, "application/json");
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    return Content(json, "application/json");
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> getMeasurementTypes()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                HttpContext.Session.Clear();
+                return Json(new { success = false, message = "Session expired" });
+            }
+            using (var http = new HttpClient())
+            {
+                var req = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5003/getMeasurementTypes");
+                req.Headers.Add("Authorization", "Bearer " + token);
+                var res = await http.SendAsync(req);
+                var json = await res.Content.ReadAsStringAsync();
+                return Content(json, "application/json");
+            }
+        }
+
 
         [HttpGet]
         public IActionResult GMMeasure()
@@ -440,6 +488,63 @@ namespace Iot_dashboard.Controllers.GM
                 var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/insertStyleData");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    return Content(json, "application/json");
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> removeStyleM([FromBody] JsonElement payload)
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                HttpContext.Session.Clear();
+                return Json(new { success = false, message = "Session expired" });
+            }
+            string style = payload.GetProperty("Style").GetString();
+            string measurement = payload.GetProperty("Measurement").GetString();
+            using (var http = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/removeStyleM");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                request.Content = new StringContent($"{{\"Style\":\"{style}\",\"Measurement\":\"{measurement}\"}}", Encoding.UTF8, "application/json");
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    return Content(json, "application/json");
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> removeStyle([FromBody] JsonElement payload)
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                HttpContext.Session.Clear();
+                return Json(new { success = false, message = "Session expired" });
+            }
+            string style = payload.GetProperty("Style").GetString();
+            using (var http = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/removeStyle");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                request.Content = new StringContent($"{{\"Style\":\"{style}\"}}", Encoding.UTF8, "application/json");
                 try
                 {
                     var response = await http.SendAsync(request);

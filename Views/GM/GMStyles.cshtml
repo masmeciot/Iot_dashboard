@@ -1,28 +1,19 @@
+@{
+  ViewBag.Title = "Styles";
+}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Measuring යාළුවා | Styles</title>
-  <!-- plugins:css -->
   <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
   <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
-  <script src="/assets/js/react.production.min.js"></script>
-  <script src="/assets/js/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End Plugin css for this page -->
-  <!-- inject:css -->
-  <!-- endinject -->
-  <!-- Layout styles -->
   <link rel="stylesheet" href="/assets/css/style.css">
-  <!-- End layout styles -->
   <link rel="shortcut icon" href="/assets/images/favicon.ico" />
-  <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
     <style>
             .container-fluid.page-body-wrapper,
         .main-panel,
@@ -34,9 +25,53 @@
             width: 100vw;
             max-width: 100vw;
         }
-        body, html {
+
+    body,
+    html {
             overflow-x: hidden;
         }
+
+    .table-responsive {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .order-cell {
+      width: 40px;
+      text-align: center;
+    }
+
+    .delete-btn {
+      color: #fff;
+      background: #dc3545;
+      border: none;
+      border-radius: 4px;
+      padding: 2px 10px;
+    }
+
+    .editable-cell {
+      background: #f8f9fa;
+      cursor: pointer;
+    }
+
+    .type-select {
+      min-width: 90px;
+        }
+
+    #savingOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    #savingOverlay.active {
+      display: flex;
+    }
   </style>
 </head>
 
@@ -47,460 +82,525 @@
         style="position: absolute; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
         <i class="mdi mdi-arrow-left"></i> Back
       </a>
+      <div id="savingOverlay">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          <div class="saving-spinner" style="border:6px solid #f3f3f3;border-top:6px solid #4facfe;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
+          <div class="saving-message" style="color:#fff;font-size:1.2rem;font-weight:600;text-align:center;text-shadow:0 2px 8px #000;">Saving...</div>
+        </div>
+      </div>
+      <style>
+      @@keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+      </style>
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row">
-
-            <div class="col-xs-6 col-sm-6">
-              <div class="card">
-                <div class="card-body" <div class="form group">
-                  <form method="post" autocomplete="off" id="sug-form_style">
-                    <div class="card">
-                      <div class="card-header">
-                        <strong class="card-title">Select Style</strong>
-                      </div>
-                      <div class="card-body">
-
-                        <div class="chosen-container chosen-container-single" title="" style="width: 100%;"><a
-                            class="chosen-single chosen-default">
-
-                            <div><b></b></div>
-                          </a>
-                          <div class="chosen-drop_style">
-                            <div class="search-box_style">
-                              <input type="text" name="example" list="styleList" placeholder="Enter a Style"
-                                class="col-xs-6 col-sm-6">
-                              <datalist id="styleList">
-
-                              </datalist>
-                              </input>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+          <div class="row mb-4">
+            <div class="col-lg-6">
+              <div class="input-group">
+                <input id="style-search-input" type="text" class="form-control" placeholder="Enter style name..."
+                  list="style-list">
+                <datalist id="style-list"></datalist>
+                <button id="style-search-btn" class="btn btn-primary">Search</button>
               </div>
             </div>
-
-            <!-- User Profile Card/ -->
-            <div class="col-lg-4 col-md-6" name="userprofile" id="userprofile"></div>
-
-
           </div>
-
-          <div class="row">
-
-
-
-            <div class="col-xs-6 col-sm-6">
-
+          <div class="row mb-2">
+            <div class="col-lg-12 d-flex gap-2">
+              <button id="add-size-btn" class="btn btn-info me-2" disabled>Add Size</button>
+              <button id="add-measurement-btn" class="btn btn-info" disabled>Add Measurement</button>
             </div>
-
-
           </div>
-
           <div class="row">
-
-            <div class="col-md-12">
+            <div class="col-lg-12">
               <div class="card">
-                <div class="card-header">
-                  <strong class="card-title">Style Mesurements</strong>
-                </div>
-
                 <div class="card-body">
-                  <!-- <form class="" id="issueadd" name="issueadd" action="phpscripts/issue/addissue.php" method="post"> -->
-                  <?php
-                        if ($_SESSION['prvlg'] == 'admin') {
-                        ?>
-                  <div class="col-md-6">
-                    <button type="button" name="delStl" id="delStl" class="btn btn-danger"
-                      style="margin-right: 20px; margin-bottom: 10px; margin-left:15px " disabled>Delete</button>
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="style-table">
+                      <thead>
+                        <tr id="style-table-header-row">
+                          <!-- Dynamic header -->
+                        </tr>
+                      </thead>
+                      <tbody id="style-table-body">
+                        <!-- Dynamic rows -->
+                      </tbody>
+                    </table>
                   </div>
-                  <?php
+                  <div class="text-center mt-3">
+                    <button id="submit-style-btn" class="btn btn-success" disabled>Submit</button>
+                    @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp >= 3) {
+                    <button id="delete-style-btn" class="btn btn-danger ms-2">Delete Style</button>
                         }
-                        ?>
-                  <div align="right">
-                    <button type="button" name="add" id="add" class="btn btn-info"
-                      style="margin-right: 20px; margin-bottom: 10px; margin-left:15px " disabled>Add
-                      Measurement</button>
                   </div>
-                  <table id="user_data" Name="user_data" class="table table-striped table-bordered">
-                    <thead>
-                      <tr>
-                        <th>Mesurement</th>
-                        <th>Type</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody id="invinfo">
-                    </tbody>
-                  </table>
-                  <!-- </form> -->
                 </div>
               </div>
             </div>
-
-
           </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:partials/_footer.html -->
-          <footer class="footer">
+          <footer class="footer mt-4">
             <div class="d-sm-flex justify-content-center justify-content-sm-between">
               <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © MAS KREEDA
                 2024</span>
             </div>
           </footer>
-          <!-- partial -->
         </div>
-        <!-- main-panel ends -->
       </div>
-      <!-- page-body-wrapper ends -->
     </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
+  </div>
+  <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="/assets/vendors/select2/select2.min.js"></script>
     <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
-    <script src="/assets/vendors/chart.js/chart.js"></script>
-    <script src="/assets/vendors/chart.js/chart.js@3.9.1"></script>
-    <script src="/assets/vendors/chart.js/luxon.min.js"></script>
-    <script src="/assets/vendors/chart.js/chartjs-adapter-luxon@1.0.0"></script>
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="/assets/js/off-canvas.js"></script>
-    <script src="/assets/js/hoverable-collapse.js"></script>
-    <script src="/assets/js/misc.js"></script>
-    <script src="/assets/js/settings.js"></script>
-    <script src="/assets/js/todolist.js"></script>
-    <script src="/assets/js/select2.js"></script>
-    <script src="/assets/vendors2/jquery/dist/jquery.min.js"></script>
-    <script src="/assets/vendors2/popper.js/dist/umd/popper.min.js"></script>
-    <script src="/assets/vendors2/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="/assets/vendors2/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
-    <script src="/assets/vendors2/jszip/dist/jszip.min.js"></script>
-    <script src="/assets/vendors2/pdfmake/build/pdfmake.min.js"></script>
-    <script src="/assets/vendors2/pdfmake/build/vfs_fonts.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.html5.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.print.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.colVis.min.js"></script>
-    <script src="/assets/vendors2/js/init-scripts/data-table/datatables-init.js"></script>
-    <script src="/assets/vendors2/chosen/chosen.jquery.min.js"></script>
-    <script src="/assets/vendors2/jquery-validation/dist/jquery.validate.min.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        console.log("table");
-        var table = jQuery('#table_data').DataTable();
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <script>
+    var userPrvlgtyp = @(ViewBag.prvlgtyp ?? 0);
+    let currentStyle = '';
+    let sizeHeaders = [];
+    let measurementTypes = [];
+    let measurementTypeMap = {};
+    let allStyles = [];
+    let originalSizes = [];
+    let originalMeasurements = [];
+
+    $(document).ready(function () {
+      // Fetch all styles for autocomplete
+      $.post('/GM/getStyles', function (data) {
+        if (typeof data === 'string') data = JSON.parse(data);
+        allStyles = data.styles || [];
+        const datalist = $('#style-list');
+        datalist.empty();
+        allStyles.forEach(style => datalist.append(`<option value="${style}">`));
       });
-    </script>
 
-    <script>
-      jQuery(document).ready(function () {
-        console.log("Jquery Ok");
-        jQuery(".standardSelect").chosen({
-          disable_search_threshold: 10,
-          no_results_text: "Oops, nothing found!",
-          width: "100%"
-        });
+      // Fetch measurement types for Add Measurement dropdown
+      $.get('/GM/getMeasurementTypes', function (data) {
+        if (typeof data === 'string') data = JSON.parse(data);
+        measurementTypes = (data.measurementTypes || []).map(mt => mt.name);
+        measurementTypeMap = {};
+        (data.measurementTypes || []).forEach(mt => { measurementTypeMap[mt.name] = mt.type; });
       });
-    </script>
-    <script type="text/javascript" language="javascript">
-      jQuery(document).ready(function () {
 
-        const yourDate = new Date();
-        var newdate = yourDate.toISOString().split('T')[0];
+      // Search style
+      $('#style-search-btn').on('click', function () {
+        const style = $('#style-search-input').val().trim();
+        if (!style) { alert('Enter a style name.'); return; }
+        if (!allStyles.includes(style)) { alert('Style not found.'); return; }
+        searchStyle(style);
+      });
+      $('#style-search-input').on('keypress', function (e) {
+        if (e.which === 13) $('#style-search-btn').click();
+      });
 
-        jQuery('.datePicker').val(newdate);
+      // Only allow add size if prvlgtyp >= 3 or for unsubmitted sizes
+      $('#add-size-btn').on('click', function () {
+        var size = prompt('Enter new size name:');
+        size = size.trim().toUpperCase();
+        if (!size) return;
+        if (sizeHeaders.includes(size)) { alert('Size already exists.'); return; }
+        addSizeColumn(size);
+      });
 
-        dataLoader();
-        testFunc();
-        styleLoader();
-        // reqlnsrh();
-        //partnamesugestion();
-        //getuserdata();
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Only allow add measurement if prvlgtyp >= 3 or for unsubmitted measurements
+      $('#add-measurement-btn').on('click', async function () {
+        let name = await promptMeasurementName();
+        if (!name) return;
+        addMeasurementRow(name);
+      });
 
-        jQuery(document).on('click', '#srhtxt', function () {
-          console.log("Clicked");
-          // dataLoader();
-        })
-        jQuery(document).on('click', '#expbtn', function () {
-          console.log("Clicked");
-          dataSaver();
-        })
+      // Submit
+      $('#submit-style-btn').on('click', function () {
+        submitStyleData();
+      });
+    });
 
-        function styleLoader() {
-          jQuery('#styleList').empty();
-          jQuery.ajax({
-            type: 'POST',
-            url: 'phpscripts/styles/styleLoader.php',
-            dataType: 'json',
-            encode: true
-          })
-            .done(function (data) {
-              console.log(data);
-              for (let i = 0; i < data.length; i++) {
-                console.log(data[i][0]);
-                jQuery('#styleList').append(data[i][0])
+    function searchStyle(style) {
+      $.ajax({
+        url: '/GM/getMeasurements',
+        method: 'POST',
+        data: { style: style },
+        success: function (res) {
+          let measurementsBySize = res.measurements || [];
+          // Collect all unique measurement names and types
+          let measurementMap = {};
+          let allSizes = [];
+          let allMeasurements = [];
+          measurementsBySize.forEach(sizeBlock => {
+            if (!allSizes.includes(sizeBlock.size)) allSizes.push(sizeBlock.size);
+            sizeBlock.measurements.forEach(m => {
+              if (!measurementMap[m.measurement]) {
+                measurementMap[m.measurement] = { type: m.type, tolerance: m.tolerance, refs: {} };
+                allMeasurements.push(m.measurement);
               }
-            }).fail(function () {
-              //  jQuery('#product_info').html(data).show();
+              measurementMap[m.measurement].refs[sizeBlock.size] = m.reference;
             });
-        }
-
-        function testFunc(selStl) {
-          var x = document.getElementById("styleList");
-          var stList = [];
-          var i;
-          for (i = 0; i < x.options.length; i++) {
-            stList.push(x.options[i].value);
-          }
-          return stList.includes(selStl)
-        }
-
-        function dataLoader() {
-          function isFirstCharacterNumber(str) {
-            return /^[0-9]/.test(str);
-          }
-          jQuery('.search-box_style input[type="text"]').change(function () {
-            jQuery('#user_data').DataTable().clear().destroy();
-            var inputVal = jQuery(this).val();
-            inputVal = inputVal.replace(/[^a-zA-Z0-9 ]/g, ''); // Remove non-alphanumeric characters
-            inputVal = inputVal.replace(/\s+/g, '_'); // Replace spaces with underscores
-            inputVal = inputVal.toUpperCase();
-            var formData = {
-              'style': inputVal
+          });
+          // Build measurements array for table rendering
+          let measurements = Object.keys(measurementMap).map(name => {
+            return {
+              measurement: name,
+              type: measurementMap[name].type,
+              tolerance: measurementMap[name].tolerance,
+              references: measurementMap[name].refs
             };
-            var srhRes = testFunc(inputVal);
-            if (!srhRes) {
-              if (confirm("Style entered is not on the databse, Do you want to add it?")) {
-                console.log("ADD");
+          });
+          currentStyle = style;
+          sizeHeaders = allSizes;
+          originalSizes = allSizes.slice();
+          originalMeasurements = allMeasurements.filter((v, i, a) => a.indexOf(v) === i).map(m => m.toUpperCase());
+          renderTable(measurements, allSizes);
+          $('#add-size-btn').prop('disabled', false);
+          $('#add-measurement-btn').prop('disabled', false);
+          $('#submit-style-btn').prop('disabled', false);
+        },
+        error: function () {
+          alert('Error loading style data.');
+        }
+      });
+    }
 
-                if (isFirstCharacterNumber(inputVal)) {
-                  alert("ERROR!! 1st letter cannot be a number!")
-                } else {
-                  jQuery.ajax({
-                    type: 'POST',
-                    url: 'phpscripts/styles/addStyle.php',
-                    data: formData,
-                    dataType: 'json',
-                    encode: true
-                  });
-                  jQuery('.search-box_style input[type="text"]').val(inputVal)
-                  tblUpdate()
-                  styleLoader();
-                  jQuery('#add').prop('disabled', false);
-                  jQuery('#delStl').prop('disabled', false);
-                }
+    function renderTable(measurements, sizes) {
+      // Build header
+      const headerRow = $('#style-table-header-row');
+      headerRow.empty();
+      headerRow.append('<th style="width:40px;">#</th>');
+      headerRow.append('<th>Measurement</th>');
+      headerRow.append('<th>Type</th>');
+      headerRow.append('<th>Tolerance</th>');
+      sizes.forEach(size => headerRow.append(`<th>${size}</th>`));
+      headerRow.append('<th>Delete</th>');
 
+      // Build body
+      const body = $('#style-table-body');
+      body.empty();
+      let orderNum = 1;
+      measurements.forEach(measurement => {
+        let row = $('<tr draggable="true"></tr>');
+        row.append(`<td class="order-cell">${orderNum}</td>`);
+        row.append(`<td class="measurement-cell">${escapeHtml(measurement.measurement || '')}</td>`);
+        row.append(`<td>${typeDropdown(measurement.type || 'p2p')}</td>`);
+        row.append(`<td contenteditable="true" class="editable-cell">${measurement.tolerance || 0}</td>`);
+        sizes.forEach(size => {
+          let val = (measurement.references && measurement.references[size] !== undefined) ? measurement.references[size] : 0;
+          row.append(`<td contenteditable="true" class="editable-cell">${val}</td>`);
+        });
+        if (userPrvlgtyp >= 3) {
+            row.append(`<td><button class="delete-btn">Delete</button></td>`);
+        } else {
+            row.append('<td></td>');
+        }
+        body.append(row);
+        orderNum++;
+      });
+      makeRowsDraggable();
+      // Delete row (only if userPrvlgtyp >= 3)
+      if (userPrvlgtyp >= 3) {
+          $('.delete-btn').off('click').on('click', function () {
+              handleDeleteMeasurement($(this).closest('tr'));
+          });
+      }
+      renderDeleteSizeRow();
+    }
 
-              } else {
-                console.log("Yeet");
-              }
+    // Add a row at the bottom for deleting sizes
+    function renderDeleteSizeRow() {
+      // Remove any previous delete size row
+      $('#delete-size-row').remove();
+      if (!sizeHeaders.length) return;
+      const headerRow = $('#style-table-header-row');
+      const body = $('#style-table-body');
+      // Only add as many delete buttons as there are size columns
+      let row = $('<tr id="delete-size-row" style="background:#f8d7da;"></tr>');
+      row.append(`<td colspan="4" style="text-align:right;font-weight:bold;">Delete Size:</td>`);
+
+      console.log("Size length ", sizeHeaders.length);
+      sizeHeaders.slice(0, sizeHeaders.length).forEach(size => {
+        // Allow delete for all users if size is not in originalSizes (newly added), else only for privileged users
+        if (userPrvlgtyp >= 3 || !originalSizes.includes(size)) {
+            row.append(`<td><button class="btn btn-danger btn-sm delete-size-btn" data-size="${size}">Delete</button></td>`);
+        } else {
+            row.append('<td></td>');
+        }
+      });
+      // Only one extra cell for the delete column, and no more
+      row.append('<td></td>');
+      body.append(row);
+      // Delete size handler
+      $('.delete-size-btn').off('click').on('click', function () {
+        const size = $(this).data('size');
+        handleDeleteSize(size);
+      });
+    }
+
+    function handleDeleteSize(size) {
+      // If the size is in originalSizes, warn the user before deleting
+      if (originalSizes.includes(size)) {
+        if (!confirm('Warning: This will delete all previous measurements taken using this size. Continue?')) return;
+      }
+      // Remove from sizeHeaders
+      sizeHeaders = sizeHeaders.filter(s => s !== size);
+      // Find the header index for this size
+      const headerRow = $('#style-table-header-row');
+      let sizeIdx = -1;
+      headerRow.find('th').each(function (idx) {
+        if ($(this).text().trim().toUpperCase() === size.trim().toUpperCase()) {
+          sizeIdx = idx;
+          $(this).remove();
+        }
+      });
+      // Remove the cell at sizeIdx in every row (except the delete size row)
+      $('#style-table-body tr').not('#delete-size-row').each(function () {
+        $(this).find('td').eq(sizeIdx).remove();
+      });
+
+      // Remove from originalSizes if not present (new size)
+      if (originalSizes.includes(size)) {
+        // Call API to delete size
+        $.ajax({
+          url: '/GM/deleteSize',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ style: currentStyle, size: size }),
+          success: function (res) {
+            // Optionally show a message
+          },
+          error: function () {
+            alert('Error deleting size from server.');
+          }
+        });
+        // Remove from originalSizes
+        originalSizes = originalSizes.filter(s => s !== size);
+      }
+      // Remove and re-render delete size row
+      renderDeleteSizeRow();
+    }
+
+    function addSizeColumn(size) {
+      size = size.trim().toUpperCase(); // Always uppercase
+      // Duplicate check (all entries in sizeHeaders are uppercase)
+      if (sizeHeaders.includes(size)) return;
+      // Add header as the last size column (before delete)
+      const headerRow = $('#style-table-header-row');
+      const ths = headerRow.find('th');
+      ths.eq(ths.length - 1).before(`<th>${size}</th>`);
+      // Add cell to each row before the delete button cell
+      $('#style-table-body tr').each(function () {
+        const tds = $(this).find('td');
+        tds.eq(tds.length - 1).before(`<td contenteditable="true" class="editable-cell">0</td>`);
+      });
+      sizeHeaders.push(size);
+      console.log('SizeHeaders:', sizeHeaders);
+      updateOrderNumbers();
+      renderDeleteSizeRow();
+    }
+
+    function addMeasurementRow(name) {
+      name = name.trim().toUpperCase();
+      let type = measurementTypeMap[name] || 'p2p';
+      const row = $('<tr draggable="true"></tr>');
+      row.append(`<td class="order-cell"></td>`);
+      row.append(`<td class="measurement-cell">${escapeHtml(name)}</td>`);
+      row.append(`<td>${typeDropdown(type)}</td>`);
+      row.append(`<td contenteditable="true" class="editable-cell">0</td>`);
+      sizeHeaders.forEach(() => row.append(`<td contenteditable="true" class="editable-cell">0</td>`));
+      row.append(`<td><button class="delete-btn">Delete</button></td>`);
+      // Insert before delete size row if present, else append
+      const deleteSizeRow = $('#delete-size-row');
+      if (deleteSizeRow.length) {
+        row.insertBefore(deleteSizeRow);
             } else {
-              jQuery('#user_data').DataTable().clear().destroy();
-              var dataTable = jQuery('#user_data').DataTable({
-                processing: true,
-                serverSide: true,
-                order: [],
-                ajax: {
-                  url: 'phpscripts/styles/fetchInfo.php',
-                  type: 'POST',
-                  data: formData,
-                } // Use the dynamically determined columns
-              });
-              jQuery('#add').prop('disabled', false);
-              jQuery('#delStl').prop('disabled', false);
-            }
-          });
+        $('#style-table-body').append(row);
+      }
+      updateOrderNumbers();
+      $('.delete-btn').off('click').on('click', function () {
+        handleDeleteMeasurement($(this).closest('tr'));
+      });
+    }
 
+    function updateOrderNumbers() {
+      $('#style-table-body tr').each(function (idx) {
+        $(this).find('.order-cell').text(idx + 1);
+      });
+    }
+
+    function typeDropdown(selected) {
+      const types = ['p2p', 'curve', 'p2pMulti', 'curveCnt', 'manual'];
+      let html = `<select class="form-control type-select">`;
+      types.forEach(t => {
+        html += `<option value="${t}"${t === selected ? ' selected' : ''}>${t}</option>`;
+      });
+      html += `</select>`;
+      return html;
+    }
+
+    function makeRowsDraggable() {
+      const tbody = document.getElementById('style-table-body');
+      if (!tbody) return;
+      if (tbody._sortable) return;
+      tbody._sortable = true;
+      Sortable.create(tbody, {
+        animation: 150,
+        handle: undefined,
+        onEnd: function () {
+          updateOrderNumbers();
         }
+      });
+      updateOrderNumbers();
+    }
 
-        function tblUpdate() {
-          jQuery('#user_data').DataTable().clear().destroy();
-          var inputVal = jQuery('.search-box_style input[type="text"]').val();
-          var formData = {
-            'style': inputVal
-          };
-          console.log(formData);
-          var dataTable = jQuery('#user_data').DataTable({
-            processing: true,
-            serverSide: true,
-            order: [],
-            ajax: {
-              url: 'phpscripts/styles/fetchInfo.php',
-              type: 'POST',
-              data: formData,
-            } // Use the dynamically determined columns
-          });
-          jQuery('#add').prop('disabled', false);
-          jQuery('#delStl').prop('disabled', false);
-        }
+    function escapeHtml(text) {
+      return text.replace(/["&'<>]/g, function (a) {
+        return { '"': '&quot;', '&': '&amp;', "'": '&#39;', '<': '&lt;', '>': '&gt;' }[a];
+      });
+    }
 
-
-        jQuery(document).on('change', '.update', function () {
-          var column_name = jQuery(this).data("column");
-          var value = jQuery(this).val();
-          var style = jQuery('.search-box_style input[type="text"]').val();
-          console.log("Value Inside the input", value);
-          update_data(style, column_name, value);
+    async function promptMeasurementName() {
+      // Fetch measurement types if not loaded
+      if (!Object.keys(measurementTypeMap).length) {
+        await $.get('/GM/getMeasurementTypes', function (data) {
+          if (typeof data === 'string') data = JSON.parse(data);
+          measurementTypes = (data.measurementTypes || []).map(mt => mt.name);
+          measurementTypeMap = {};
+          (data.measurementTypes || []).forEach(mt => { measurementTypeMap[mt.name] = mt.type; });
         });
+      }
+      return new Promise((resolve) => {
+        const input = $('<input type="text" class="form-control" list="measurement-type-list" placeholder="Measurement name...">');
+        const datalist = $('<datalist id="measurement-type-list"></datalist>');
+        measurementTypes.forEach(name => datalist.append(`<option value="${name}">`));
+        const modal = $('<div class="modal" tabindex="-1" role="dialog" style="display:block;background:rgba(0,0,0,0.2);z-index:9999;"></div>');
+        const dialog = $('<div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Add Measurement</h5></div><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-primary">OK</button><button type="button" class="btn btn-secondary">Cancel</button></div></div></div>');
+        dialog.find('.modal-body').append(input).append(datalist);
+        modal.append(dialog);
+        $('body').append(modal);
+        input.focus();
+        dialog.find('.btn-primary').on('click', function () {
+          const val = input.val().trim();
+          modal.remove();
+          resolve(val);
+        });
+        dialog.find('.btn-secondary').on('click', function () {
+          modal.remove();
+          resolve(null);
+        });
+        input.on('keypress', function (e) {
+          if (e.which === 13) dialog.find('.btn-primary').click();
+        });
+      });
+    }
 
-        function update_data(style, column_name, value) {
+    function submitStyleData() {
+      // Build payload
+      const rows = $('#style-table-body tr').not('#delete-size-row'); // Exclude delete size row
+      let dataBySize = {};
+      sizeHeaders.forEach(size => dataBySize[size] = []);
+      rows.each(function (idx) {
+        const cells = $(this).find('td');
+        const order = parseInt(cells.eq(0).text().trim());
+        const measurement = cells.eq(1).text().trim();
+        const type = cells.eq(2).find('select').val();
+        const tolerance = parseFloat(cells.eq(3).text().trim()) || 0;
+        sizeHeaders.forEach((size, sIdx) => {
+          const reference = parseFloat(cells.eq(4 + sIdx).text().trim()) || 0;
+          dataBySize[size].push({
+            measurement: measurement,
+            type: type,
+            reference: reference,
+            tolerance: tolerance,
+            order: order
+          });
+        });
+      });
+      // Build final payload
+      const payload = {
+        Style: currentStyle,
+        Data: Object.keys(dataBySize).map(size => ({
+          size: size,
+          measurements: dataBySize[size]
+        }))
+      };
+      // Send AJAX POST to /GM/insertStyleData
+      $('#savingOverlay').addClass('active');
+      $.ajax({
+        url: '/GM/insertStyleData',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function (res) {
+            if (typeof res === 'string') {
+                try { res = JSON.parse(res); } catch (e) { }
+            }
+            $('#savingOverlay').removeClass('active');
+            if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
+                alert(res.message || 'Style data uploaded successfully!');
+                // Refresh the table after successful submit
+                if (currentStyle) searchStyle(currentStyle);
+            } else {
+                alert('Upload complete, but check server response.');
+            }
+        },
+        error: function (xhr, status, error) {
+            $('#savingOverlay').removeClass('active');
+            alert('Error uploading style data: ' + error);
+        }
+    });
+}
 
-          console.log("Col Name:", column_name);
-          console.log("Value:", value);
+    // Delete measurement logic
+    function handleDeleteMeasurement(row) {
+      const measurement = row.find('.measurement-cell').text().trim().toUpperCase();
+      console.log('Trying to delete measurement:', measurement, 'Originals:', originalMeasurements);
+      if (originalMeasurements.includes(measurement)) {
+        if (!confirm('Warning: This will delete all previous measurements taken using this measurement. Continue?')) return;
+        $.ajax({
+          url: '/GM/removeStyleM',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ Style: currentStyle, Measurement: measurement }),
+          success: function (res) {
+            // Optionally show a message
+            row.remove();
+            updateOrderNumbers();
+            // Remove from originalMeasurements
+            originalMeasurements = originalMeasurements.filter(m => m !== measurement);
+          },
+          error: function () {
+            alert('Error deleting measurement from server.');
+          }
+        });
+      } else {
+        row.remove();
+        updateOrderNumbers();
+      }
+    }
 
-
-          jQuery.ajax({
-            url: "phpscripts/styles/update.php",
-            method: "POST",
-            data: {
-              style: style,
-              column_name: column_name,
-              value: value
+    // Delete Style button handler
+    $('#delete-style-btn').on('click', function () {
+        if (userPrvlgtyp < 3) return;
+        if (!currentStyle) return;
+        if (!confirm('Are you sure you want to delete this style? This will remove all measurements and sizes for this style.')) return;
+        $.ajax({
+            url: '/GM/removeStyle',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ Style: currentStyle }),
+            success: function (res) {
+                if (typeof res === 'string') {
+                    try { res = JSON.parse(res); } catch (e) { }
+                }
+                if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
+                    alert(res.message || 'Style deleted successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Delete complete, but check server response.');
+                }
             },
-            success: function (data) {
-              console.log(data);
-              jQuery('#alert_message').html('<div class="alert alert-success">' + data + '</div>');
-              // jQuery('#user_data').DataTable().destroy();
-              //fetch_data();
+            error: function (xhr, status, error) {
+                alert('Error deleting style: ' + error);
             }
-          });
-          setInterval(function () {
-            jQuery('#alert_message').html('');
-          }, 5000);
-        }
-
-
-        jQuery(document).on('click', '.delete', function () {
-          var id = jQuery(this).attr('id');
-          var style = jQuery('.search-box_style input[type="text"]').val();
-          // var id = jQuery(this).attr("id");
-          console.log(id);
-          if (confirm("Are you sure you want to remove this? " + id + "\nRemoving this will delete all the measurment records of this measuement type")) {
-            console.log(id);
-            jQuery.ajax({
-              url: "phpscripts/styles/deleteMeas.php",
-              method: "POST",
-              data: {
-                id: id,
-                style: style
-              },
-              success: function (data) {
-                console.log(data);
-                jQuery('#alert_message').html('<div class="alert alert-success">' + data + '</div>');
-                jQuery('#user_data').DataTable().destroy();
-                tblUpdate();
-              },
-              error: function (err) {
-                console.log(err);
-              }
-            });
-            setInterval(function () {
-              jQuery('#alert_message').html('');
-            }, 5000);
-          }
         });
-
-
-        jQuery(document).on('click', '#delStl', function () {
-          var style = jQuery('.search-box_style input[type="text"]').val();
-          // var id = jQuery(this).attr("id");
-          if (confirm("Are you sure you want to remove this style? " + style + "\nRemoving this will delete all the measurements taken for this style...")) {
-            // console.log(id);
-            jQuery.ajax({
-              url: "phpscripts/styles/deleteStyle.php",
-              method: "POST",
-              data: {
-                style: style
-              },
-              success: function (data) {
-                console.log(data);
-                jQuery('#alert_message').html('<div class="alert alert-success">' + data + '</div>');
-                var table = jQuery('#user_data').DataTable();
-                table.clear().destroy();
-                jQuery('.search-box_style input[type="text"]').val("")
-
-                styleLoader();
-              },
-              error: function (err) {
-                console.log(err);
-              }
-            });
-            setInterval(function () {
-              jQuery('#alert_message').html('');
-            }, 5000);
-          }
-        });
-
-        /////Adding New Rows//////////////
-        jQuery('#add').click(function () {
-          var html = '<tr>';
-          html += '<td contenteditable id="data1"></td>';
-          html += '<td><select class="typinsert" data-placeholder="Choose a type" name="type" id="newDat" data-column="newDat"">"<option value="p2p" selected>p2p</option><option value="curve">curve</option><option value="p2pMulti">p2pMulti</option><option value="curveCnt">curveCnt</option>"</select></td>';
-          html += '<td><button type="button" name="insert" id="insert" class="btn btn-success btn-xs">Insert</button></td>';
-          html += '</tr>';
-          jQuery('#user_data tbody').prepend(html);
-          jQuery('#add').prop('disabled', true);
-        });
-
-        // ////Insert Function//////////////////////
-
-        jQuery(document).on('click', '#insert', function () {
-
-          console.log("Clicked Insert");
-
-          var meas = jQuery('#data1').text();
-          meas = meas.replace(/[^a-zA-Z0-9 ]/g, ''); // Remove non-alphanumeric characters
-          meas = meas.replace(/\s+/g, '_'); // Replace spaces with underscores
-          meas = meas.toUpperCase(); // Capitalize all characters
-          var type = jQuery('.typinsert').val();
-          var style = jQuery('.search-box_style input[type="text"]').val();
-
-          console.log(meas);
-          console.log(type);
-
-
-          if (meas != '') {
-            console.log("Inside AJAX");
-            jQuery.ajax({
-              url: "phpscripts/styles/insertMea.php",
-              method: "POST",
-              data: {
-                meas: meas,
-                type: type,
-                style: style
-              },
-
-              success: function (data) {
-                console.log(data);
-                jQuery('#add').prop('disabled', false);
-                tblUpdate();
-              }
-            });
-            setInterval(function () {
-              jQuery('#alert_message').html('');
-            }, 5000);
-          } else {
-            alert("Please fill all the fields!");
-          }
-
-
-
-
-        });
-      })
+    });
     </script>
-    <!-- <script src="/assets/js/getstylesize.js"></script> -->
-    <!-- End custom js for this page -->
 </body>
 
 </html>
