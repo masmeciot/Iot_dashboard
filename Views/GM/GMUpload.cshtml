@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Measuring යාළුවා | Upload Data</title>
+  <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
+  <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+  <style>
+    .container-fluid.page-body-wrapper,
+    .main-panel,
+    .content-wrapper {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100vw;
+      max-width: 100vw;
+    }
+    body, html { overflow-x: hidden; }
+    .drop-zone {
+      border: 2px dashed #007bff;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      color: #888;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      background: #f8f9fa;
+    }
+    .drop-zone.dragover {
+      border-color: #0056b3;
+      background: #e3f2fd;
+    }
+    .hidden-input {
+      display: none;
+    }
+    .table-responsive {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-scroller">
+    <div class="container-fluid page-body-wrapper">
+      <a href="/GM" class="btn btn-outline-primary"
+        style="position: absolute; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
+        <i class="mdi mdi-arrow-left"></i> Back
+      </a>
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row">
+            <!-- Card 1: File Upload -->
+            <div class="col-lg-6 mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <h3 class="text-center mb-4">Upload Excel File</h3>
+                  <div id="drop-zone" class="drop-zone">
+                    <span id="drop-zone-text">Drag & Drop your .xlsx file here or click to browse</span>
+                    <input type="file" id="file-input" class="hidden-input" accept=".xlsx" />
+                  </div>
+                  <button id="upload-btn" class="btn btn-lg btn-info btn-block mt-3" disabled>Upload</button>
+                  <div id="file-name" class="text-center mt-2 text-muted"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Card 2: Table View -->
+            <div class="col-lg-12">
+              <div class="card">
+                <div class="card-body">
+                  <h3 class="text-center mb-4">Extracted Data</h3>
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="excel-table">
+                      <thead>
+                        <tr id="table-header-row">
+                          <!-- Dynamic header -->
+                        </tr>
+                      </thead>
+                      <tbody id="table-body">
+                        <!-- Dynamic rows -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12 text-center mt-3">
+              <button id="save-style-data-btn" class="btn btn-success" disabled>Submit</button>
+            </div>
+          </div>
+          <footer class="footer">
+            <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © MAS KREEDA 2025</span>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+  <script src="/assets/vendors/select2/select2.min.js"></script>
+  <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    // Drag and drop logic
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const uploadBtn = document.getElementById('upload-btn');
+    const fileNameDiv = document.getElementById('file-name');
+    let selectedFile = null;
+    let uploadedFileName = '';
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        handleFile(e.target.files[0]);
+      }
+    });
+    function handleFile(file) {
+      if (file && file.name.endsWith('.xlsx')) {
+        selectedFile = file;
+        fileNameDiv.textContent = file.name;
+        uploadBtn.disabled = false;
+        uploadedFileName = file.name;
+      } else {
+        fileNameDiv.textContent = 'Please select a valid .xlsx file.';
+        uploadBtn.disabled = true;
+        selectedFile = null;
+        uploadedFileName = '';
+      }
+    }
+    uploadBtn.addEventListener('click', () => {
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          renderTable(json);
+          // Enable save to DB button after table is rendered
+          document.getElementById('save-style-data-btn').disabled = false;
+        };
+        reader.readAsArrayBuffer(selectedFile);
+      }
+    });
+    function renderTable(data) {
+      if (!data || data.length < 2) return;
+      // Find size columns (from 6th col onward)
+      const header = data[0];
+      const sizeCols = header.slice(5); // 0-based index
+      // Build table header
+      const headerRow = document.getElementById('table-header-row');
+      headerRow.innerHTML = '';
+      headerRow.innerHTML += '<th>Measurement</th>';
+      headerRow.innerHTML += '<th>Type</th>';
+      headerRow.innerHTML += '<th>Measure?</th>';
+      headerRow.innerHTML += '<th>Tolerance</th>';
+      sizeCols.forEach(size => {
+        headerRow.innerHTML += `<th>${size}</th>`;
+      });
+      // Build table body
+      const body = document.getElementById('table-body');
+      body.innerHTML = '';
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (!row[0]) continue; // skip empty rows
+        const measurement = row[0] || '';
+        const type = row[1] || '';
+        const tolMinus = parseFloat(row[2] || 0);
+        const tolPlus = parseFloat(row[3] || 0);
+        const isOptional = (row[4] || '').toString().trim().toLowerCase();
+        // Tolerance: multiply by 10, show as "+/- value"
+        const tolerance = `±${((tolPlus)  * 10).toFixed(1)}`;
+        // Measure? dropdown: inverse of isOptional ("yes" if not optional, "no" if optional)
+        let measureDefault = 'Yes';
+        if (isOptional === 'yes' || isOptional === 'true' || isOptional === '1') measureDefault = 'No';
+        else if (isOptional === 'no' || isOptional === 'false' || isOptional === '0') measureDefault = 'Yes';
+        // Type dropdown: default to p2p
+        const typeOptions = ['p2p', 'curve', 'p2pMulti', 'curveCnt', 'manual'];
+        let typeDropdown = `<select class="form-control type-select">`;
+        typeOptions.forEach(opt => {
+          typeDropdown += `<option value="${opt}"${opt === 'p2p' ? ' selected' : ''}>${opt}</option>`;
+        });
+        typeDropdown += `</select>`;
+        // Size values: multiply by 10
+        let sizeCells = '';
+        for (let j = 5; j < header.length; j++) {
+          let val = row[j] !== undefined && row[j] !== null && row[j] !== '' ? (parseFloat(row[j]) * 10).toFixed(1) : '';
+          sizeCells += `<td>${val}</td>`;
+        }
+        body.innerHTML += `
+          <tr>
+            <td>${measurement}</td>
+            <td>${typeDropdown}</td>
+            <td>
+              <select class="form-control measure-select">
+                <option value="Yes"${measureDefault === 'Yes' ? ' selected' : ''}>Yes</option>
+                <option value="No"${measureDefault === 'No' ? ' selected' : ''}>No</option>
+              </select>
+            </td>
+            <td>${tolerance}</td>
+            ${sizeCells}
+          </tr>
+        `;
+      }
+    }
+
+    // Save to DB button handler
+    document.getElementById('save-style-data-btn').addEventListener('click', function() {
+      saveStyleDataFromTable(uploadedFileName);
+    });
+
+    function saveStyleDataFromTable(filename) {
+      if (!filename) {
+        alert('No file uploaded.');
+        return;
+      }
+      // Extract style from filename (before first space)
+      var style = filename.split(' ')[0];
+
+      // Get table headers (sizes)
+      var headerRow = document.getElementById('table-header-row');
+      var sizeHeaders = [];
+      for (let i = 4; i < headerRow.children.length; i++) {
+        sizeHeaders.push(headerRow.children[i].innerText.trim());
+      }
+
+      // Prepare data per size
+      var tableBody = document.getElementById('table-body');
+      var rows = tableBody.getElementsByTagName('tr');
+      var sizeData = {};
+
+      // Loop through each row (measurement)
+      for (let i = 0; i < rows.length; i++) {
+        let cells = rows[i].children;
+        let measurement = cells[0].innerText.trim();
+        let type = cells[1].querySelector('select') ? cells[1].querySelector('select').value : cells[1].innerText.trim();
+        let measure = cells[2].querySelector('select') ? cells[2].querySelector('select').value : cells[2].innerText.trim();
+        let tolerance = parseFloat(cells[3].innerText.replace('±', '').trim());
+
+        if (measure !== 'Yes') continue; // Only include if Measure? is Yes
+
+        // For each size column, add measurement if value exists
+        for (let s = 0; s < sizeHeaders.length; s++) {
+          let size = sizeHeaders[s];
+          let reference = parseFloat(cells[4 + s].innerText.trim());
+          if (!isNaN(reference) && reference !== 0) {
+            if (!sizeData[size]) sizeData[size] = [];
+            sizeData[size].push({
+              measurement: measurement,
+              type: type,
+              reference: reference,
+              tolerance: tolerance
+            });
+          }
+        }
+      }
+
+      // Build final payload
+      var payload = {
+        Style: style,
+        Data: Object.keys(sizeData).map(size => ({
+          size: size,
+          measurements: sizeData[size]
+        }))
+      };
+
+      // Send AJAX POST to /GM/insertStyleData
+      $.ajax({
+        url: '/GM/insertStyleData',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function (res) {
+          if (typeof res === 'string') {
+            try { res = JSON.parse(res); } catch (e) {}
+          }
+          if (res && (res.success === true || res.status === 'success')) {
+            alert('Style data uploaded successfully!');
+          } else {
+            alert('Upload complete, but check server response.');
+          }
+        },
+        error: function (xhr, status, error) {
+          alert('Error uploading style data: ' + error);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

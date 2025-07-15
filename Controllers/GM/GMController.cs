@@ -310,6 +310,24 @@ namespace Iot_dashboard.Controllers.GM
         }
 
         [HttpGet]
+        public IActionResult GMUpload()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            var prvlgtypStr = HttpContext.Session.GetString("type");
+            int prvlgtyp = 0;
+            int.TryParse(prvlgtypStr, out prvlgtyp);
+            if (string.IsNullOrEmpty(token) || prvlgtyp < 1)
+            {
+                return RedirectToAction("Index");
+            }
+            ViewBag.account = HttpContext.Session.GetString("account");
+            ViewBag.accessToken = HttpContext.Session.GetString("accessToken");
+            ViewBag.plant = HttpContext.Session.GetString("plant");
+            ViewBag.prvlgtyp = prvlgtyp;
+            return View("GMUpload");
+        }
+
+        [HttpGet]
         public IActionResult GMReferences()
         {
             var token = HttpContext.Session.GetString("accessToken");
@@ -393,6 +411,33 @@ namespace Iot_dashboard.Controllers.GM
             using (var http = new HttpClient())
             {
                 var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/saveMData");
+                request.Headers.Add("Authorization", "Bearer " + token);
+                request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
+                try
+                {
+                    var response = await http.SendAsync(request);
+                    var json = await response.Content.ReadAsStringAsync();
+                    return Content(json, "application/json");
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> insertStyleData([FromBody] object payload)
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                HttpContext.Session.Clear();
+                return Json(new { success = false, message = "Session expired" });
+            }
+            using (var http = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/insertStyleData");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
                 try

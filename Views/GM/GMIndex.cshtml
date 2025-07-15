@@ -158,6 +158,11 @@
                 <a href="/GM/GMReferences" class="btn-large btn-inverse-bl btn-fw"
                     style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">References</a>
             }
+            @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 1)
+            {
+                <a href="/GM/GMUpload" class="btn-large btn-inverse-fl btn-fw"
+                    style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Upload Data</a>
+            }
             @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 2)
             {
                 <a href="/GM/GMUsers" class="btn-large btn-inverse-pink btn-fw"

@@ -40,6 +40,7 @@
     <None Include="Views\GM\GMReport.cshtml" />
     <None Include="Views\GM\GMStyles.cshtml" />
     <None Include="Views\GM\GMUsers.cshtml" />
+    <None Include="Views\GM\GMUpload.cshtml" />
     <None Include="Views\Home\outanalyze.cshtml" />
     <None Include="Views\SynBest.cshtml" />
     <None Include="Views\synergy\synbest.cshtml" />
