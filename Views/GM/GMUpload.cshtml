@@ -74,44 +74,47 @@
       </div>
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row">
-            <!-- Card 1: File Upload -->
-            <div class="col-lg-6 mb-4">
-              <div class="card">
-                <div class="card-body">
-                  <h3 class="text-center mb-4">Upload Excel File</h3>
-                  <div id="drop-zone" class="drop-zone">
-                    <span id="drop-zone-text">Drag & Drop your .xlsx file here or click to browse</span>
-                    <input type="file" id="file-input" class="hidden-input" accept=".xlsx" />
+          <div class="row" style="min-height: 100vh;">
+              <!-- Card 1: File Upload (vertically centered) -->
+              <div class="col-12 d-flex flex-column justify-content-center align-items-center" style="min-height: 50vh;">
+                <div class="w-100 mb-4" style="max-width: 600px;">
+                  <div class="card h-100 d-flex flex-column justify-content-center align-items-center">
+                    <div class="card-body w-100">
+                      <h3 class="text-center mb-4">Upload Excel File</h3>
+                      <div id="drop-zone" class="drop-zone">
+                        <span id="drop-zone-text">Drag & Drop your .xlsx file here or click to browse</span>
+                        <input type="file" id="file-input" class="hidden-input" accept=".xlsx" />
                       </div>
-                  <button id="upload-btn" class="btn btn-lg btn-info btn-block mt-3" disabled>Upload</button>
-                  <div id="file-name" class="text-center mt-2 text-muted"></div>
-                          </div>
-                        </div>
-                      </div>
-            <!-- Card 2: Table View -->
-            <div class="col-lg-12">
-              <div class="card">
-                <div class="card-body">
-                  <h3 class="text-center mb-4">Extracted Data</h3>
-                  <div class="table-responsive">
-                    <table class="table table-bordered" id="excel-table">
-                      <thead>
-                        <tr id="table-header-row">
-                          <th style="width:40px;">#</th>
-                          <!-- Dynamic header -->
-                        </tr>
-                      </thead>
-                      <tbody id="table-body">
-                        <!-- Dynamic rows -->
-                      </tbody>
-                    </table>
+                      <button id="upload-btn" class="btn btn-lg btn-info btn-block mt-3" disabled>Upload</button>
+                      <div id="file-name" class="text-center mt-2 text-muted"></div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="col-lg-12 text-center mt-3">
-              <button id="save-style-data-btn" class="btn btn-success" disabled>Submit</button>
+              <!-- Card 2: Table View (full width) -->
+              <div class="col-12 px-0">
+                <div class="card h-100 d-flex flex-column justify-content-center align-items-center" style="border-radius:0;">
+                  <div class="card-body w-100">
+                    <h3 class="text-center mb-4">Extracted Data</h3>
+                    <div class="table-responsive">
+                      <table class="table table-bordered" id="excel-table">
+                        <thead>
+                          <tr id="table-header-row">
+                            <th style="width:40px;">#</th>
+                            <!-- Dynamic header -->
+                          </tr>
+                        </thead>
+                        <tbody id="table-body">
+                          <!-- Dynamic rows -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center mt-3">
+                  <button id="save-style-data-btn" class="btn btn-success" disabled>Submit</button>
+                </div>
+              </div>
             </div>
           </div>
           <footer class="footer">

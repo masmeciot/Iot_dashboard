@@ -36,7 +36,6 @@
     <None Include="Views\GM\GMLogin.cshtml" />
     <None Include="Views\GM\GMIndex.cshtml" />
     <None Include="Views\GM\GMDashboard.cshtml" />
-    <None Include="Views\GM\GMReferences.cshtml" />
     <None Include="Views\GM\GMReport.cshtml" />
     <None Include="Views\GM\GMStyles.cshtml" />
     <None Include="Views\GM\GMUsers.cshtml" />

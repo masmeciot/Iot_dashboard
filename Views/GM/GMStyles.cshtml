@@ -97,19 +97,22 @@
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row mb-4">
-            <div class="col-lg-6">
-              <div class="input-group">
-                <input id="style-search-input" type="text" class="form-control" placeholder="Enter style name..."
-                  list="style-list">
+            <div class="col-lg-6 offset-lg-3 d-flex justify-content-center">
+              <div class="input-group w-100" style="max-width: 420px;">
+                <input id="style-search-input" type="text" class="form-control" placeholder="Loading styles..." list="style-list" disabled>
                 <datalist id="style-list"></datalist>
-                <button id="style-search-btn" class="btn btn-primary">Search</button>
+                <button id="style-search-btn" class="btn btn-primary" disabled>Search</button>
               </div>
             </div>
           </div>
-          <div class="row mb-2">
-            <div class="col-lg-12 d-flex gap-2">
-              <button id="add-size-btn" class="btn btn-info me-2" disabled>Add Size</button>
+          <div class="row mb-2 align-items-center">
+            <div class="col-lg-12 d-flex align-items-center">
+              <button id="add-size-btn" class="btn btn-info me-3" disabled style="margin-right: 16px; margin-left: 16px;">Add Size</button>
               <button id="add-measurement-btn" class="btn btn-info" disabled>Add Measurement</button>
+              <div class="flex-grow-1"></div>
+              @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp >= 3) {
+                <button id="delete-style-btn" class="btn btn-danger ms-2" style="margin-right: 16px;">Delete Style</button>
+              }
             </div>
           </div>
           <div class="row">
@@ -130,9 +133,6 @@
                   </div>
                   <div class="text-center mt-3">
                     <button id="submit-style-btn" class="btn btn-success" disabled>Submit</button>
-                    @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp >= 3) {
-                    <button id="delete-style-btn" class="btn btn-danger ms-2">Delete Style</button>
-                        }
                   </div>
                 </div>
               </div>
@@ -165,12 +165,17 @@
 
     $(document).ready(function () {
       // Fetch all styles for autocomplete
+      $('#style-search-input').prop('disabled', true).attr('placeholder', 'Loading styles...');
+      $('#style-search-btn').prop('disabled', true);
       $.post('/GM/getStyles', function (data) {
         if (typeof data === 'string') data = JSON.parse(data);
         allStyles = data.styles || [];
         const datalist = $('#style-list');
         datalist.empty();
         allStyles.forEach(style => datalist.append(`<option value="${style}">`));
+        // Enable input and button, update placeholder
+        $('#style-search-input').prop('disabled', false).attr('placeholder', 'Select a style...');
+        $('#style-search-btn').prop('disabled', false);
       });
 
       // Fetch measurement types for Add Measurement dropdown
@@ -185,8 +190,30 @@
       $('#style-search-btn').on('click', function () {
         const style = $('#style-search-input').val().trim();
         if (!style) { alert('Enter a style name.'); return; }
-        if (!allStyles.includes(style)) { alert('Style not found.'); return; }
-        searchStyle(style);
+        if (!allStyles.includes(style)) {
+          if (confirm('Style not found. Would you like to add this style?')) {
+            const newStyle = style.toUpperCase();
+            allStyles.push(newStyle);
+            // Add to datalist
+            $('#style-list').append(`<option value="${newStyle}">`);
+            // Set input to new style (capitalized)
+            $('#style-search-input').val(newStyle);
+            // Enable Add Size, Add Measurement, and Submit buttons
+            $('#add-size-btn').prop('disabled', false);
+            $('#add-measurement-btn').prop('disabled', false);
+            $('#submit-style-btn').prop('disabled', false);
+            // Do NOT enable delete style button here
+            // Initialize the table with only headers (no measurements or sizes)
+            currentStyle = newStyle;
+            sizeHeaders = [];
+            originalSizes = [];
+            originalMeasurements = [];
+            renderTable([], []);
+          } else {
+            return;
+          }
+        }
+        searchStyle($('#style-search-input').val().trim());
       });
       $('#style-search-input').on('keypress', function (e) {
         if (e.which === 13) $('#style-search-btn').click();
@@ -512,6 +539,7 @@
         });
       });
       // Build final payload
+      currentStyle = $('#style-search-input').val().trim().toUpperCase();
       const payload = {
         Style: currentStyle,
         Data: Object.keys(dataBySize).map(size => ({
