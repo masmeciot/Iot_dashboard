@@ -78,6 +78,7 @@
                     <table class="table table-bordered" id="excel-table">
                       <thead>
                         <tr id="table-header-row">
+                          <th style="width:40px;">#</th>
                           <!-- Dynamic header -->
                         </tr>
                       </thead>
@@ -106,6 +107,7 @@
   <script src="/assets/vendors/select2/select2.min.js"></script>
   <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
   <script>
     // Drag and drop logic
     const dropZone = document.getElementById('drop-zone');
@@ -170,6 +172,7 @@
       // Build table header
       const headerRow = document.getElementById('table-header-row');
       headerRow.innerHTML = '';
+      headerRow.innerHTML += '<th style="width:40px;">#</th>';
       headerRow.innerHTML += '<th>Measurement</th>';
       headerRow.innerHTML += '<th>Type</th>';
       headerRow.innerHTML += '<th>Measure?</th>';
@@ -180,6 +183,7 @@
       // Build table body
       const body = document.getElementById('table-body');
       body.innerHTML = '';
+      let orderNum = 1;
       for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (!row[0]) continue; // skip empty rows
@@ -208,7 +212,8 @@
           sizeCells += `<td>${val}</td>`;
         }
         body.innerHTML += `
-          <tr>
+          <tr draggable="true">
+            <td class="order-cell">${orderNum}</td>
             <td>${measurement}</td>
             <td>${typeDropdown}</td>
             <td>
@@ -221,7 +226,34 @@
             ${sizeCells}
           </tr>
         `;
+        orderNum++;
       }
+      makeRowsDraggable();
+    }
+
+    // Make table rows draggable and update order numbers
+    function makeRowsDraggable() {
+      const tbody = document.getElementById('table-body');
+      if (!tbody) return;
+      if (tbody._sortable) return; // Prevent double init
+      tbody._sortable = true;
+      Sortable.create(tbody, {
+        animation: 150,
+        handle: undefined,
+        onEnd: function () {
+          updateOrderNumbers();
+        }
+      });
+      updateOrderNumbers();
+    }
+
+    function updateOrderNumbers() {
+      const tbody = document.getElementById('table-body');
+      const rows = tbody.querySelectorAll('tr');
+      rows.forEach((row, idx) => {
+        const orderCell = row.querySelector('.order-cell');
+        if (orderCell) orderCell.textContent = idx + 1;
+      });
     }
 
     // Save to DB button handler
@@ -240,7 +272,7 @@
       // Get table headers (sizes)
       var headerRow = document.getElementById('table-header-row');
       var sizeHeaders = [];
-      for (let i = 4; i < headerRow.children.length; i++) {
+      for (let i = 5; i < headerRow.children.length; i++) {
         sizeHeaders.push(headerRow.children[i].innerText.trim());
       }
 
@@ -252,26 +284,29 @@
       // Loop through each row (measurement)
       for (let i = 0; i < rows.length; i++) {
         let cells = rows[i].children;
-        let measurement = cells[0].innerText.trim();
-        let type = cells[1].querySelector('select') ? cells[1].querySelector('select').value : cells[1].innerText.trim();
-        let measure = cells[2].querySelector('select') ? cells[2].querySelector('select').value : cells[2].innerText.trim();
-        let tolerance = parseFloat(cells[3].innerText.replace('±', '').trim());
+        let order = parseInt(cells[0].innerText.trim());
+        let measurement = cells[1].innerText.trim();
+        let type = cells[2].querySelector('select') ? cells[2].querySelector('select').value : cells[2].innerText.trim();
+        let measure = cells[3].querySelector('select') ? cells[3].querySelector('select').value : cells[3].innerText.trim();
+        let tolerance = parseFloat(cells[4].innerText.replace('±', '').trim());
 
         if (measure !== 'Yes') continue; // Only include if Measure? is Yes
 
         // For each size column, add measurement if value exists
         for (let s = 0; s < sizeHeaders.length; s++) {
-          let size = sizeHeaders[s];
-          let reference = parseFloat(cells[4 + s].innerText.trim());
-          if (!isNaN(reference) && reference !== 0) {
-            if (!sizeData[size]) sizeData[size] = [];
-            sizeData[size].push({
-              measurement: measurement,
-              type: type,
-              reference: reference,
-              tolerance: tolerance
-            });
-          }
+           let size = sizeHeaders[s];
+           let cell = cells[5 + s];
+           let reference = cell ? parseFloat(cell.innerText.trim()) : NaN;
+           if (!isNaN(reference) && reference !== 0) {
+               if (!sizeData[size]) sizeData[size] = [];
+               sizeData[size].push({
+                   measurement: measurement,
+                   type: type,
+                   reference: reference,
+                   tolerance: tolerance,
+                   order: order
+               });
+           }
         }
       }
 
