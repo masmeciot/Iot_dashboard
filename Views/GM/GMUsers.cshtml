@@ -1,246 +1,212 @@
+@{
+    ViewBag.Title = "User Management";
+    var prvlgtyp = ViewBag.prvlgtyp ?? 0;
+    var plant = ViewBag.plant ?? "";
+}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Measuring යාළුවා | Users</title>
-  <!-- plugins:css -->
-  <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
-  <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End Plugin css for this page -->
-  <!-- inject:css -->
-  <!-- endinject -->
-  <!-- Layout styles -->
-  <link rel="stylesheet" href="/assets/css/style.css">
-  <!-- End layout styles -->
-  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
-  <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
-  <style>
-    .container-fluid.page-body-wrapper,
-    .main-panel,
-    .content-wrapper {
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      width: 100vw;
-      max-width: 100vw;
-    }
-
-    body,
-    html {
-      overflow-x: hidden;
-    }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>User Management</title>
+    <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+    <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="/assets/vendors2/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsencrypt@3.3.2/bin/jsencrypt.min.js"></script>
+    <style>
+        .container-fluid.page-body-wrapper,
+        .main-panel,
+        .content-wrapper {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            width: 100vw;
+            max-width: 100vw;
+        }
+        body, html { overflow-x: hidden; }
+        .table th, .table td { vertical-align: middle; }
+    </style>
 </head>
-
 <body>
-  <div class="container-scroller">
+<div class="container-scroller">
     <div class="container-fluid page-body-wrapper">
-      <a href="/GM" class="btn btn-outline-primary"
-        style="position: absolute; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
-        <i class="mdi mdi-arrow-left"></i> Back
-      </a>
-      <!-- partial -->
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="card">
-                <div class="card-body">
-                  <div id="pay-invoice">
-                    <div class="card-body">
-                      <div class="card-title">
-                        <h3 class="text-center">ADD NEW USER</h3>
+        <a href="/GM" class="btn btn-outline-primary"
+           style="position: absolute; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
+            <i class="mdi mdi-arrow-left"></i> Back
+        </a>
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h3 class="text-center">User List</h3>
+                        <button class="btn btn-success mb-3" id="showAddUserModal" style="float:right;">Add User</button>
+                        <table class="table table-bordered" id="userTable">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Plant</th>
+                                    <th>Privilege</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Add User Modal -->
+                <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
                       </div>
-                      <hr>
-                      <!-- <form action="phpscripts/insertItems/insert.php" method="post" novalidate="novalidate"> -->
-                      <div class="form-group text-center">
-                        <ul class="list-inline">
-                          <!-- <li class="list-inline-item"><i class="text-muted fa fa-cc-visa fa-2x"></i></li>
-                          <li class="list-inline-item"><i class="fa fa-cc-mastercard fa-2x"></i></li>
-                          <li class="list-inline-item"><i class="fa fa-cc-amex fa-2x"></i></li>
-                          <li class="list-inline-item"><i class="fa fa-cc-discover fa-2x"></i></li> -->
-                        </ul>
+                      <div class="modal-body">
+                        <form id="addUserForm" autocomplete="off">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" class="form-control" id="add-username" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" class="form-control" id="add-password" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" class="form-control" id="add-confirm-password" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Privilege Type</label>
+                                <input type="number" class="form-control" id="add-prvlgtyp" required min="0" max="@prvlgtyp" value="0" />
+                            </div>
+                            <div class="form-group">
+                                <label>Station</label>
+                                <input type="text" class="form-control" id="add-station" value="WebUser" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Plant</label>
+                                <input type="text" class="form-control" id="add-plant" required />
+                            </div>
+                            <div id="addUserMsg" class="mt-2"></div>
+                            <button type="submit" class="btn btn-info btn-block">Add User</button>
+                        </form>
                       </div>
-                      <input type="hidden" name="usrtyp" id="usrtyp" value="addusrs">
-
-                      <div class="form-group">
-                        <div class="search-box">
-                          <label for="cc-payment" class="control-label mb-1">Username</label>
-                          <input autocomplete="off" name="usrnme" id="usrnme" type="text" class="form-control"
-                            aria-required="true" aria-invalid="false" value="">
-                          <div class="result"></div>
-                        </div>
-                      </div>
-
-                      <div class="form-group has-success">
-                        <div class="search-box">
-                          <label for="cc-name" class="control-label mb-1">Password</label>
-                          <input name="psswd" autocomplete="off" id="psswd" type="password"
-                            class="form-control cc-name valid" data-val="false">
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <div>
-                          <label for="x_card_code" class="control-label mb-1">User Type</label>
-                          <div class="input-group">
-                            <select name="prvlgtyp" id="prvlgtyp">
-                              <option value="user">User</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-
                     </div>
                   </div>
                 </div>
-                <div>
-                  <button id="add_update" type="submit" class="btn btn-lg btn-info btn-block">
-                    <span id="payment-button-amount">Insert</span>
-                    <span id="payment-button-sending" style="display:none;">Sending…</span>
-                  </button>
-                </div>
-              </div>
+                <footer class="footer mt-4">
+                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">© MAS KREEDA - FOF | 2025</span>
+                    </div>
+                </footer>
             </div>
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:partials/_footer.html -->
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">© MAS KREEDA - FOF | 2025</span>
-            </div>
-          </footer>
-          <!-- partial -->
         </div>
-        <!-- main-panel ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
     </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <script src="/assets/vendors/select2/select2.min.js"></script>
-    <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="/assets/js/off-canvas.js"></script>
-    <script src="/assets/js/hoverable-collapse.js"></script>
-    <script src="/assets/js/misc.js"></script>
-    <script src="/assets/js/settings.js"></script>
-    <script src="/assets/js/todolist.js"></script>
-    <script src="/assets/js/select2.js"></script>
-    <script src="/assets/vendors2/jquery/dist/jquery.min.js"></script>
-    <script src="/assets/vendors2/popper.js/dist/umd/popper.min.js"></script>
-    <script src="/assets/vendors2/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="/assets/vendors2/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
-    <script src="/assets/vendors2/jszip/dist/jszip.min.js"></script>
-    <script src="/assets/vendors2/pdfmake/build/pdfmake.min.js"></script>
-    <script src="/assets/vendors2/pdfmake/build/vfs_fonts.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.html5.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.print.min.js"></script>
-    <script src="/assets/vendors2/datatables.net-buttons/js/buttons.colVis.min.js"></script>
-    <script src="/assets/vendors2/js/init-scripts/data-table/datatables-init.js"></script>
-    <script src="/assets/vendors2/chosen/chosen.jquery.min.js"></script>
-    <script src="/assets/vendors2/jquery-validation/dist/jquery.validate.min.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
-    <script>
-      jQuery(document).ready(function () {
-        jQuery('.search-box input[type="text"]').on("keyup input", function () {
-          /* Get input value on change */
-          var inputVal = jQuery(this).val();
-          var columnname = jQuery(this).attr('id')
-          //console.log(jQuery(this).attr('id'));
-          console.log(inputVal);
-          var resultDropdown = jQuery(this).siblings(".result");
-          if (inputVal.length) {
-            jQuery.get("phpscripts/users/searchUnme.php", {
-              term: inputVal,
-              columnname: columnname
-            }).done(function (data) {
-              // Display the returned data in browser
-              //console.log(data);
-              resultDropdown.html(data);
-              if (!data.includes("Not")) {
-                // console.log('not issue')
-                jQuery('#add_update').prop('disabled', false);
-              } else {
-                jQuery('#add_update').prop('disabled', true);
-                //  console.log('issue')
-              }
-            });
-          } else {
-            resultDropdown.empty();
-          }
+</div>
+<!-- Ensure Bootstrap JS is loaded for modal functionality -->
+<script src="/assets/vendors2/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const currentPrvlgtyp = @prvlgtyp;
+    const currentPlant = '@plant';
+    $(document).ready(function () {
+        // Plant field logic
+        if (currentPrvlgtyp < 5) {
+            $('#add-plant').val(currentPlant).prop('readonly', true);
+        }
+        // Show modal on button click
+        $('#showAddUserModal').on('click', function() {
+            $('#addUserForm')[0].reset();
+            $('#addUserMsg').text('');
+            if (currentPrvlgtyp < 5) $('#add-plant').val(currentPlant);
+            // Set min/max for privilege input
+            $('#add-prvlgtyp').attr('min', 0).attr('max', currentPrvlgtyp).val(0);
+            $('#addUserModal').modal('show');
         });
-        // Set search input value on click of result item
-        jQuery(document).on("click", ".result p", function () {
-          jQuery(this).parents(".search-box").find('input[type="text"]').val(jQuery(this).text());
-          jQuery(this).parent(".result").empty();
-        });
-        //////Set Data Call For PHP SCRIPTS////////////////////////////////////////////////////////////////
-        jQuery(document).on('click', '#add_update', function () {
-          console.log("Clicked");
-          setdata();
-        })
-
-        function setdata() {
-          var sndData = {
-            'usrnme': jQuery('input[name=usrnme]').val(),
-            'psswd': jQuery('input[name=psswd]').val(),
-            'prvlgtyp': jQuery('select[name=prvlgtyp]').val(),
-            'token': jQuery('input[name=token]').val()
-          }
-          console.log(sndData);
-          jQuery.ajax({
-            type: 'POST',
-            url: 'phpscripts/users/insertusr.php',
-            data: sndData,
-            dataType: 'text',
-            encode: true
-          })
-            .done(function (data) {
-              console.log(data);
-              jQuery('select[name=usrnme]').val("");
-              jQuery('input[name=psswd]').val(""),
-                jQuery('select[name=prvlgtrp]').val("")
-              alert("Inserted");
-            }).fail(function () {
-              // jQuery('#product_info').html(data).show();
+        // Fetch and populate user list
+        function loadUsers() {
+            $.get('/GM/GetUsers', function (data) {
+                let users = data.users || [];
+                let rows = '';
+                users.forEach(function (user) {
+                    rows += `<tr>
+                        <td>${user.username}</td>
+                        <td>${user.plant}</td>
+                        <td>${user.prvlgtyp}</td>
+                        <td>`;
+                    if (parseInt(currentPrvlgtyp) >= parseInt(user.prvlgtyp)) {
+                        rows += `<button class='btn btn-danger btn-sm delete-user' data-username='${user.username}'>Delete</button>`;
+                    }
+                    rows += `</td></tr>`;
+                });
+                $('#userTable tbody').html(rows);
             });
         }
-      });
-    </script>
-    <script>
-      jQuery(document).ready(function () {
-        jQuery(".standardSelect").chosen({
-          disable_search_threshold: 10,
-          no_results_text: "Oops, nothing found!",
-          width: "100%"
+        loadUsers();
+        // Delete user
+        $('#userTable').on('click', '.delete-user', function () {
+            const username = $(this).data('username');
+            if (!confirm('Are you sure you want to delete user ' + username + '?')) return;
+            $.ajax({
+                url: '/GM/DeleteUser',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ username }),
+                success: function (res) {
+                    loadUsers();
+                },
+                error: function () {
+                    alert('Failed to delete user.');
+                }
+            });
         });
-      });
-    </script>
-    <!-- <script src="/assets/js/getstylesize.js"></script> -->
-    <!-- End custom js for this page -->
+        // Add user
+        $('#addUserForm').on('submit', async function (e) {
+            e.preventDefault();
+            const username = $('#add-username').val().trim();
+            const password = $('#add-password').val();
+            const confirmPassword = $('#add-confirm-password').val();
+            const prvlgtyp = $('#add-prvlgtyp').val();
+            const plant = $('#add-plant').val();
+            const station = $('#add-station').val();
+            if (!username || !password || !confirmPassword || !prvlgtyp || !plant || !station) {
+                $('#addUserMsg').text('All fields are required.').css('color', 'red');
+                return;
+            }
+            if (password !== confirmPassword) {
+                $('#addUserMsg').text('Passwords do not match.').css('color', 'red');
+                return;
+            }
+            // Send add user request (encryption handled server-side)
+            $.ajax({
+                url: '/GM/AddUser',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    username,
+                    password,
+                    prvlgtyp,
+                    plant,
+                    station
+                }),
+                success: function (res) {
+                    $('#addUserMsg').text('User added successfully!').css('color', 'green');
+                    loadUsers();
+                    setTimeout(() => { $('#addUserModal').modal('hide'); }, 1000);
+                },
+                error: function () {
+                    $('#addUserMsg').text('Failed to add user.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
 </body>
-
 </html>

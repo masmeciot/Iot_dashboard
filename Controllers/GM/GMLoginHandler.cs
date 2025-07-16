@@ -17,7 +17,7 @@ namespace Iot_dashboard.Controllers.GM
             string publicKey;
             using (var http = new HttpClient())
             {
-                var keyResponse = await http.GetAsync("https://localhost:5003/publicKey");
+                var keyResponse = await http.GetAsync("http://localhost:5003/publicKey");
                 if (!keyResponse.IsSuccessStatusCode)
                     return Json(new { success = false, message = "Failed to get public key" });
 
@@ -42,7 +42,7 @@ namespace Iot_dashboard.Controllers.GM
                     password = encryptedPassword
                 };
                 var content = new StringContent(JsonSerializer.Serialize(loginPayload), Encoding.UTF8, "application/json");
-                var loginResponse = await http.PostAsync("https://localhost:5003/login", content);
+                var loginResponse = await http.PostAsync("http://localhost:5003/login", content);
 
                 var loginResult = await loginResponse.Content.ReadAsStringAsync();
 

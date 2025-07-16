@@ -43,7 +43,7 @@ namespace Iot_dashboard.Controllers.GM
 
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/logout");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/logout");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent($"{{\"account\":\"{account}\"}}", Encoding.UTF8, "application/json");
 
@@ -73,7 +73,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/getStyles");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/getStyles");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 try
                 {
@@ -113,7 +113,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5003/liveStatus");
+                var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5003/liveStatus");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 try
                 {
@@ -175,7 +175,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/getReport");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/getReport");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent($"{jsonPayload}", Encoding.UTF8, "application/json");
                 try
@@ -203,7 +203,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/loadMData");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/loadMData");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent($"{{\"Style\":\"{style}\"}}", Encoding.UTF8, "application/json");
                 try
@@ -239,7 +239,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/getSizes");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/getSizes");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent($"{{\"Style\":\"{style}\"}}", Encoding.UTF8, "application/json");
                 try
@@ -285,7 +285,7 @@ namespace Iot_dashboard.Controllers.GM
             string size = payload.GetProperty("size").GetString();
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/deleteSize");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/deleteSize");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent($"{{\"style\":\"{style}\",\"size\":\"{size}\"}}", Encoding.UTF8, "application/json");
                 try
@@ -312,7 +312,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var req = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5003/getMeasurementTypes");
+                var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5003/getMeasurementTypes");
                 req.Headers.Add("Authorization", "Bearer " + token);
                 var res = await http.SendAsync(req);
                 var json = await res.Content.ReadAsStringAsync();
@@ -458,7 +458,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/saveMData");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/saveMData");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
                 try
@@ -485,7 +485,7 @@ namespace Iot_dashboard.Controllers.GM
             }
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/insertStyleData");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/insertStyleData");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
                 try
@@ -514,7 +514,7 @@ namespace Iot_dashboard.Controllers.GM
             string measurement = payload.GetProperty("Measurement").GetString();
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/removeStyleM");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/removeStyleM");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent($"{{\"Style\":\"{style}\",\"Measurement\":\"{measurement}\"}}", Encoding.UTF8, "application/json");
                 try
@@ -542,7 +542,7 @@ namespace Iot_dashboard.Controllers.GM
             string style = payload.GetProperty("Style").GetString();
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5003/removeStyle");
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5003/removeStyle");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent($"{{\"Style\":\"{style}\"}}", Encoding.UTF8, "application/json");
                 try
@@ -555,6 +555,94 @@ namespace Iot_dashboard.Controllers.GM
                 {
                     return Json(new { success = false, message = ex.Message });
                 }
+            }
+        }
+
+        // --- User Management Proxy Endpoints ---
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized();
+            using (var http = new HttpClient())
+            {
+                http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var response = await http.GetAsync("http://localhost:5003/getUsers");
+                var json = await response.Content.ReadAsStringAsync();
+                return Content(json, "application/json");
+            }
+        }
+
+        public class AddUserRequest
+        {
+            public string username { get; set; }
+            public string password { get; set; }
+            public string prvlgtyp { get; set; }
+            public string plant { get; set; }
+            public string station { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUser([FromBody] AddUserRequest model)
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized();
+            // 1. Get the public key
+            string publicKey;
+            using (var http = new HttpClient())
+            {
+                var keyResponse = await http.GetAsync("http://localhost:5003/publicKey");
+                if (!keyResponse.IsSuccessStatusCode)
+                    return Json(new { success = false, message = "Failed to get public key" });
+                publicKey = await keyResponse.Content.ReadAsStringAsync();
+            }
+            // 2. Encrypt the password using RSA
+            string encryptedPassword;
+            using (var rsa = System.Security.Cryptography.RSA.Create())
+            {
+                rsa.ImportFromPem(publicKey.ToCharArray());
+                var encryptedBytes = rsa.Encrypt(System.Text.Encoding.UTF8.GetBytes(model.password), System.Security.Cryptography.RSAEncryptionPadding.Pkcs1);
+                encryptedPassword = System.Convert.ToBase64String(encryptedBytes);
+            }
+            // 3. Call the addUser API
+            using (var http = new HttpClient())
+            {
+                http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var payload = new
+                {
+                    username = model.username,
+                    password = encryptedPassword,
+                    prvlgtyp = model.prvlgtyp,
+                    plant = model.plant,
+                    station = model.station
+                };
+                var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+                var response = await http.PostAsync("http://localhost:5003/addUser", content);
+                var json = await response.Content.ReadAsStringAsync();
+                return Content(json, "application/json");
+            }
+        }
+
+        public class DeleteUserRequest
+        {
+            public string username { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser([FromBody] DeleteUserRequest model)
+        {
+            var token = HttpContext.Session.GetString("accessToken");
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized();
+            using (var http = new HttpClient())
+            {
+                http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(new { username = model.username }), System.Text.Encoding.UTF8, "application/json");
+                var response = await http.PostAsync("http://localhost:5003/removeUser", content);
+                var json = await response.Content.ReadAsStringAsync();
+                return Content(json, "application/json");
             }
         }
 
