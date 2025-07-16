@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Measuring යාළුවා | Menu</title>
+    <title>Dashboard</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="~/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="~/vendors/css/vendor.bundle.base.css">
@@ -119,69 +119,34 @@
 </head>
 
 <body>
-    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch" style="position: relative;">
+
+    <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
         <ul class="navbar-nav w-100">
             <li class="nav-item w-100">
-                <h3 style="text-align: center;">Measuring යාළුවා | Menu</h3>
+                <h3 style="text-align: center;">IOT Menu</h3>
             </li>
         </ul>
-        <div style="position: absolute; top: 10px; right: 30px; z-index: 1000;">
-            <form method="post" action="/GM/Logout" style="display:inline;">
-                <button type="submit" class="btn btn-danger">Logout</button>
-            </form>
-        </div>
     </div>
 
     <div class="content-wrapper">
 
         <div class="btn-container">
-            <a href="/GM/GMMeasure" class="btn-large btn-inverse-primary btn-fw"
-                style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Measure</a>
-            @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 0)
-            {
-                <a href="/GM/GMDashboard" class="btn-large btn-inverse-success btn-fw"
-                    style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Dashboard</a>
-            }
-
-            @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 0)
-            {
-                <a href="/GM/GMReport" class="btn-large btn-inverse-info btn-fw"
-                    style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Report</a>
-            }
-            @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 1)
-            {
-                <a href="/GM/GMStyles" class="btn-large btn-inverse-ou btn-fw"
-                    style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Styles</a>
-            }
-            @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 1)
-            {
-                <a href="/GM/GMUpload" class="btn-large btn-inverse-fl btn-fw"
-                    style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Upload Data</a>
-            }
-            @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp > 2)
-            {
-                <a href="/GM/GMUsers" class="btn-large btn-inverse-pink btn-fw"
-                    style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Users</a>
-            }
-            @*  <button type="button" class="btn-large btn-inverse-info btn-fw" onclick="window.location.href='/iotdash'">Real Time Data</button>
-            <button type="button" class="btn-large btn-inverse-warning btn-fw" onclick="window.location.href='/iotbest'">Best Repeat Dashboard</button>
-            <button type="button" class="btn-large btn-inverse-bl btn-fw" onclick="window.location.href='/iotout'">IoT Output</button>
-            <button type="button" class="btn-large btn-inverse-ou btn-fw" onclick="window.location.href='/manualOutput'">Manual Output</button> *@
+            <button type="button" class="btn-large btn-inverse-primary btn-fw" onclick="window.location.href='/L1'">L1
+                Menu</button>
+            <button type="button" class="btn-large btn-inverse-success btn-fw" onclick="window.location.href='/L2'">L2
+                Menu</button>
+            <button type="button" class="btn-large btn-inverse-info btn-fw" onclick="window.location.href='/L3'">L3
+                Menu</button>
+            <button type="button" class="btn-large btn-inverse-warning btn-fw" onclick="window.location.href='/FG'">FG
+                Out</button>
+            <button type="button" class="btn-large btn-inverse-de btn-fw" onclick="window.location.href='/FG1'">Module
+                Out</button>
+            <button type="button" class="btn-large btn-inverse-bl btn-fw"
+                onclick="window.location.href='/confirm'">Cutting Out</button>
+            <button type="button" class="btn-large btn-inverse-ou btn-fw" onclick="window.location.href='/AMR_Dash'">AMR
+                Location Dashboard</button>
 
         </div>
-        @* <div class="btn-container">
-       
-
-            <button type="button" class="btn-large btn-inverse-de btn-fw" onclick="window.location.href='/iotdevice'">Device Status</button>
-            <!----<button type="button" class="btn-large btn-inverse-danger btn-fw" onclick="window.location.href='/andonreport'">Andon Report</button>
-            <button type="button" class="btn-large btn-inverse-pink btn-fw" onclick="window.location.href='/andon'">Andon Dashboard</button>-->
-
-            <button type="button" class="btn-large btn-inverse-bl btn-fw" onclick="window.location.href='/ChangebyModule'">Change By Module</button>
-            <button type="button" class="btn-large btn-inverse-secondary btn-fw" onclick="window.location.href='/iotpast/'">Past Data</button>
-            <button type="button" class="btn-large btn-inverse-fl btn-fw" onclick="window.location.href='/iotoutfl'">Filter IoT Output</button>
-            <button type="button" class="btn-large btn-inverse-pink btn-fw" onclick="window.location.href='/outAnalyze'">IoT Output Analyze</button>
-
-        </div> *@
     </div>
 
 

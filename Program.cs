@@ -9,10 +9,13 @@ using Microsoft.Extensions.Configuration;
 using Iot_dashboard.Hubs;
 using static Iot_dashboard.Controllers.andon.andonController;
 
+
+
 using static Iot_dashboard.Controllers.AMR.confirmController;
 using static Iot_dashboard.Controllers.AMR.L1Controller;
 using static Iot_dashboard.Controllers.AMR.L2Controller;
 using static Iot_dashboard.Controllers.AMR.L3Controller;
+using static Iot_dashboard.Controllers.AMR.AMRMenuController;
 using Iot_dashboard.Models.AMR;
 using static Iot_dashboard.Controllers.AMR.amr_dashController;
 using static Iot_dashboard.Controllers.AMR.AMR_FG.FG1Controller;
@@ -484,17 +487,21 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 
     endpoints.MapControllerRoute(
-    name: "iotmenu",
-    pattern: "{controller=iotmenu}/{action=Index}/{id?}");
+        name: "default",
+        pattern: "{controller=IndexM}/{action=Index}/{id?}");
 
     endpoints.MapControllerRoute(
- name: "synout",
- pattern: "{controller=synout}/{action=Index}/{id?}");
+        name: "iotmenu",
+        pattern: "{controller=iotmenu}/{action=Index}/{id?}");
+
+    endpoints.MapControllerRoute(
+        name: "synout",
+        pattern: "{controller=synout}/{action=Index}/{id?}");
 
     endpoints.MapControllerRoute(
         name: "fallback",
         pattern: "{*url}",
-        defaults: new { controller = "iotmenu", action = "Index" });
+        defaults: new { controller = "IndexM", action = "Index" });
 
     endpoints.MapHub<HistoryHub>("/HistoryHub");
     endpoints.MapHub<DashboardHub>("/dashboardHub");
