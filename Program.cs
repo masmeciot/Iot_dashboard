@@ -56,6 +56,10 @@ using static Iot_dashboard.Controllers.hanger.AQL;
 using static Iot_dashboard.Controllers.hanger.input;
 using static Iot_dashboard.Controllers.Synergy.manualOutput;
 
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Iot_dashboard.Controllers.GM_API.Middleware;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -463,7 +467,45 @@ builder.Services.AddSession(options =>
 
 // Add SignalR
 builder.Services.AddSignalR();
+
+// Add memory cache, authentication, and authorization for GM_API endpoints
+builder.Services.AddMemoryCache();
+
+// Add OpenAPI/Swagger if not already present
+#if DEBUG
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "IoT Dashboard API", Version = "v1" });
+});
+#endif
+
+// Add JWT authentication for GM_API endpoints
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+#if DEBUG
+// Enable Swagger UI for development
+app.UseSwagger();
+app.UseSwaggerUI();
+#endif
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -478,6 +520,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseCors("AllowAll");
+
+// Add authentication and custom middleware for GM_API endpoints
+app.UseAuthentication();
+app.UseMiddleware<JwtRevocationMiddleware>();
 app.UseAuthorization();
 app.UseSession();
 app.UseStaticFiles();
@@ -514,4 +560,21 @@ app.UseEndpoints(endpoints =>
 
     
 });
+
+// Ensure RSA keypair is generated and cached at startup for GM_API endpoints
+using (var scope = app.Services.CreateScope())
+{
+    var provider = scope.ServiceProvider;
+    var config = provider.GetRequiredService<IConfiguration>();
+    var cache = provider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+    if (!cache.TryGetValue("PrivateKeyPem", out object _))
+    {
+        var client = new System.Net.Http.HttpClient();
+        var url = config["PublicKeyEndpointUrl"] ?? "http://localhost:5000/api/gm/publicKey";
+        try { var _ = client.GetStringAsync(url).Result; } catch { }
+    }
+}
+
+// Optionally listen on 0.0.0.0:5003 for legacy support
+// app.Urls.Add("http://0.0.0.0:5003");
 app.Run();

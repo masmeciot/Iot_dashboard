@@ -17,7 +17,8 @@ namespace Iot_dashboard.Controllers.GM
             string publicKey;
             using (var http = new HttpClient())
             {
-                var keyResponse = await http.GetAsync("http://localhost:5003/publicKey");
+                http.BaseAddress = new Uri($"{Request.Scheme}://{Request.Host}");
+                var keyResponse = await http.GetAsync("/api/gm/publicKey");
                 if (!keyResponse.IsSuccessStatusCode)
                     return Json(new { success = false, message = "Failed to get public key" });
 
@@ -36,13 +37,14 @@ namespace Iot_dashboard.Controllers.GM
             // 3. Call the login API with username and encrypted password
             using (var http = new HttpClient())
             {
+                http.BaseAddress = new Uri($"{Request.Scheme}://{Request.Host}");
                 var loginPayload = new
                 {
                     account = model.Username,
                     password = encryptedPassword
                 };
                 var content = new StringContent(JsonSerializer.Serialize(loginPayload), Encoding.UTF8, "application/json");
-                var loginResponse = await http.PostAsync("http://localhost:5003/login", content);
+                var loginResponse = await http.PostAsync("/api/gm/login/login", content);
 
                 var loginResult = await loginResponse.Content.ReadAsStringAsync();
 
