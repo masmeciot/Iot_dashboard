@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
   <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
   <link rel="stylesheet" href="/assets/css/style.css">
-  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+  <link rel="shortcut icon" href="/assets/images/logo3.png />
   <style>
     .container-fluid.page-body-wrapper,
     .main-panel,
@@ -197,6 +197,7 @@
       headerRow.innerHTML = '';
       headerRow.innerHTML += '<th style="width:40px;">#</th>';
       headerRow.innerHTML += '<th>Measurement</th>';
+      headerRow.innerHTML += '<th>Description</th>';
       headerRow.innerHTML += '<th>Type</th>';
       headerRow.innerHTML += '<th>Measure?</th>';
       headerRow.innerHTML += '<th>Tolerance</th>';
@@ -210,13 +211,24 @@
       for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (!row[0]) continue; // skip empty rows
-        const measurement = row[0] || '';
-        const type = row[1] || '';
+        // Measurement and Description from DESCRIPTION column
+        let rawDescription = row[1] || '';
+        let measurement = '';
+        let description = '';
+        if (rawDescription.includes('-')) {
+          const dashIdx = rawDescription.indexOf('-');
+          measurement = rawDescription.substring(0, dashIdx).trim();
+          description = rawDescription.substring(dashIdx + 1).trim();
+        } else {
+          measurement = rawDescription.trim();
+          description = '';
+        }
+        // Tolerance and IsOptional
         const tolMinus = parseFloat(row[2] || 0);
         const tolPlus = parseFloat(row[3] || 0);
         const isOptional = (row[4] || '').toString().trim().toLowerCase();
-        // Tolerance: multiply by 10, show as "+/- value"
-        const tolerance = `±${((tolPlus)  * 10).toFixed(1)}`;
+        // Tolerance: show as "±0.5" (use tolPlus)
+        const tolerance = `±${(tolPlus * 10).toFixed(1)}`;
         // Measure? dropdown: inverse of isOptional ("yes" if not optional, "no" if optional)
         let measureDefault = 'Yes';
         if (isOptional === 'yes' || isOptional === 'true' || isOptional === '1') measureDefault = 'No';
@@ -228,9 +240,9 @@
           typeDropdown += `<option value="${opt}"${opt === 'p2p' ? ' selected' : ''}>${opt}</option>`;
         });
         typeDropdown += `</select>`;
-        // Size values: multiply by 10
+        // Size values: multiply by 10, start at index 5
         let sizeCells = '';
-        for (let j = 5; j < header.length; j++) {
+        for (let j = 5; j < row.length; j++) {
           let val = row[j] !== undefined && row[j] !== null && row[j] !== '' ? (parseFloat(row[j]) * 10).toFixed(1) : '';
           sizeCells += `<td>${val}</td>`;
         }
@@ -238,6 +250,7 @@
           <tr draggable="true">
             <td class="order-cell">${orderNum}</td>
             <td>${measurement}</td>
+            <td contenteditable="true" class="description-cell">${description}</td>
             <td>${typeDropdown}</td>
             <td>
               <select class="form-control measure-select">
@@ -295,7 +308,7 @@
       // Get table headers (sizes)
       var headerRow = document.getElementById('table-header-row');
       var sizeHeaders = [];
-      for (let i = 5; i < headerRow.children.length; i++) {
+      for (let i = 6; i < headerRow.children.length; i++) {
         sizeHeaders.push(headerRow.children[i].innerText.trim());
       }
 
@@ -309,21 +322,20 @@
         let cells = rows[i].children;
         let order = parseInt(cells[0].innerText.trim());
         let measurement = cells[1].innerText.trim();
-        let type = cells[2].querySelector('select') ? cells[2].querySelector('select').value : cells[2].innerText.trim();
-        let measure = cells[3].querySelector('select') ? cells[3].querySelector('select').value : cells[3].innerText.trim();
-        let tolerance = parseFloat(cells[4].innerText.replace('±', '').trim());
-
+        let description = cells[2].innerText.trim();
+        let type = cells[3].querySelector('select') ? cells[3].querySelector('select').value : cells[3].innerText.trim();
+        let measure = cells[4].querySelector('select') ? cells[4].querySelector('select').value : cells[4].innerText.trim();
+        let tolerance = parseFloat(cells[5].innerText.replace('±', '').trim());
         if (measure !== 'Yes') continue; // Only include if Measure? is Yes
-
-        // For each size column, add measurement if value exists
         for (let s = 0; s < sizeHeaders.length; s++) {
            let size = sizeHeaders[s];
-           let cell = cells[5 + s];
+           let cell = cells[6 + s];
            let reference = cell ? parseFloat(cell.innerText.trim()) : NaN;
            if (!isNaN(reference) && reference !== 0) {
                if (!sizeData[size]) sizeData[size] = [];
                sizeData[size].push({
                    measurement: measurement,
+                   description: description,
                    type: type,
                    reference: reference,
                    tolerance: tolerance,
@@ -354,6 +366,10 @@
                 try { res = JSON.parse(res); } catch (e) { }
             }
             document.getElementById('savingOverlay').classList.remove('active');
+            if (res && res.message && res.message.toLowerCase().includes('already exists')) {
+                alert(res.message);
+                return;
+            }
             if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
                 alert(res.message || 'Style data uploaded successfully!');
             } else {

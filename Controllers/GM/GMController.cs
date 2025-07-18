@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Iot_dashboard.Controllers.GM
 {
@@ -196,7 +197,7 @@ namespace Iot_dashboard.Controllers.GM
         }
 
         [HttpPost]
-        public async Task<IActionResult> getMeasurements(string style)
+        public async Task<IActionResult> getMeasurements([FromBody] JsonElement payload)
         {
             var token = HttpContext.Session.GetString("accessToken");
             if (string.IsNullOrEmpty(token))
@@ -204,6 +205,9 @@ namespace Iot_dashboard.Controllers.GM
                 HttpContext.Session.Clear();
                 return Json(new { measurements = new[] { "Session expired or missing token." } });
             }
+            if (!payload.TryGetProperty("Style", out var styleElement) || styleElement.ValueKind != JsonValueKind.String)
+                return Json(new { measurements = new[] { "Invalid request: missing Style property." } });
+            string style = styleElement.GetString();
             using (var http = new HttpClient())
             {
                 http.BaseAddress = new Uri($"{Request.Scheme}://{Request.Host}");
@@ -214,8 +218,64 @@ namespace Iot_dashboard.Controllers.GM
                 {
                     var response = await http.SendAsync(request);
                     var json = await response.Content.ReadAsStringAsync();
-                    // Parse the received JSON string and wrap it in a 'measurements' property
                     var doc = System.Text.Json.JsonDocument.Parse(json);
+                    if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    {
+                        var result = new List<object>();
+                        foreach (var sizeBlock in doc.RootElement.EnumerateArray())
+                        {
+                            string size = null;
+                            if (sizeBlock.TryGetProperty("Size", out var sizeProp))
+                                size = sizeProp.GetString();
+                            else if (sizeBlock.TryGetProperty("size", out var sizeProp2))
+                                size = sizeProp2.GetString();
+                            var measurements = new List<object>();
+                            JsonElement measurementsArray;
+                            if (sizeBlock.TryGetProperty("Measurements", out var measProp))
+                                measurementsArray = measProp;
+                            else if (sizeBlock.TryGetProperty("measurements", out var measProp2))
+                                measurementsArray = measProp2;
+                            else
+                                measurementsArray = default;
+                            if (measurementsArray.ValueKind == JsonValueKind.Array)
+                            {
+                                foreach (var m in measurementsArray.EnumerateArray())
+                                {
+                                    string measurement = null, type = null, description = null;
+                                    int reference = 0, tolerance = 0;
+                                    if (m.TryGetProperty("Measurement", out var mProp))
+                                        measurement = mProp.GetString();
+                                    else if (m.TryGetProperty("measurement", out var mProp2))
+                                        measurement = mProp2.GetString();
+                                    if (m.TryGetProperty("Type", out var tProp))
+                                        type = tProp.GetString();
+                                    else if (m.TryGetProperty("type", out var tProp2))
+                                        type = tProp2.GetString();
+                                    if (m.TryGetProperty("Description", out var dProp))
+                                        description = dProp.GetString();
+                                    else if (m.TryGetProperty("description", out var dProp2))
+                                        description = dProp2.GetString();
+                                    if (m.TryGetProperty("Reference", out var rProp) && rProp.TryGetInt32(out var refVal))
+                                        reference = refVal;
+                                    else if (m.TryGetProperty("reference", out var rProp2) && rProp2.TryGetInt32(out var refVal2))
+                                        reference = refVal2;
+                                    if (m.TryGetProperty("Tolerance", out var tolProp) && tolProp.TryGetInt32(out var tolVal))
+                                        tolerance = tolVal;
+                                    else if (m.TryGetProperty("tolerance", out var tolProp2) && tolProp2.TryGetInt32(out var tolVal2))
+                                        tolerance = tolVal2;
+                                    measurements.Add(new {
+                                        measurement,
+                                        type,
+                                        reference,
+                                        tolerance,
+                                        description
+                                    });
+                                }
+                            }
+                            result.Add(new { size, measurements });
+                        }
+                        return Json(new { measurements = result });
+                    }
                     return Json(new { measurements = doc.RootElement });
                 }
                 catch (System.Exception ex)
@@ -494,7 +554,7 @@ namespace Iot_dashboard.Controllers.GM
             using (var http = new HttpClient())
             {
                 http.BaseAddress = new Uri($"{Request.Scheme}://{Request.Host}");
-                var request = new HttpRequestMessage(HttpMethod.Post, "/api/gm/styles/insertStyle");
+                var request = new HttpRequestMessage(HttpMethod.Post, "/api/gm/styles/insertStyleData");
                 request.Headers.Add("Authorization", "Bearer " + token);
                 request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
                 try

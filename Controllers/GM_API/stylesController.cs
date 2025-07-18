@@ -55,10 +55,10 @@ namespace Iot_dashboard.Controllers.GM_API
         {
             RefreshTokenExpiry();
             var privilegeType = User.Claims.FirstOrDefault(c => c.Type == "prvlgtyp")?.Value;
-            if (string.IsNullOrEmpty(privilegeType) || !string.Equals(privilegeType, "admin", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(privilegeType) || !int.TryParse(privilegeType, out int privilegeLevel) || privilegeLevel < 3)
             {
                 // Return 403 with a JSON message
-                return StatusCode(403, new { Message = "Only admin users can insert styles." });
+                return StatusCode(403, new { Message = "Only users with privilege level 3 or above can insert styles." });
             }
             if (!body.TryGetProperty("Style", out var styleElement) || styleElement.ValueKind != JsonValueKind.String)
             {
@@ -359,13 +359,14 @@ namespace Iot_dashboard.Controllers.GM_API
                             else
                             {
                                 styleId = (int)result;
+                                // Do not rollback or return conflict; proceed to upsert measurements
                             }
                         }
 
                         // 2. Prepare measurement type and style-measurement caches
-                        var measurementTypeCache = new Dictionary<string, (int id, string type)>(StringComparer.OrdinalIgnoreCase);
+                        var measurementTypeCache = new Dictionary<string, (int id, string type, string description)>(StringComparer.OrdinalIgnoreCase);
                         using (var cmd = new SqlCommand(
-                            "SELECT measurement_id, name, [type] FROM CODE.hanger_sys.GM_MEASUREMENT_TYPES", connection, tran))
+                            "SELECT measurement_id, name, [type], description FROM CODE.hanger_sys.GM_MEASUREMENT_TYPES", connection, tran))
                         {
                             using (var reader = await cmd.ExecuteReaderAsync())
                             {
@@ -373,7 +374,8 @@ namespace Iot_dashboard.Controllers.GM_API
                                 {
                                     var name = reader.GetString(1);
                                     var type = reader.IsDBNull(2) ? null : reader.GetString(2);
-                                    measurementTypeCache[name] = (reader.GetInt32(0), type);
+                                    var description = reader.IsDBNull(3) ? null : reader.GetString(3);
+                                    measurementTypeCache[name] = (reader.GetInt32(0), type, description);
                                 }
                             }
                         }
@@ -411,38 +413,43 @@ namespace Iot_dashboard.Controllers.GM_API
                                 var measName = measNameElement.GetString();
                                 if (string.IsNullOrWhiteSpace(measName))
                                     continue;
+                                var description = measObj.TryGetProperty("description", out var descElement) && descElement.ValueKind == JsonValueKind.String ? descElement.GetString() : null;
                                 var type = measObj.TryGetProperty("type", out var typeElement) && typeElement.ValueKind == JsonValueKind.String ? typeElement.GetString() : null;
                                 var reference = measObj.TryGetProperty("reference", out var refElement) && refElement.ValueKind == JsonValueKind.Number ? refElement.GetInt32() : 0;
                                 var tolerance = measObj.TryGetProperty("tolerance", out var tolElement) && tolElement.ValueKind == JsonValueKind.Number ? tolElement.GetInt32() : 0;
                                 var order = measObj.TryGetProperty("order", out var orderElement) && orderElement.ValueKind == JsonValueKind.Number ? orderElement.GetInt32() : (int?)null;
 
-                                // 3.1. Get or create measurement type
+                                // 3.1. Get or create measurement type, set description
                                 int measurementId;
                                 if (!measurementTypeCache.TryGetValue(measName, out var measTypeInfo))
                                 {
                                     using (var insertCmd = new SqlCommand(
-                                        "INSERT INTO CODE.hanger_sys.GM_MEASUREMENT_TYPES (name, [type]) OUTPUT INSERTED.measurement_id VALUES (@name, @type)", connection, tran))
+                                        "INSERT INTO CODE.hanger_sys.GM_MEASUREMENT_TYPES (name, [type], description) OUTPUT INSERTED.measurement_id VALUES (@name, @type, @description)", connection, tran))
                                     {
                                         insertCmd.Parameters.AddWithValue("@name", measName);
                                         insertCmd.Parameters.AddWithValue("@type", (object?)type ?? DBNull.Value);
+                                        insertCmd.Parameters.AddWithValue("@description", (object?)description ?? DBNull.Value);
                                         measurementId = (int)await insertCmd.ExecuteScalarAsync();
-                                        measurementTypeCache[measName] = (measurementId, type);
+                                        measurementTypeCache[measName] = (measurementId, type, description);
                                     }
                                 }
                                 else
                                 {
                                     measurementId = measTypeInfo.id;
-                                    // Optionally update type if changed
-                                    if (!string.Equals(measTypeInfo.type, type, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(type))
+                                    // Optionally update type or description if changed
+                                    bool updateType = !string.Equals(measTypeInfo.type, type, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(type);
+                                    bool updateDesc = !string.Equals(measTypeInfo.description, description, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(description);
+                                    if (updateType || updateDesc)
                                     {
                                         using (var updateCmd = new SqlCommand(
-                                            "UPDATE CODE.hanger_sys.GM_MEASUREMENT_TYPES SET [type] = @type WHERE measurement_id = @id", connection, tran))
+                                            "UPDATE CODE.hanger_sys.GM_MEASUREMENT_TYPES SET [type] = @type, description = @description WHERE measurement_id = @id", connection, tran))
                                         {
-                                            updateCmd.Parameters.AddWithValue("@type", type);
+                                            updateCmd.Parameters.AddWithValue("@type", (object?)type ?? DBNull.Value);
+                                            updateCmd.Parameters.AddWithValue("@description", (object?)description ?? DBNull.Value);
                                             updateCmd.Parameters.AddWithValue("@id", measurementId);
                                             await updateCmd.ExecuteNonQueryAsync();
                                         }
-                                        measurementTypeCache[measName] = (measurementId, type);
+                                        measurementTypeCache[measName] = (measurementId, type, description);
                                     }
                                 }
 

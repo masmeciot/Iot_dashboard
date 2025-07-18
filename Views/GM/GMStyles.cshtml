@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
   <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
   <link rel="stylesheet" href="/assets/css/style.css">
-  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+  <link rel="shortcut icon" href="/assets/images/logo3.png />
     <style>
             .container-fluid.page-body-wrapper,
         .main-panel,
@@ -245,7 +245,8 @@
       $.ajax({
         url: '/GM/getMeasurements',
         method: 'POST',
-        data: { style: style },
+        contentType: 'application/json',
+        data: JSON.stringify({ Style: style }),
         success: function (res) {
           let measurementsBySize = res.measurements || [];
           // Collect all unique measurement names and types
@@ -256,10 +257,12 @@
             if (!allSizes.includes(sizeBlock.size)) allSizes.push(sizeBlock.size);
             sizeBlock.measurements.forEach(m => {
               if (!measurementMap[m.measurement]) {
-                measurementMap[m.measurement] = { type: m.type, tolerance: m.tolerance, refs: {} };
+                measurementMap[m.measurement] = { type: m.type, tolerance: m.tolerance, refs: {}, description: m.description || '' };
                 allMeasurements.push(m.measurement);
               }
               measurementMap[m.measurement].refs[sizeBlock.size] = m.reference;
+              // Always update description if present
+              if (typeof m.description !== 'undefined') measurementMap[m.measurement].description = m.description;
             });
           });
           // Build measurements array for table rendering
@@ -268,7 +271,8 @@
               measurement: name,
               type: measurementMap[name].type,
               tolerance: measurementMap[name].tolerance,
-              references: measurementMap[name].refs
+              references: measurementMap[name].refs,
+              description: measurementMap[name].description || '',
             };
           });
           currentStyle = style;
@@ -292,6 +296,7 @@
       headerRow.empty();
       headerRow.append('<th style="width:40px;">#</th>');
       headerRow.append('<th>Measurement</th>');
+      headerRow.append('<th>Description</th>');
       headerRow.append('<th>Type</th>');
       headerRow.append('<th>Tolerance</th>');
       sizes.forEach(size => headerRow.append(`<th>${size}</th>`));
@@ -305,6 +310,7 @@
         let row = $('<tr draggable="true"></tr>');
         row.append(`<td class="order-cell">${orderNum}</td>`);
         row.append(`<td class="measurement-cell">${escapeHtml(measurement.measurement || '')}</td>`);
+                row.append(`<td class="description-cell">${escapeHtml(measurement.description || '')}</td>`);
         row.append(`<td>${typeDropdown(measurement.type || 'p2p')}</td>`);
         row.append(`<td contenteditable="true" class="editable-cell">${measurement.tolerance || 0}</td>`);
         sizes.forEach(size => {
@@ -422,20 +428,35 @@
     }
 
     function addMeasurementRow(name) {
-      name = name.trim().toUpperCase();
+      name = name.trim();
       let type = measurementTypeMap[name] || 'p2p';
+      let description = '';
+      // Prefill description if available
+      if (measurementTypeMap[name] && measurementTypeMap[name + '_desc']) {
+        description = measurementTypeMap[name + '_desc'];
+      } else {
+        // Try to find in current table
+        $('#style-table-body .measurement-cell').each(function () {
+          if ($(this).text().trim() === name) {
+            description = $(this).closest('tr').find('.description-cell').text().trim();
+          }
+        });
+      }
+      // Prompt for description
+      description = prompt('Enter description for measurement:', description) || '';
       const row = $('<tr draggable="true"></tr>');
       row.append(`<td class="order-cell"></td>`);
       row.append(`<td class="measurement-cell">${escapeHtml(name)}</td>`);
       row.append(`<td>${typeDropdown(type)}</td>`);
       row.append(`<td contenteditable="true" class="editable-cell">0</td>`);
+      row.append(`<td class="description-cell">${escapeHtml(description)}</td>`);
       sizeHeaders.forEach(() => row.append(`<td contenteditable="true" class="editable-cell">0</td>`));
       row.append(`<td><button class="delete-btn">Delete</button></td>`);
       // Insert before delete size row if present, else append
       const deleteSizeRow = $('#delete-size-row');
       if (deleteSizeRow.length) {
         row.insertBefore(deleteSizeRow);
-            } else {
+      } else {
         $('#style-table-body').append(row);
       }
       updateOrderNumbers();
@@ -527,14 +548,16 @@
         const measurement = cells.eq(1).text().trim();
         const type = cells.eq(2).find('select').val();
         const tolerance = parseFloat(cells.eq(3).text().trim()) || 0;
+        const description = cells.eq(4).text().trim(); // Get description
         sizeHeaders.forEach((size, sIdx) => {
-          const reference = parseFloat(cells.eq(4 + sIdx).text().trim()) || 0;
+          const reference = parseFloat(cells.eq(5 + sIdx).text().trim()) || 0;
           dataBySize[size].push({
             measurement: measurement,
             type: type,
             reference: reference,
             tolerance: tolerance,
-            order: order
+            order: order,
+            description: description // Include description
           });
         });
       });

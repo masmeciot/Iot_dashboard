@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Measuring යාළුවා</title>
+    <link rel="shortcut icon" href="/assets/images/logo3.png />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -291,29 +292,35 @@
             }
         }
 
-        #graphsArea, .graph-container, #graphsContainer {
+        #graphsArea,
+        .graph-container,
+        #graphsContainer {
             height: 100%;
             min-height: 0;
         }
+
         #graphsContainer {
             display: flex;
             flex-direction: column;
             height: 100%;
             min-height: 0;
         }
+
         .graphs-row {
             display: flex;
             flex: 1 1 0;
             gap: 15px;
             min-height: 0;
         }
-        .graphs-row > div {
+
+        .graphs-row>div {
             flex: 1 1 0;
             min-width: 0;
             min-height: 0;
             display: flex;
             flex-direction: column;
         }
+
         .graphs-row canvas {
             width: 100% !important;
             height: 100% !important;
@@ -325,15 +332,20 @@
         #savingOverlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
             z-index: 2000;
             justify-content: center;
             align-items: center;
         }
+
         #savingOverlay.active {
             display: flex;
         }
+
         .saving-spinner {
             border: 6px solid #f3f3f3;
             border-top: 6px solid #4facfe;
@@ -343,10 +355,17 @@
             animation: spin 1s linear infinite;
             margin-bottom: 18px;
         }
+
         @@keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
         .saving-message {
             color: #fff;
             font-size: 1.2rem;
@@ -396,7 +415,8 @@
                     </select>
                 </div>
                 <div class="button-container">
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='@Url.Action("Index", "GM")'">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="window.location.href='@Url.Action("Index", "GM")'">
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
                     <button type="button" class="btn btn-primary" onclick="nextBtn()">
@@ -571,13 +591,15 @@
             showMeasurement(currentMeasurementIdx);
         }
 
+
         function getMeasureData() {
             var style = document.getElementById('styleSelector').value;
             console.log("Loading Measurement Data...");
             $.ajax({
                 url: '/GM/getMeasurements',
                 method: 'POST',
-                data: { style: style },
+                contentType: 'application/json',
+                data: JSON.stringify({ Style: style }),
                 success: function (response) {
                     console.log("Received Data")
                     measData = response.measurements;
@@ -634,6 +656,14 @@
 
             var m = currentSizeObj.measurements[idx];
             document.getElementById('measurementName').innerText = m.measurement || '-';
+
+            // Add click handler to show description popup
+            var measurementNameDiv = document.getElementById('measurementName');
+            measurementNameDiv.onclick = function() {
+                if (m.description && m.description.trim() !== '') {
+                    showDescriptionPopup(m.description);
+                }
+            };
 
             // Measured value input
             var measuredValueDiv = document.getElementById('measuredValue');
@@ -757,14 +787,14 @@
             var size = document.getElementById('sizeSelector').value;
             // Get current date and time in local timezone
             var now = new Date();
-            var localDateTime = now.getFullYear() + '-' + 
-                String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                String(now.getDate()).padStart(2, '0') + ' ' + 
-                String(now.getHours()).padStart(2, '0') + ':' + 
-                String(now.getMinutes()).padStart(2, '0') + ':' + 
-                String(now.getSeconds()).padStart(2, '0') + '.' + 
+            var localDateTime = now.getFullYear() + '-' +
+                String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                String(now.getDate()).padStart(2, '0') + ' ' +
+                String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0') + ':' +
+                String(now.getSeconds()).padStart(2, '0') + '.' +
                 String(now.getMilliseconds()).padStart(3, '0');
-            
+
             var payload = {
                 Session: garmentSession,
                 Style: style,
@@ -790,7 +820,7 @@
                     allGarmentMeasurements.push({ size, measurements: measurementResults });
                     updateGraphsForCurrentGarment();
                     @* alert('Garment data saved!'); *@
-                    measuredValues[size] = {};
+                        measuredValues[size] = { };
                     currentMeasurementIdx = 0;
                     showMeasurement(currentMeasurementIdx);
                     setUILock(false);
@@ -1124,6 +1154,48 @@
                 prevMeasurement();
             }
         });
+
+        // Description popup modal
+        function showDescriptionPopup(description) {
+            // Remove any existing popup
+            var existing = document.getElementById('desc-popup-modal');
+            if (existing) existing.remove();
+            var modal = document.createElement('div');
+            modal.id = 'desc-popup-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.background = 'rgba(0,0,0,0.4)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.style.zIndex = '3000';
+            modal.innerHTML = `
+                <div style="background:#fff;color:#222;padding:32px 28px 20px 28px;border-radius:12px;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.25);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                    <h3 style="margin-bottom:16px;font-size:1.2rem;font-weight:700;text-align:center;">Measurement Description</h3>
+                    <div style="font-size:1.05rem;line-height:1.5;margin-bottom:24px;white-space:pre-line;text-align:justify;text-justify:inter-word;max-width:360px;">${escapeHtml(description)}</div>
+                    <button id="desc-popup-close" style="background:#4facfe;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:1rem;font-weight:600;cursor:pointer;display:block;margin:0 auto;">Dismiss</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('desc-popup-close').onclick = function() {
+                modal.remove();
+            };
+            // Also close on clicking outside the modal content
+            modal.onclick = function(e) {
+                if (e.target === modal) modal.remove();
+            };
+        }
+
+        // Helper to escape HTML for safe display
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/["&'<>]/g, function (a) {
+                return { '"': '&quot;', '&': '&amp;', "'": '&#39;', '<': '&lt;', '>': '&gt;' }[a];
+            });
+        }
     </script>
     <script src="~/vendors/js/vendor.bundle.base.js"></script>
     <!-- endinject -->

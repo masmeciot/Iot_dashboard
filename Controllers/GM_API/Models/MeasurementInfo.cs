@@ -6,6 +6,8 @@ namespace Iot_dashboard.Controllers.GM_API.Models
         public string Type { get; set; }
         public int Reference { get; set; }
         public int Tolerance { get; set; }
+
+        public string Description { get; set; }
     }
 
     public class SizeMeasurements

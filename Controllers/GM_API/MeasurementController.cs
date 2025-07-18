@@ -55,11 +55,12 @@ namespace Iot_dashboard.Controllers.GM_API
                 // Query measurements for the style using the new structure
                 var cmd = new SqlCommand(@"
                 SELECT 
-                    r.[size], 
-                    mt.name AS Measurement, 
-                    mt.[type] AS Type, 
-                    r.ref_value AS Reference, 
-                    r.tolerance_value AS Tolerance
+                        r.[size], 
+                        mt.name AS Measurement, 
+                        mt.[type] AS Type, 
+                        mt.description AS Description,
+                        r.ref_value AS Reference, 
+                        r.tolerance_value AS Tolerance
                 FROM CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS r
                 JOIN CODE.hanger_sys.GM_STYLE_MEASUREMENRTS sm ON r.stylemeas_id = sm.stylemeas_id
                 JOIN CODE.hanger_sys.GM_MEASUREMENT_TYPES mt ON sm.measurement_id = mt.measurement_id
@@ -70,37 +71,50 @@ namespace Iot_dashboard.Controllers.GM_API
 
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
+                    // Defensive: print all column names for debugging
+                    int idxSize = reader.GetOrdinal("size");
+                    int idxMeasurement = reader.GetOrdinal("Measurement");
+                    int idxType = reader.GetOrdinal("Type");
+                    int idxDescription = reader.GetOrdinal("Description");
+                    int idxReference = reader.GetOrdinal("Reference");
+                    int idxTolerance = reader.GetOrdinal("Tolerance");
+
                     string currentSize = null;
                     SizeMeasurements current = null;
 
                     while (await reader.ReadAsync())
                     {
-                        var size = reader["size"].ToString();
+                        var size = reader[idxSize].ToString();
+                        var measurement = reader[idxMeasurement] == DBNull.Value ? "" : reader[idxMeasurement].ToString();
+                        var type = reader[idxType] == DBNull.Value ? "" : reader[idxType].ToString();
+                        var description = reader[idxDescription] == DBNull.Value ? "" : reader[idxDescription].ToString();
+                        var reference = reader[idxReference] == DBNull.Value ? 0 : Convert.ToInt32(reader[idxReference]);
+                        var tolerance = reader[idxTolerance] == DBNull.Value ? 0 : Convert.ToInt32(reader[idxTolerance]);
+                        System.Diagnostics.Debug.WriteLine($"Row: size='{size}', Measurement='{measurement}', Type='{type}', Description='{description}', Reference={reference}, Tolerance={tolerance}");
                         if (current == null || current.Size != size)
                         {
                             if (current != null)
                                 result.Add(current);
-
                             current = new SizeMeasurements
                             {
                                 Size = size,
                                 Measurements = new List<MeasurementInfo>()
                             };
                         }
-
                         current.Measurements.Add(new MeasurementInfo
                         {
-                            Measurement = reader["Measurement"].ToString(),
-                            Type = reader["Type"].ToString(),
-                            Reference = Convert.ToInt32(reader["Reference"]),
-                            Tolerance = Convert.ToInt32(reader["Tolerance"])
+                            Measurement = measurement,
+                            Type = type,
+                            Description = description,
+                            Reference = reference,
+                            Tolerance = tolerance
                         });
                     }
                     if (current != null)
                         result.Add(current);
                 }
             }
-
+            // System.Diagnostics.Debug.WriteLine("Returning result: " + System.Text.Json.JsonSerializer.Serialize(result));
             return Ok(result);
         }
 
@@ -634,7 +648,7 @@ namespace Iot_dashboard.Controllers.GM_API
 
             return Ok(resultList);
         }
-        
+
         [HttpPost("getSizes")]
         [Authorize]
         public async Task<IActionResult> GetSizes([FromBody] JsonElement payload)
