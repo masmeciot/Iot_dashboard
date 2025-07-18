@@ -13,7 +13,7 @@
     <Content Remove="Views\synergy\synout.cshtml" />
   </ItemGroup>
 
-	<ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
@@ -35,6 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\iotmainmenu.cshtml" />
+    <None Include="Views\ESL\ESLMenu.cshtml" />
     <None Include="Views\GM\GMLogin.cshtml" />
     <None Include="Views\GM\GMIndex.cshtml" />
     <None Include="Views\GM\GMDashboard.cshtml" />
@@ -52,7 +54,8 @@
     <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\feature.md" />
     <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\feature_request.md" />
     <None Include="wwwroot\assets\vendors2\bootstrap\.github\SUPPORT.md" />
-    <None Include="wwwroot\assets\vendors2\jquery-validation-unobtrusive\.vsts-pipelines\builds\ci-public.yml" />
+    <None
+      Include="wwwroot\assets\vendors2\jquery-validation-unobtrusive\.vsts-pipelines\builds\ci-public.yml" />
   </ItemGroup>
 
   <ItemGroup>
