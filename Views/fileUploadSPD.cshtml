@@ -32,7 +32,7 @@
     <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
         <ul class="navbar-nav w-100">
             <li class="nav-item w-100">
-                <h3 style="text-align: center;">Synergy IoT File Upload</h3>
+                <h3 style="text-align: center;">Spreader FW File Upload</h3>
             </li>
         </ul>
     </div>
@@ -42,13 +42,13 @@
             <div class="col-4 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title text-warning">IoT File Upload</h4>
+                        <h4 class="card-title text-warning">Spreader FW File Upload</h4>
                         <p class="card-title">Upload your file here.</p>
                         <form class="form-sample" enctype="multipart/form-data" id="uploadForm">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group row">
-                                       
+
                                         <div class="col-sm-12">
                                             <input type="file" class="form-control" name="file" id="file" accept=".bin" placeholder="Upload your file here">
                                         </div>
@@ -71,7 +71,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group row">
-                                     
+
                                         <div class="col-sm-12">
                                             <input type="text" class="form-control" id="deviceId" placeholder="Device ID" required>
                                         </div>
@@ -95,7 +95,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group row">
-                                       
+
                                         <div class="col-sm-12">
                                             <input type="text" class="form-control" id="module" placeholder="Module" required>
                                         </div>
@@ -205,7 +205,7 @@
             formData.append("file", file);
 
             $.ajax({
-                url: "/iotfile/UploadFile",
+                url: "/fwSpreader/UploadFile",
                 type: "POST",
                 data: formData,
                 processData: false,
@@ -236,7 +236,7 @@
     <script>
 
                 function updatemodule() {
-           
+
             const module = document.getElementById('module').value;
 
             // Validation check

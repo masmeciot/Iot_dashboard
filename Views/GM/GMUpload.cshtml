@@ -57,6 +57,22 @@
     #savingOverlay.active {
       display: flex;
     }
+     /* New styles for editable cells and dropdowns */
+    .type-select {
+      min-width: 100px;
+    }
+    .measure-select {
+      min-width: 70px;
+    }
+    .tolerance-cell {
+      min-width: 80px;
+    }
+    .size-value-cell {
+      min-width: 60px;
+    }
+    .size-value-cell[contenteditable="true"] {
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -244,12 +260,12 @@
         let sizeCells = '';
         for (let j = 5; j < row.length; j++) {
           let val = row[j] !== undefined && row[j] !== null && row[j] !== '' ? (parseFloat(row[j]) * 10).toFixed(1) : '';
-          sizeCells += `<td>${val}</td>`;
+          sizeCells += `<td contenteditable="true" class="size-cell">${val}</td>`;
         }
         body.innerHTML += `
           <tr draggable="true">
             <td class="order-cell">${orderNum}</td>
-            <td>${measurement}</td>
+            <td contenteditable="true" class="measuremem-cell">${measurement}</td>
             <td contenteditable="true" class="description-cell">${description}</td>
             <td>${typeDropdown}</td>
             <td>
@@ -258,7 +274,7 @@
                 <option value="No"${measureDefault === 'No' ? ' selected' : ''}>No</option>
               </select>
             </td>
-            <td>${tolerance}</td>
+            <td contenteditable="true" class="tolerance-cell">${tolerance}</td>
             ${sizeCells}
           </tr>
         `;

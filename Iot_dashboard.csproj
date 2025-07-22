@@ -54,8 +54,7 @@
     <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\feature.md" />
     <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\feature_request.md" />
     <None Include="wwwroot\assets\vendors2\bootstrap\.github\SUPPORT.md" />
-    <None
-      Include="wwwroot\assets\vendors2\jquery-validation-unobtrusive\.vsts-pipelines\builds\ci-public.yml" />
+    <None Include="wwwroot\assets\vendors2\jquery-validation-unobtrusive\.vsts-pipelines\builds\ci-public.yml" />
   </ItemGroup>
 
   <ItemGroup>
