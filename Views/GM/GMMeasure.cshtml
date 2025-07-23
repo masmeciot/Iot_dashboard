@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Measuring යාළුවා</title>
-    <link rel="shortcut icon" href="/assets/images/logo3.png"/>
+    <link rel="shortcut icon" href="/assets/images/logo3.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -659,7 +659,7 @@
 
             // Add click handler to show description popup
             var measurementNameDiv = document.getElementById('measurementName');
-            measurementNameDiv.onclick = function() {
+            measurementNameDiv.onclick = function () {
                 if (m.description && m.description.trim() !== '') {
                     showDescriptionPopup(m.description);
                 }
@@ -667,7 +667,7 @@
 
             // Measured value input
             var measuredValueDiv = document.getElementById('measuredValue');
-            measuredValueDiv.innerHTML = `<input id="measuredValueInput" type="number" class="form-control" style="width: 120px; margin: 0 auto; text-align: center; font-size: 1.2em;" autocomplete="off" />`;
+            measuredValueDiv.innerHTML = `<input id="measuredValueInput" type="number" readonly inputmode="none" class="form-control" style="width: 120px; margin: 0 auto; text-align: center; font-size: 1.2em;" autocomplete="off" />`;
 
             var input = document.getElementById('measuredValueInput');
             var size = document.getElementById('sizeSelector').value;
@@ -698,6 +698,33 @@
             // Focus input on show
             setTimeout(() => { input.focus(); }, 100);
             updateGraphsForCurrentGarment();
+        }
+
+        // Listen for physical keyboard input on the readonly field
+        document.addEventListener('keydown', handleExternalKeyboard);
+
+        function handleExternalKeyboard(e) {
+            const input = document.getElementById('measuredValueInput');
+            if (!input || document.activeElement !== input) return; // only when input has focus
+
+            // Allow digits, decimal point, backspace, delete, arrow keys
+            const allowed = /[0-9.\b]|[\r\n]|[\x08]|[\x7F]|ArrowLeft|ArrowRight|Tab/;
+            if (allowed.test(e.key)) {
+                e.preventDefault();
+
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    input.value = input.value.slice(0, -1);
+                } else if (e.key === 'Enter' || e.key === 'Return') {
+                    // optional: go to next measurement on Enter
+                    nextMeasurement();
+                    return;
+                } else if (e.key.length === 1) { // printable char
+                    input.value += e.key;
+                }
+
+                // trigger your existing onInput logic
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
         }
 
         function updatePassFail(val, m) {
@@ -1180,11 +1207,11 @@
                 </div>
             `;
             document.body.appendChild(modal);
-            document.getElementById('desc-popup-close').onclick = function() {
+            document.getElementById('desc-popup-close').onclick = function () {
                 modal.remove();
             };
             // Also close on clicking outside the modal content
-            modal.onclick = function(e) {
+            modal.onclick = function (e) {
                 if (e.target === modal) modal.remove();
             };
         }

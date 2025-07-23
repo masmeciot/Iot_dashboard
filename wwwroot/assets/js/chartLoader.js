@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
   searchBtn.addEventListener('click', handleSearch);
   exportBtn.addEventListener('click', handleExport);
   dateFilterCheckbox.addEventListener('change', toggleDateFilter);
-  // styleInput.addEventListener('change', handleStyleChange); // This is now handled by the new logic
+  // styleInput.addEventListemner('change', handleStyleChange); // This is now handled by the new logic
   // sizeInput.addEventListener('change', handleSizeChange); // This is now handled by the new logic
 
   function formatDateTimeLocal(date) {
@@ -212,7 +212,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $.ajax({
           url: '/GM/getMeasurements',
           method: 'POST',
-          data: { style: selectedStyle },
+          contentType: 'application/json',
+          data: JSON.stringify({ Style: selectedStyle }),
           success: function (response) {
             referenceData = response.measurements;
             buildDashboard();

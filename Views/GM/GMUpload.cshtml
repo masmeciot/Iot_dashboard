@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,7 +10,7 @@
   <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
   <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
   <link rel="stylesheet" href="/assets/css/style.css">
-  <link rel="shortcut icon" href="/assets/images/logo3.png"/>
+  <link rel="shortcut icon" href="/assets/images/logo3.png" />
   <style>
     .container-fluid.page-body-wrapper,
     .main-panel,
@@ -21,7 +22,12 @@
       width: 100vw;
       max-width: 100vw;
     }
-    body, html { overflow-x: hidden; }
+
+    body,
+    html {
+      overflow-x: hidden;
+    }
+
     .drop-zone {
       border: 2px dashed #007bff;
       border-radius: 8px;
@@ -32,49 +38,63 @@
       transition: border-color 0.2s;
       background: #f8f9fa;
     }
+
     .drop-zone.dragover {
       border-color: #0056b3;
       background: #e3f2fd;
     }
+
     .hidden-input {
       display: none;
     }
+
     .table-responsive {
       max-height: 500px;
       overflow-y: auto;
     }
+
     #savingOverlay {
       display: none;
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.4);
       z-index: 2000;
       justify-content: center;
       align-items: center;
     }
+
     #savingOverlay.active {
       display: flex;
     }
-     /* New styles for editable cells and dropdowns */
+
+    /* New styles for editable cells and dropdowns */
     .type-select {
       min-width: 100px;
     }
+
     .measure-select {
       min-width: 70px;
     }
+
     .tolerance-cell {
       min-width: 80px;
     }
+
     .size-value-cell {
       min-width: 60px;
     }
+
     .size-value-cell[contenteditable="true"] {
       text-align: center;
     }
   </style>
 </head>
+
 <body>
   <div class="container-scroller">
     <div class="container-fluid page-body-wrapper">
@@ -84,70 +104,76 @@
       </a>
       <div id="savingOverlay">
         <div style="display:flex;flex-direction:column;align-items:center;">
-          <div class="saving-spinner" style="border:6px solid #f3f3f3;border-top:6px solid #4facfe;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
-          <div class="saving-message" style="color:#fff;font-size:1.2rem;font-weight:600;text-align:center;text-shadow:0 2px 8px #000;">Saving...</div>
+          <div class="saving-spinner"
+            style="border:6px solid #f3f3f3;border-top:6px solid #4facfe;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite;margin-bottom:18px;">
+          </div>
+          <div class="saving-message"
+            style="color:#fff;font-size:1.2rem;font-weight:600;text-align:center;text-shadow:0 2px 8px #000;">Saving...
+          </div>
         </div>
       </div>
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row" style="min-height: 100vh;">
-              <!-- Card 1: File Upload (vertically centered) -->
-              <div class="col-12 d-flex flex-column justify-content-center align-items-center" style="min-height: 50vh;">
-                <div class="w-100 mb-4" style="max-width: 600px;">
-                  <div class="card h-100 d-flex flex-column justify-content-center align-items-center">
-                    <div class="card-body w-100">
-                      <h3 class="text-center mb-4">Upload Excel File</h3>
-                      <div id="drop-zone" class="drop-zone">
-                        <span id="drop-zone-text">Drag & Drop your .xlsx file here or click to browse</span>
-                        <input type="file" id="file-input" class="hidden-input" accept=".xlsx" />
-                      </div>
-                      <button id="upload-btn" class="btn btn-lg btn-info btn-block mt-3" disabled>Upload</button>
-                      <div id="file-name" class="text-center mt-2 text-muted"></div>
+            <!-- Card 1: File Upload (vertically centered) -->
+            <div class="col-12 d-flex flex-column justify-content-center align-items-center" style="min-height: 50vh;">
+              <div class="w-100 mb-4" style="max-width: 600px;">
+                <div class="card h-100 d-flex flex-column justify-content-center align-items-center">
+                  <div class="card-body w-100">
+                    <h3 class="text-center mb-4">Upload Excel File</h3>
+                    <div id="drop-zone" class="drop-zone">
+                      <span id="drop-zone-text">Drag & Drop your .xlsx file here or click to browse</span>
+                      <input type="file" id="file-input" class="hidden-input" accept=".xlsx" />
                     </div>
+                    <button id="upload-btn" class="btn btn-lg btn-info btn-block mt-3" disabled>Upload</button>
+                    <div id="file-name" class="text-center mt-2 text-muted"></div>
                   </div>
                 </div>
               </div>
-              <!-- Card 2: Table View (full width) -->
-              <div class="col-12 px-0">
-                <div class="card h-100 d-flex flex-column justify-content-center align-items-center" style="border-radius:0;">
-                  <div class="card-body w-100">
-                    <h3 class="text-center mb-4">Extracted Data</h3>
-                    <div class="table-responsive">
-                      <table class="table table-bordered" id="excel-table">
-                        <thead>
-                          <tr id="table-header-row">
-                            <th style="width:40px;">#</th>
-                            <!-- Dynamic header -->
-                          </tr>
-                        </thead>
-                        <tbody id="table-body">
-                          <!-- Dynamic rows -->
-                        </tbody>
-                      </table>
-                    </div>
+            </div>
+            <!-- Card 2: Table View (full width) -->
+            <div class="col-12 px-0">
+              <div class="card h-100 d-flex flex-column justify-content-center align-items-center"
+                style="border-radius:0;">
+                <div class="card-body w-100">
+                  <h3 class="text-center mb-4">Extracted Data</h3>
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="excel-table">
+                      <thead>
+                        <tr id="table-header-row">
+                          <th style="width:40px;">#</th>
+                          <!-- Dynamic header -->
+                        </tr>
+                      </thead>
+                      <tbody id="table-body">
+                        <!-- Dynamic rows -->
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-                <div class="text-center mt-3">
-                  <button id="save-style-data-btn" class="btn btn-success" disabled>Submit</button>
-                </div>
+              </div>
+              <div class="text-center mt-3">
+                <button id="save-style-data-btn" class="btn btn-success" disabled>Submit</button>
               </div>
             </div>
           </div>
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © MAS KREEDA 2025</span>
-            </div>
-          </footer>
         </div>
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © MAS KREEDA
+              2025</span>
+          </div>
+        </footer>
       </div>
     </div>
   </div>
+  </div>
   <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
-    <script src="/assets/vendors/select2/select2.min.js"></script>
-    <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+  <script src="/assets/vendors/select2/select2.min.js"></script>
+  <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
-    <script>
+  <script>
     // Drag and drop logic
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -180,7 +206,7 @@
         fileNameDiv.textContent = file.name;
         uploadBtn.disabled = false;
         uploadedFileName = file.name;
-          } else {
+      } else {
         fileNameDiv.textContent = 'Please select a valid .xlsx file.';
         uploadBtn.disabled = true;
         selectedFile = null;
@@ -244,7 +270,7 @@
         const tolPlus = parseFloat(row[3] || 0);
         const isOptional = (row[4] || '').toString().trim().toLowerCase();
         // Tolerance: show as "±0.5" (use tolPlus)
-        const tolerance = `±${(tolPlus * 10).toFixed(1)}`;
+        const tolerance = `±${Math.round(tolPlus * 10)}`;
         // Measure? dropdown: inverse of isOptional ("yes" if not optional, "no" if optional)
         let measureDefault = 'Yes';
         if (isOptional === 'yes' || isOptional === 'true' || isOptional === '1') measureDefault = 'No';
@@ -259,8 +285,9 @@
         // Size values: multiply by 10, start at index 5
         let sizeCells = '';
         for (let j = 5; j < row.length; j++) {
-          let val = row[j] !== undefined && row[j] !== null && row[j] !== '' ? (parseFloat(row[j]) * 10).toFixed(1) : '';
-          sizeCells += `<td contenteditable="true" class="size-cell">${val}</td>`;
+          let val = row[j] !== undefined && row[j] !== null && row[j] !== '' ?
+            Math.round(parseFloat(row[j]) * 10) : ''; // Changed to remove decimal
+          sizeCells += `<td contenteditable="true" class="size-value-cell">${val}</td>`;
         }
         body.innerHTML += `
           <tr draggable="true">
@@ -309,7 +336,7 @@
     }
 
     // Save to DB button handler
-    document.getElementById('save-style-data-btn').addEventListener('click', function() {
+    document.getElementById('save-style-data-btn').addEventListener('click', function () {
       saveStyleDataFromTable(uploadedFileName);
     });
 
@@ -344,20 +371,20 @@
         let tolerance = parseFloat(cells[5].innerText.replace('±', '').trim());
         if (measure !== 'Yes') continue; // Only include if Measure? is Yes
         for (let s = 0; s < sizeHeaders.length; s++) {
-           let size = sizeHeaders[s];
-           let cell = cells[6 + s];
-           let reference = cell ? parseFloat(cell.innerText.trim()) : NaN;
-           if (!isNaN(reference) && reference !== 0) {
-               if (!sizeData[size]) sizeData[size] = [];
-               sizeData[size].push({
-                   measurement: measurement,
-                   description: description,
-                   type: type,
-                   reference: reference,
-                   tolerance: tolerance,
-                   order: order
-               });
-           }
+          let size = sizeHeaders[s];
+          let cell = cells[6 + s];
+          let reference = cell ? parseFloat(cell.innerText.trim()) : NaN;
+          if (!isNaN(reference) && reference !== 0) {
+            if (!sizeData[size]) sizeData[size] = [];
+            sizeData[size].push({
+              measurement: measurement,
+              description: description,
+              type: type,
+              reference: reference,
+              tolerance: tolerance,
+              order: order
+            });
+          }
         }
       }
 
@@ -378,32 +405,38 @@
         contentType: 'application/json',
         data: JSON.stringify(payload),
         success: function (res) {
-            if (typeof res === 'string') {
-                try { res = JSON.parse(res); } catch (e) { }
-            }
-            document.getElementById('savingOverlay').classList.remove('active');
-            if (res && res.message && res.message.toLowerCase().includes('already exists')) {
-                alert(res.message);
-                return;
-            }
-            if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
-                alert(res.message || 'Style data uploaded successfully!');
-            } else {
-                alert('Upload complete, but check server response.');
-            }
+          if (typeof res === 'string') {
+            try { res = JSON.parse(res); } catch (e) { }
+          }
+          document.getElementById('savingOverlay').classList.remove('active');
+          if (res && res.message && res.message.toLowerCase().includes('already exists')) {
+            alert(res.message);
+            return;
+          }
+          if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
+            alert(res.message || 'Style data uploaded successfully!');
+          } else {
+            alert('Upload complete, but check server response.');
+          }
         },
         error: function (xhr, status, error) {
-            document.getElementById('savingOverlay').classList.remove('active');
+          document.getElementById('savingOverlay').classList.remove('active');
           alert('Error uploading style data: ' + error);
         }
       });
     }
-    </script>
-    <style>
+  </script>
+  <style>
     @@keyframes spin {
-     0% { transform: rotate(0deg); }
-     100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
-    </style>
+  </style>
 </body>
+
 </html>
