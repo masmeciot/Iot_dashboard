@@ -13,23 +13,23 @@
   <link rel="stylesheet" href="/assets/vendors/select2/select2.min.css">
   <link rel="stylesheet" href="/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
   <link rel="stylesheet" href="/assets/css/style.css">
-  <link rel="shortcut icon" href="/assets/images/logo3.png"/>
-    <style>
-            .container-fluid.page-body-wrapper,
-        .main-panel,
-        .content-wrapper {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            width: 100vw;
-            max-width: 100vw;
-        }
+  <link rel="shortcut icon" href="/assets/images/logo3.png" />
+  <style>
+    .container-fluid.page-body-wrapper,
+    .main-panel,
+    .content-wrapper {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100vw;
+      max-width: 100vw;
+    }
 
     body,
     html {
-            overflow-x: hidden;
-        }
+      overflow-x: hidden;
+    }
 
     .table-responsive {
       max-height: 600px;
@@ -56,19 +56,23 @@
 
     .type-select {
       min-width: 90px;
-        }
+    }
 
     #savingOverlay {
       display: none;
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.4);
       z-index: 2000;
       justify-content: center;
       align-items: center;
     }
+
     #savingOverlay.active {
       display: flex;
     }
@@ -84,22 +88,32 @@
       </a>
       <div id="savingOverlay">
         <div style="display:flex;flex-direction:column;align-items:center;">
-          <div class="saving-spinner" style="border:6px solid #f3f3f3;border-top:6px solid #4facfe;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
-          <div class="saving-message" style="color:#fff;font-size:1.2rem;font-weight:600;text-align:center;text-shadow:0 2px 8px #000;">Saving...</div>
+          <div class="saving-spinner"
+            style="border:6px solid #f3f3f3;border-top:6px solid #4facfe;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite;margin-bottom:18px;">
+          </div>
+          <div class="saving-message"
+            style="color:#fff;font-size:1.2rem;font-weight:600;text-align:center;text-shadow:0 2px 8px #000;">Saving...
+          </div>
         </div>
       </div>
       <style>
-      @@keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-      }
+        @@keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+
+          100% {
+            transform: rotate(360deg);
+          }
+        }
       </style>
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row mb-4">
             <div class="col-lg-6 offset-lg-3 d-flex justify-content-center">
               <div class="input-group w-100" style="max-width: 420px;">
-                <input id="style-search-input" type="text" class="form-control" placeholder="Loading styles..." list="style-list" disabled>
+                <input id="style-search-input" type="text" class="form-control" placeholder="Loading styles..."
+                  list="style-list" disabled>
                 <datalist id="style-list"></datalist>
                 <button id="style-search-btn" class="btn btn-primary" disabled>Search</button>
               </div>
@@ -107,11 +121,14 @@
           </div>
           <div class="row mb-2 align-items-center">
             <div class="col-lg-12 d-flex align-items-center">
-              <button id="add-size-btn" class="btn btn-info me-3" disabled style="margin-right: 16px; margin-left: 16px;">Add Size</button>
+              <button id="add-size-btn" class="btn btn-info me-3" disabled
+                style="margin-right: 16px; margin-left: 16px;">Add Size</button>
               <button id="add-measurement-btn" class="btn btn-info" disabled>Add Measurement</button>
               <div class="flex-grow-1"></div>
-              @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp >= 3) {
-                <button id="delete-style-btn" class="btn btn-danger ms-2" style="margin-right: 16px;">Delete Style</button>
+              @if (ViewBag.prvlgtyp != null && ViewBag.prvlgtyp >= 3)
+              {
+                <button id="delete-style-btn" class="btn btn-danger ms-2" style="margin-right: 16px;">Delete
+                  Style</button>
               }
             </div>
           </div>
@@ -149,8 +166,8 @@
     </div>
   </div>
   <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
-    <script src="/assets/vendors/select2/select2.min.js"></script>
-    <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+  <script src="/assets/vendors/select2/select2.min.js"></script>
+  <script src="/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
   <script>
@@ -257,7 +274,7 @@
             if (!allSizes.includes(sizeBlock.size)) allSizes.push(sizeBlock.size);
             sizeBlock.measurements.forEach(m => {
               if (!measurementMap[m.measurement]) {
-                measurementMap[m.measurement] = { type: m.type, tolerance: m.tolerance, refs: {}, description: m.description || '' };
+                measurementMap[m.measurement] = { type: m.type, toleranceP: m.toleranceP, toleranceM: m.toleranceM, refs: {}, description: m.description || '' };
                 allMeasurements.push(m.measurement);
               }
               measurementMap[m.measurement].refs[sizeBlock.size] = m.reference;
@@ -270,7 +287,8 @@
             return {
               measurement: name,
               type: measurementMap[name].type,
-              tolerance: measurementMap[name].tolerance,
+              toleranceP: measurementMap[name].toleranceP,
+              toleranceM: measurementMap[name].toleranceM,
               references: measurementMap[name].refs,
               description: measurementMap[name].description || '',
             };
@@ -298,7 +316,8 @@
       headerRow.append('<th>Measurement</th>');
       headerRow.append('<th>Description</th>');
       headerRow.append('<th>Type</th>');
-      headerRow.append('<th>Tolerance</th>');
+      headerRow.append('<th>Tol&nbsp;(+)</th>');
+      headerRow.append('<th>Tol&nbsp;(-)</th>');
       sizes.forEach(size => headerRow.append(`<th>${size}</th>`));
       headerRow.append('<th>Delete</th>');
 
@@ -310,17 +329,18 @@
         let row = $('<tr draggable="true"></tr>');
         row.append(`<td class="order-cell">${orderNum}</td>`);
         row.append(`<td class="measurement-cell">${escapeHtml(measurement.measurement || '')}</td>`);
-                row.append(`<td class="description-cell">${escapeHtml(measurement.description || '')}</td>`);
+        row.append(`<td class="description-cell">${escapeHtml(measurement.description || '')}</td>`);
         row.append(`<td>${typeDropdown(measurement.type || 'p2p')}</td>`);
-        row.append(`<td contenteditable="true" class="editable-cell">${measurement.tolerance || 0}</td>`);
+        row.append(`<td contenteditable="true" class="editable-cell">${Number(measurement.toleranceP || 0)}</td>`);
+        row.append(`<td contenteditable="true" class="editable-cell">${Number(measurement.toleranceM || 0)}</td>`);
         sizes.forEach(size => {
           let val = (measurement.references && measurement.references[size] !== undefined) ? measurement.references[size] : 0;
           row.append(`<td contenteditable="true" class="editable-cell">${val}</td>`);
         });
         if (userPrvlgtyp >= 3) {
-            row.append(`<td><button class="delete-btn">Delete</button></td>`);
+          row.append(`<td><button class="delete-btn">Delete</button></td>`);
         } else {
-            row.append('<td></td>');
+          row.append('<td></td>');
         }
         body.append(row);
         orderNum++;
@@ -328,9 +348,9 @@
       makeRowsDraggable();
       // Delete row (only if userPrvlgtyp >= 3)
       if (userPrvlgtyp >= 3) {
-          $('.delete-btn').off('click').on('click', function () {
-              handleDeleteMeasurement($(this).closest('tr'));
-          });
+        $('.delete-btn').off('click').on('click', function () {
+          handleDeleteMeasurement($(this).closest('tr'));
+        });
       }
       renderDeleteSizeRow();
     }
@@ -350,9 +370,9 @@
       sizeHeaders.slice(0, sizeHeaders.length).forEach(size => {
         // Allow delete for all users if size is not in originalSizes (newly added), else only for privileged users
         if (userPrvlgtyp >= 3 || !originalSizes.includes(size)) {
-            row.append(`<td><button class="btn btn-danger btn-sm delete-size-btn" data-size="${size}">Delete</button></td>`);
+          row.append(`<td><button class="btn btn-danger btn-sm delete-size-btn" data-size="${size}">Delete</button></td>`);
         } else {
-            row.append('<td></td>');
+          row.append('<td></td>');
         }
       });
       // Only one extra cell for the delete column, and no more
@@ -447,9 +467,10 @@
       const row = $('<tr draggable="true"></tr>');
       row.append(`<td class="order-cell"></td>`);
       row.append(`<td class="measurement-cell">${escapeHtml(name)}</td>`);
+      row.append(`<td class="description-cell">${escapeHtml(description)}</td>`);
       row.append(`<td>${typeDropdown(type)}</td>`);
       row.append(`<td contenteditable="true" class="editable-cell">0</td>`);
-      row.append(`<td class="description-cell">${escapeHtml(description)}</td>`);
+      row.append(`<td contenteditable="true" class="editable-cell">0</td>`);
       sizeHeaders.forEach(() => row.append(`<td contenteditable="true" class="editable-cell">0</td>`));
       row.append(`<td><button class="delete-btn">Delete</button></td>`);
       // Insert before delete size row if present, else append
@@ -546,56 +567,58 @@
         const cells = $(this).find('td');
         const order = parseInt(cells.eq(0).text().trim());
         const measurement = cells.eq(1).text().trim();
-        const type = cells.eq(2).find('select').val();
-        const tolerance = parseFloat(cells.eq(3).text().trim()) || 0;
-        const description = cells.eq(4).text().trim(); // Get description
+        const description = cells.eq(2).text().trim(); // Get description
+        const type = cells.eq(3).find('select').val();
+        const toleranceP = parseFloat(cells.eq(4).text().trim()) || 0;
+        const toleranceM = parseFloat(cells.eq(5).text().trim()) || 0;
         sizeHeaders.forEach((size, sIdx) => {
-          const reference = parseFloat(cells.eq(5 + sIdx).text().trim()) || 0;
+          const reference = parseFloat(cells.eq(6 + sIdx).text().trim()) || 0;
           dataBySize[size].push({
             measurement: measurement,
             type: type,
             reference: reference,
-            tolerance: tolerance,
             order: order,
-            description: description // Include description
+            description: description,
+            toleranceP: toleranceP,
+            toleranceM: toleranceM
           });
         });
-      });
-      // Build final payload
-      currentStyle = $('#style-search-input').val().trim().toUpperCase();
-      const payload = {
-        Style: currentStyle,
-        Data: Object.keys(dataBySize).map(size => ({
-          size: size,
-          measurements: dataBySize[size]
-        }))
-      };
-      // Send AJAX POST to /GM/insertStyleData
-      $('#savingOverlay').addClass('active');
-      $.ajax({
-        url: '/GM/insertStyleData',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(payload),
-        success: function (res) {
+        // Build final payload
+        currentStyle = $('#style-search-input').val().trim().toUpperCase();
+        const payload = {
+          Style: currentStyle,
+          Data: Object.keys(dataBySize).map(size => ({
+            size: size,
+            measurements: dataBySize[size]
+          }))
+        };
+        // Send AJAX POST to /GM/insertStyleData
+        $('#savingOverlay').addClass('active');
+        $.ajax({
+          url: '/GM/insertStyleData',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(payload),
+          success: function (res) {
             if (typeof res === 'string') {
-                try { res = JSON.parse(res); } catch (e) { }
+              try { res = JSON.parse(res); } catch (e) { }
             }
             $('#savingOverlay').removeClass('active');
             if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
-                alert(res.message || 'Style data uploaded successfully!');
-                // Refresh the table after successful submit
-                if (currentStyle) searchStyle(currentStyle);
+              alert(res.message || 'Style data uploaded successfully!');
+              // Refresh the table after successful submit
+              if (currentStyle) searchStyle(currentStyle);
             } else {
-                alert('Upload complete, but check server response.');
+              alert('Upload complete, but check server response.');
             }
-        },
-        error: function (xhr, status, error) {
+          },
+          error: function (xhr, status, error) {
             $('#savingOverlay').removeClass('active');
             alert('Error uploading style data: ' + error);
-        }
-    });
-}
+          }
+        });
+      });
+    }
 
     // Delete measurement logic
     function handleDeleteMeasurement(row) {
@@ -627,31 +650,31 @@
 
     // Delete Style button handler
     $('#delete-style-btn').on('click', function () {
-        if (userPrvlgtyp < 3) return;
-        if (!currentStyle) return;
-        if (!confirm('Are you sure you want to delete this style? This will remove all measurements and sizes for this style.')) return;
-        $.ajax({
-            url: '/GM/removeStyle',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ Style: currentStyle }),
-            success: function (res) {
-                if (typeof res === 'string') {
-                    try { res = JSON.parse(res); } catch (e) { }
-                }
-                if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
-                    alert(res.message || 'Style deleted successfully!');
-                    window.location.reload();
-                } else {
-                    alert('Delete complete, but check server response.');
-                }
-            },
-            error: function (xhr, status, error) {
-                alert('Error deleting style: ' + error);
-            }
-        });
+      if (userPrvlgtyp < 3) return;
+      if (!currentStyle) return;
+      if (!confirm('Are you sure you want to delete this style? This will remove all measurements and sizes for this style.')) return;
+      $.ajax({
+        url: '/GM/removeStyle',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ Style: currentStyle }),
+        success: function (res) {
+          if (typeof res === 'string') {
+            try { res = JSON.parse(res); } catch (e) { }
+          }
+          if (res && (res.success === true || res.status === 'success' || (res.message && typeof res.message === 'string'))) {
+            alert(res.message || 'Style deleted successfully!');
+            window.location.reload();
+          } else {
+            alert('Delete complete, but check server response.');
+          }
+        },
+        error: function (xhr, status, error) {
+          alert('Error deleting style: ' + error);
+        }
+      });
     });
-    </script>
+  </script>
 </body>
 
 </html>

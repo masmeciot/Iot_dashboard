@@ -242,7 +242,8 @@
       headerRow.innerHTML += '<th>Description</th>';
       headerRow.innerHTML += '<th>Type</th>';
       headerRow.innerHTML += '<th>Measure?</th>';
-      headerRow.innerHTML += '<th>Tolerance</th>';
+      headerRow.innerHTML += '<th>Tolerance (+)</th>';
+      headerRow.innerHTML += '<th>Tolerance (-)</th>';
       sizeCols.forEach(size => {
         headerRow.innerHTML += `<th>${size}</th>`;
       });
@@ -270,7 +271,8 @@
         const tolPlus = parseFloat(row[3] || 0);
         const isOptional = (row[4] || '').toString().trim().toLowerCase();
         // Tolerance: show as "±0.5" (use tolPlus)
-        const tolerance = `±${Math.round(tolPlus * 10)}`;
+        const toleranceP = Math.round(tolPlus * 10);
+        const toleranceM = Math.round(tolMinus * 10);
         // Measure? dropdown: inverse of isOptional ("yes" if not optional, "no" if optional)
         let measureDefault = 'Yes';
         if (isOptional === 'yes' || isOptional === 'true' || isOptional === '1') measureDefault = 'No';
@@ -301,7 +303,8 @@
                 <option value="No"${measureDefault === 'No' ? ' selected' : ''}>No</option>
               </select>
             </td>
-            <td contenteditable="true" class="tolerance-cell">${tolerance}</td>
+            <td contenteditable="true" class="tolerance-cell">${toleranceP}</td>
+            <td contenteditable="true" class="tolerance-cell">${toleranceM}</td>
             ${sizeCells}
           </tr>
         `;
@@ -351,7 +354,7 @@
       // Get table headers (sizes)
       var headerRow = document.getElementById('table-header-row');
       var sizeHeaders = [];
-      for (let i = 6; i < headerRow.children.length; i++) {
+      for (let i = 7; i < headerRow.children.length; i++) {
         sizeHeaders.push(headerRow.children[i].innerText.trim());
       }
 
@@ -368,11 +371,12 @@
         let description = cells[2].innerText.trim();
         let type = cells[3].querySelector('select') ? cells[3].querySelector('select').value : cells[3].innerText.trim();
         let measure = cells[4].querySelector('select') ? cells[4].querySelector('select').value : cells[4].innerText.trim();
-        let tolerance = parseFloat(cells[5].innerText.replace('±', '').trim());
+        let toleranceP = parseFloat(cells[5].innerText.trim()) || 0;
+        let toleranceM = parseFloat(cells[6].innerText.trim()) || 0;
         if (measure !== 'Yes') continue; // Only include if Measure? is Yes
         for (let s = 0; s < sizeHeaders.length; s++) {
           let size = sizeHeaders[s];
-          let cell = cells[6 + s];
+          let cell = cells[7 + s];
           let reference = cell ? parseFloat(cell.innerText.trim()) : NaN;
           if (!isNaN(reference) && reference !== 0) {
             if (!sizeData[size]) sizeData[size] = [];
@@ -381,7 +385,8 @@
               description: description,
               type: type,
               reference: reference,
-              tolerance: tolerance,
+              toleranceP,
+              toleranceM,
               order: order
             });
           }
