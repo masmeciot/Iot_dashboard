@@ -242,7 +242,7 @@ namespace Iot_dashboard.Controllers.GM
                                 foreach (var m in measurementsArray.EnumerateArray())
                                 {
                                     string measurement = null, type = null, description = null;
-                                    int reference = 0, tolerance = 0;
+                                    int reference = 0, toleranceP = 0, toleranceM = 0;
                                     if (m.TryGetProperty("Measurement", out var mProp))
                                         measurement = mProp.GetString();
                                     else if (m.TryGetProperty("measurement", out var mProp2))
@@ -259,15 +259,20 @@ namespace Iot_dashboard.Controllers.GM
                                         reference = refVal;
                                     else if (m.TryGetProperty("reference", out var rProp2) && rProp2.TryGetInt32(out var refVal2))
                                         reference = refVal2;
-                                    if (m.TryGetProperty("Tolerance", out var tolProp) && tolProp.TryGetInt32(out var tolVal))
-                                        tolerance = tolVal;
-                                    else if (m.TryGetProperty("tolerance", out var tolProp2) && tolProp2.TryGetInt32(out var tolVal2))
-                                        tolerance = tolVal2;
+                                    if (m.TryGetProperty("ToleranceP", out var tolPProp) && tolPProp.TryGetInt32(out var tolPVal))
+                                        toleranceP = tolPVal;
+                                    else if (m.TryGetProperty("toleranceP", out var tolPProp2) && tolPProp2.TryGetInt32(out var tolPVal2))
+                                        toleranceP = tolPVal2;
+                                    if (m.TryGetProperty("ToleranceM", out var tolMProp) && tolMProp.TryGetInt32(out var tolMVal))
+                                        toleranceP = tolMVal;
+                                    else if (m.TryGetProperty("toleranceM", out var tolMProp2) && tolMProp2.TryGetInt32(out var tolMVal2))
+                                        toleranceM = tolMVal2;
                                     measurements.Add(new {
                                         measurement,
                                         type,
                                         reference,
-                                        tolerance,
+                                        toleranceP,
+                                        toleranceM,
                                         description
                                     });
                                 }

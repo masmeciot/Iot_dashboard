@@ -5,7 +5,8 @@ namespace Iot_dashboard.Controllers.GM_API.Models
         public string Measurement { get; set; }
         public string Type { get; set; }
         public int Reference { get; set; }
-        public int Tolerance { get; set; }
+        public int ToleranceP { get; set; }
+        public int ToleranceM { get; set; }
 
         public string Description { get; set; }
     }

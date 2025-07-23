@@ -654,25 +654,33 @@
                 return;
             }
 
-            const m = currentSizeObj.measurements[idx];
-            const size = document.getElementById('sizeSelector').value;
-
-            // --- 1. Display measurement name with description popup ---
+            var m = currentSizeObj.measurements[idx];
             document.getElementById('measurementName').innerText = m.measurement || '-';
-            document.getElementById('measurementName').onclick = () =>
-                m.description && m.description.trim() && showDescriptionPopup(m.description.trim());
 
-            // --- 2. Measured value input (unchanged) ---
-            const measuredValueDiv = document.getElementById('measuredValue');
-            measuredValueDiv.innerHTML =
-                `<input id="measuredValueInput" type="number" readonly inputmode="none" class="form-control"
-                        style="width:120px;margin:0 auto;text-align:center;font-size:1.2em;" autocomplete="off" />`;
-            const input = document.getElementById('measuredValueInput');
+            // Add click handler to show description popup
+            var measurementNameDiv = document.getElementById('measurementName');
+            measurementNameDiv.onclick = function () {
+                if (m.description && m.description.trim() !== '') {
+                    showDescriptionPopup(m.description);
+                }
+            };
 
-            if (measuredValues[size]?.[m.measurement]) input.value = measuredValues[size][m.measurement];
-            input.oninput = e => {
-                const now = Date.now();
-                if (now - lastInputTime > 2000) input.value = e.target.value.slice(-1);
+            // Measured value input
+            var measuredValueDiv = document.getElementById('measuredValue');
+            measuredValueDiv.innerHTML = `<input id="measuredValueInput" type="number" readonly inputmode="none" class="form-control" style="width: 120px; margin: 0 auto; text-align: center; font-size: 1.2em;" autocomplete="off" />`;
+
+            var input = document.getElementById('measuredValueInput');
+            var size = document.getElementById('sizeSelector').value;
+
+            if (measuredValues[size] && measuredValues[size][m.measurement]) {
+                input.value = measuredValues[size][m.measurement];
+            }
+
+            input.oninput = function (e) {
+                var now = Date.now();
+                if (now - lastInputTime > 2000) {
+                    input.value = e.target.value.slice(-1);
+                }
                 lastInputTime = now;
 
                 if (!measuredValues[size]) measuredValues[size] = {};
@@ -681,31 +689,13 @@
                 updateGraphsForCurrentGarment();
             };
 
-            // --- 3. Reference & tolerance display ---
-            const ref  = Number(m.reference);
-            const tolP = Number(m.toleranceP ?? 0);
-            const tolM = Number(m.toleranceM ?? 0);
+            // Reference ± Tolerance
+            document.getElementById('reference').innerText = `${m.reference} ± ${m.tolerance}`;
+            // Status
+            updatePassFail(input.value, m);
 
-            let refText;
-            if (tolP === tolM) {
-                refText = `${ref} ± <span style="color:#e74c3c">${tolP}</span>`;
-            } else {
-                // Scenario 1 & 2: asymmetric or zero-tolerance
-                const left  = tolM === 0 ? '' : `<span style="color:#e74c3c">${ref - tolM}</span>`;
-                const right = tolP === 0 ? '' : `<span style="color:#e74c3c">${ref + tolP}</span>`;
-                const mid   = `<strong>${ref}</strong>`;
-
-                if (!left)  refText = `${mid} – ${right}`;
-                else if (!right) refText = `${left} – ${mid}`;
-                else refText = `${left} – ${mid} – ${right}`;
-            }
-            document.getElementById('reference').innerHTML = refText;
-
-            // --- 4. Status check with asymmetric tolerances ---
-            updatePassFail(input.value, m, ref, tolM, tolP);
-
-            // --- 5. Focus ---
-            setTimeout(() => input.focus(), 100);
+            // Focus input on show
+            setTimeout(() => { input.focus(); }, 100);
             updateGraphsForCurrentGarment();
         }
 
@@ -736,21 +726,19 @@
             }
         }
 
-        function updatePassFail(val, m, ref = null, tolM = null, tolP = null) {
-            const statusDiv = document.getElementById('passFailStatus');
+        function updatePassFail(val, m) {
+            var statusDiv = document.getElementById('passFailStatus');
+            var ref = Number(m.reference);
+            var tol = Number(m.tolerance);
+            var num = Number(val);
 
-            ref  = ref  ?? Number(m.reference);
-            tolM = tolM ?? Number(m.toleranceM ?? 0);
-            tolP = tolP ?? Number(m.toleranceP ?? 0);
-
-            const num = Number(val);
-            if (!val || isNaN(num)) {
+            if (!val) {
                 statusDiv.innerText = '-';
                 statusDiv.className = '';
                 return;
             }
 
-            if (num >= ref - tolM && num <= ref + tolP) {
+            if (num >= (ref - tol) && num <= (ref + tol)) {
                 statusDiv.innerText = 'PASS';
                 statusDiv.className = 'status-pass';
             } else {
@@ -910,24 +898,25 @@
             });
             // For each measurement, collect measured values for all garments
             var graphData = measurementNames.map(function (name) {
-                const m = currentSizeObj.measurements.find(x => x.measurement === name);
-                const ref   = Number(m.reference);
-                const tolP  = Number(m.toleranceP ?? 0);
-                const tolM  = Number(m.toleranceM ?? 0);
-
-                const measuredVals = allGarmentMeasurements
+                var ref = referenceMap[name].ref;
+                var tol = referenceMap[name].tol;
+                var measuredVals = allGarmentMeasurements
                     .filter(g => g.size === size)
-                    .map(g => g.measurements.find(x => x.Measurement === name)?.Value ?? null);
-
-                const currentVal = measuredValues[size]?.[name];
-                if (currentVal !== null && !isNaN(currentVal)) measuredVals.push(Number(currentVal));
-
+                    .map(g => {
+                        var m = g.measurements.find(x => x.Measurement === name);
+                        return m ? m.Value : null;
+                    });
+                // Add current in-progress value if not yet saved
+                var currentVal = measuredValues[size] && measuredValues[size][name] ? Number(measuredValues[size][name]) : null;
+                if (currentVal !== null && (measuredVals.length === 0 || measuredVals.length < allGarmentMeasurements.length + 1)) {
+                    measuredVals.push(currentVal);
+                }
                 return {
-                    name,
-                    measuredVals,
+                    name: name,
+                    measuredVals: measuredVals,
                     reference: ref,
-                    plusTol:  tolP,
-                    minusTol: tolM
+                    plusTol: ref + tol,
+                    minusTol: ref - tol
                 };
             });
             renderGraphs(graphData);
@@ -1085,7 +1074,7 @@
                                             },
                                             {
                                                 label: '+Tolerance',
-                                                data: m.measuredVals.map(() => m.reference + m.plusTol),
+                                                data: m.measuredVals.map(() => m.plusTol),
                                                 borderColor: '#28a745',
                                                 borderDash: [2, 2],
                                                 fill: false,
@@ -1093,7 +1082,7 @@
                                             },
                                             {
                                                 label: '-Tolerance',
-                                                data: m.measuredVals.map(() => m.reference - m.minusTol),
+                                                data: m.measuredVals.map(() => m.minusTol),
                                                 borderColor: '#dc3545',
                                                 borderDash: [2, 2],
                                                 fill: false,

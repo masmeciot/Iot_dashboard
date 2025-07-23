@@ -286,8 +286,8 @@ namespace Iot_dashboard.Controllers.GM_API
                                 {
                                     using (var cmd = new SqlCommand(
                                         @"INSERT INTO CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS
-                                      (style_id, [size], stylemeas_id, ref_value, tolerance_value)
-                                      VALUES (@styleId, @size, @styleMeasId, 0, 0)", connection, tran))
+                                      (style_id, [size], stylemeas_id, ref_value, tolerance_value_p,tolerance_value_m)
+                                      VALUES (@styleId, @size, @styleMeasId, 0, 0,0)", connection, tran))
                                     {
                                         cmd.Parameters.AddWithValue("@styleId", styleId);
                                         cmd.Parameters.AddWithValue("@size", size);
@@ -416,7 +416,8 @@ namespace Iot_dashboard.Controllers.GM_API
                                 var description = measObj.TryGetProperty("description", out var descElement) && descElement.ValueKind == JsonValueKind.String ? descElement.GetString() : null;
                                 var type = measObj.TryGetProperty("type", out var typeElement) && typeElement.ValueKind == JsonValueKind.String ? typeElement.GetString() : null;
                                 var reference = measObj.TryGetProperty("reference", out var refElement) && refElement.ValueKind == JsonValueKind.Number ? refElement.GetInt32() : 0;
-                                var tolerance = measObj.TryGetProperty("tolerance", out var tolElement) && tolElement.ValueKind == JsonValueKind.Number ? tolElement.GetInt32() : 0;
+                                var toleranceP = measObj.TryGetProperty("toleranceP", out var tolPElement) && tolPElement.ValueKind == JsonValueKind.Number ? tolPElement.GetInt32() : 0;
+                                var toleranceM = measObj.TryGetProperty("toleranceM", out var tolMElement) && tolMElement.ValueKind == JsonValueKind.Number ? tolMElement.GetInt32() : 0;
                                 var order = measObj.TryGetProperty("order", out var orderElement) && orderElement.ValueKind == JsonValueKind.Number ? orderElement.GetInt32() : (int?)null;
 
                                 // 3.1. Get or create measurement type, set description
@@ -501,10 +502,11 @@ namespace Iot_dashboard.Controllers.GM_API
                                 {
                                     // Update
                                     using (var updateCmd = new SqlCommand(
-                                        "UPDATE CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS SET ref_value = @ref, tolerance_value = @tol WHERE ref_id = @refId", connection, tran))
+                                        "UPDATE CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS SET ref_value = @ref, tolerance_value_p = @tolP, tolerance_value_m = @tolM WHERE ref_id = @refId", connection, tran))
                                     {
                                         updateCmd.Parameters.AddWithValue("@ref", reference);
-                                        updateCmd.Parameters.AddWithValue("@tol", tolerance);
+                                        updateCmd.Parameters.AddWithValue("@tolP", toleranceP);
+                                        updateCmd.Parameters.AddWithValue("@tolM", toleranceM);
                                         updateCmd.Parameters.AddWithValue("@refId", refId.Value);
                                         await updateCmd.ExecuteNonQueryAsync();
                                     }
@@ -513,13 +515,13 @@ namespace Iot_dashboard.Controllers.GM_API
                                 {
                                     // Insert
                                     using (var insertCmd = new SqlCommand(
-                                        "INSERT INTO CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS (style_id, [size], stylemeas_id, ref_value, tolerance_value) VALUES (@styleId, @size, @styleMeasId, @ref, @tol)", connection, tran))
+                                        "INSERT INTO CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS (style_id, [size], stylemeas_id, ref_value, tolerance_value_p) VALUES (@styleId, @size, @styleMeasId, @ref, @tolP, @tolM)", connection, tran))
                                     {
                                         insertCmd.Parameters.AddWithValue("@styleId", styleId);
                                         insertCmd.Parameters.AddWithValue("@size", size);
                                         insertCmd.Parameters.AddWithValue("@styleMeasId", styleMeasId);
-                                        insertCmd.Parameters.AddWithValue("@ref", reference);
-                                        insertCmd.Parameters.AddWithValue("@tol", tolerance);
+                                        insertCmd.Parameters.AddWithValue("@tolP", toleranceP);
+                                        insertCmd.Parameters.AddWithValue("@tolM", toleranceM);
                                         await insertCmd.ExecuteNonQueryAsync();
                                     }
                                 }
@@ -636,7 +638,7 @@ namespace Iot_dashboard.Controllers.GM_API
                 }
             }
         }
-        
+
         [HttpPost("removeStyle")]
         [Authorize]
         public async Task<IActionResult> RemoveStyle([FromBody] JsonElement body)
@@ -860,7 +862,8 @@ namespace Iot_dashboard.Controllers.GM_API
                     {
                         while (await reader.ReadAsync())
                         {
-                            types.Add(new {
+                            types.Add(new
+                            {
                                 name = reader.GetString(0),
                                 type = reader.IsDBNull(1) ? null : reader.GetString(1)
                             });

@@ -60,7 +60,8 @@ namespace Iot_dashboard.Controllers.GM_API
                         mt.[type] AS Type, 
                         mt.description AS Description,
                         r.ref_value AS Reference, 
-                        r.tolerance_value AS Tolerance
+                        r.tolerance_value_p AS ToleranceP,
+                        r.tolerance_value_m AS ToleranceM
                 FROM CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS r
                 JOIN CODE.hanger_sys.GM_STYLE_MEASUREMENRTS sm ON r.stylemeas_id = sm.stylemeas_id
                 JOIN CODE.hanger_sys.GM_MEASUREMENT_TYPES mt ON sm.measurement_id = mt.measurement_id
@@ -77,7 +78,8 @@ namespace Iot_dashboard.Controllers.GM_API
                     int idxType = reader.GetOrdinal("Type");
                     int idxDescription = reader.GetOrdinal("Description");
                     int idxReference = reader.GetOrdinal("Reference");
-                    int idxTolerance = reader.GetOrdinal("Tolerance");
+                    int idxToleranceP = reader.GetOrdinal("ToleranceP");
+                    int idxToleranceM = reader.GetOrdinal("ToleranceM");
 
                     string currentSize = null;
                     SizeMeasurements current = null;
@@ -89,8 +91,9 @@ namespace Iot_dashboard.Controllers.GM_API
                         var type = reader[idxType] == DBNull.Value ? "" : reader[idxType].ToString();
                         var description = reader[idxDescription] == DBNull.Value ? "" : reader[idxDescription].ToString();
                         var reference = reader[idxReference] == DBNull.Value ? 0 : Convert.ToInt32(reader[idxReference]);
-                        var tolerance = reader[idxTolerance] == DBNull.Value ? 0 : Convert.ToInt32(reader[idxTolerance]);
-                        System.Diagnostics.Debug.WriteLine($"Row: size='{size}', Measurement='{measurement}', Type='{type}', Description='{description}', Reference={reference}, Tolerance={tolerance}");
+                        var toleranceP = reader[idxToleranceP] == DBNull.Value ? 0 : Convert.ToInt32(reader[idxToleranceP]);
+                        var toleranceM = reader[idxToleranceM] == DBNull.Value ? 0 : Convert.ToInt32(reader[idxToleranceM]);
+                        System.Diagnostics.Debug.WriteLine($"Row: size='{size}', Measurement='{measurement}', Type='{type}', Description='{description}', Reference={reference}, ToleranceP={toleranceP},ToleranceM={toleranceM}");
                         if (current == null || current.Size != size)
                         {
                             if (current != null)
@@ -107,7 +110,8 @@ namespace Iot_dashboard.Controllers.GM_API
                             Type = type,
                             Description = description,
                             Reference = reference,
-                            Tolerance = tolerance
+                            ToleranceP = toleranceP,
+                            ToleranceM = toleranceM
                         });
                     }
                     if (current != null)
