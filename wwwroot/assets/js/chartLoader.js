@@ -344,17 +344,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Calculate linear regression trend for each station (per garment)
     function calculateTrend(offsets) {
       if (offsets.length < 2) return { slope: 0, trend: 'No trend' };
-      
+
       const n = offsets.length;
-      const xs = Array.from({length: n}, (_, i) => i); // Garment indices
+      const xs = Array.from({ length: n }, (_, i) => i); // Garment indices
       const sumX = xs.reduce((a, b) => a + b, 0);
       const sumY = offsets.reduce((a, b) => a + b, 0);
       const sumXY = xs.reduce((sum, x, i) => sum + x * offsets[i], 0);
       const sumX2 = xs.reduce((sum, x) => sum + x * x, 0);
-      
+
       const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
       const intercept = (sumY - slope * sumX) / n;
-      
+
       let trend;
       if (Math.abs(slope) < 0.01) {
         trend = 'Stable';
@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         trend = `↘ ${slope.toFixed(3)}/garment`;
       }
-      
+
       return { slope, trend };
     }
 
@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function () {
         label: 'Max Limit',
         data: entries.map(entry => ({
           x: new Date(entry.dateTime),
-          y: refValues.reference + refValues.tolerance
+          y: refValues.reference + refValues.toleranceP
         })),
         borderColor: 'rgb(0, 128, 0)',
         borderWidth: 1,
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
         label: 'Min Limit',
         data: entries.map(entry => ({
           x: new Date(entry.dateTime),
-          y: refValues.reference - refValues.tolerance
+          y: refValues.reference - refValues.toleranceM
         })),
         borderColor: 'rgb(0, 128, 0)',
         borderWidth: 1,
@@ -545,11 +545,11 @@ document.addEventListener('DOMContentLoaded', function () {
         data: [
           ...entries.map(entry => ({
             x: new Date(entry.dateTime),
-            y: refValues.reference - refValues.tolerance
+            y: refValues.reference - refValues.toleranceM
           })),
           ...entries.map(entry => ({
             x: new Date(entry.dateTime),
-            y: refValues.reference + refValues.tolerance
+            y: refValues.reference + refValues.toleranceP
           })).reverse()
         ],
         backgroundColor: 'rgba(0, 128, 0, 0.1)',
@@ -580,8 +580,8 @@ document.addEventListener('DOMContentLoaded', function () {
               display: true,
               text: 'Measurement Value (mm)'
             },
-            suggestedMin: refValues ? refValues.reference - refValues.tolerance * 2 : undefined,
-            suggestedMax: refValues ? refValues.reference + refValues.tolerance * 2 : undefined
+            suggestedMin: refValues.reference - refValues.toleranceM * 2,
+            suggestedMax: refValues.reference + refValues.toleranceP * 2
           }
         },
         plugins: {
@@ -605,18 +605,17 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function getReferenceValues(measurementName, size) {
-    // Find reference value for the specific size
     const sizeRef = referenceData.find(s => s.size === size);
     if (!sizeRef) return null;
 
-    const refMeasurement = sizeRef.measurements.find(m =>
-      m.measurement === measurementName
-    );
+    const refMeasurement = sizeRef.measurements.find(m => m.measurement === measurementName);
+    if (!refMeasurement) return null;
 
-    return refMeasurement ? {
+    return {
       reference: refMeasurement.reference,
-      tolerance: refMeasurement.tolerance
-    } : null;
+      toleranceP: refMeasurement.toleranceP ?? 0,
+      toleranceM: refMeasurement.toleranceM ?? 0
+    };
   }
 
   function handleExport() {
@@ -636,10 +635,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Create CSV header
     let csvContent = 'Garment ID,Station,EPF,Session,DateTime,Size,SOLI,Overall Status';
+    
 
     // Add measurement columns (3 columns per measurement: value, offset, status)
-    sortedMeasurementNames.forEach(measurementName => {
-      csvContent += `,${measurementName},${measurementName} Offset,${measurementName} Status`;
+    sortedMeasurementNames.forEach(name => {
+      // 1. Escape inner double-quotes by doubling them
+      const escapedName = name.replace(/"/g, '""');
+      // 2. Wrap the whole cell in double quotes
+      csvContent += `,"${escapedName}","${escapedName} Offset","${escapedName} Status","${escapedName} Tol(+)","${escapedName} Tol(-)"`;
     });
     csvContent += '\n';
 
@@ -678,19 +681,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Create CSV rows
     garmentGroups.forEach(garment => {
-      // Basic garment info
+      // basic garment info
       csvContent += `"${garment.garmentId}","${garment.station}","${garment.epf}","${garment.session}","${garment.dateTime}","${garment.size}","${garment.soli}","${garment.overallStatus}"`;
-
-      // Add measurement data for each measurement type
-      sortedMeasurementNames.forEach(measurementName => {
-        const measurement = garment.measurements.get(measurementName);
-        if (measurement) {
-          csvContent += `,"${measurement.value}","${measurement.offset}","${measurement.result}"`;
-        } else {
-          csvContent += `,"","",""`; // Empty values if measurement not found
-        }
+    
+      sortedMeasurementNames.forEach(name => {
+        const m = garment.measurements.get(name);
+        const ref = getReferenceValues(name, garment.size);   // <-- reuse helper
+    
+        csvContent += m
+          ? `,"${m.value}","${m.offset}","${m.result}","${ref?.toleranceP ?? ''}","${ref?.toleranceM ?? ''}"`
+          : `,"","","","",""`;   // empty placeholders
       });
-
+    
       csvContent += '\n';
     });
 
