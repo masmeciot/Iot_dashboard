@@ -5,6 +5,17 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
+
+
+
+
+
+
+
+
+
+
+
 namespace Iot_dashboard.Controllers.Iot
 {
     /// <summary>
@@ -22,12 +33,12 @@ namespace Iot_dashboard.Controllers.Iot
         /// Constructor that initializes database contexts and logger
         /// </summary>
         /// <param name="dbContext">Database context for IoT output data</param>
-        /// <param name="dbContext1">Database context for tack time data</param>
+        /// <param name="dbContext1">Database context for tack time data</param>Controllers/Iot/iotout.cs
         /// <param name="dbContext2">Database context for user SMV data</param>
         /// <param name="dbContext3">Database context for IoT test data</param>
         /// <param name="logger">Logger instance for tracking operations</param>
         public iotout(AppDbContext37 dbContext, AppDbContext38 dbContext1, AppDbContext39 dbContext2, AppDbContext47 dbContext3, ILogger<iotout> logger)
-        {   
+        {
             _dbContext = dbContext;
             _dbContext1 = dbContext1;
             _dbContext2 = dbContext2;

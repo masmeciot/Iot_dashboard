@@ -78,6 +78,8 @@
         </ul>
     </div>
 
+
+
     <div class="content-wrapper">
         <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
@@ -95,7 +97,7 @@
                                                     <th>Style</th>
                                                     <th>Operation</th>
                                                     <th>Machine</th>
-                                                    <th>User</th>
+                                                    <th>User</th>   
                                                     <th>Target count</th>
                                                     <th>1</th>
                                                     <th>2</th>
@@ -147,7 +149,9 @@
                         username: username,
                         style: style,
                         mac: mac,
-                    };
+                    }; 
+
+
 
                     $.ajax({
                         url: '/iotout/DeleteIotData',
@@ -250,7 +254,7 @@
                 return '<span class="' + color + '">' + value + '</span>';
             }
 
-            fetchData();
+            fetchData(); 
             setInterval(fetchData, 180000);
         });
 
