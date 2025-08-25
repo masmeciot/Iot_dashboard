@@ -1,0 +1,212 @@
+@{
+    ViewBag.Title = "User Management";
+    var prvlgtyp = ViewBag.prvlgtyp ?? 0;
+    var plant = ViewBag.plant ?? "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>User Management</title>
+    <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="shortcut icon" href="/assets/images/logo3.png"/>
+    <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="/assets/vendors2/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsencrypt@3.3.2/bin/jsencrypt.min.js"></script>
+    <style>
+        .container-fluid.page-body-wrapper,
+        .main-panel,
+        .content-wrapper {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            width: 100vw;
+            max-width: 100vw;
+        }
+        body, html { overflow-x: hidden; }
+        .table th, .table td { vertical-align: middle; }
+    </style>
+</head>
+<body>
+<div class="container-scroller">
+    <div class="container-fluid page-body-wrapper">
+        <a href="/GM" class="btn btn-outline-primary"
+           style="position: absolute; top: 15px; left: 18px; z-index: 1050; font-weight: bold; border-radius: 50px; padding: 10px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: none; border-width: 2px;">
+            <i class="mdi mdi-arrow-left"></i> Back
+        </a>
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h3 class="text-center">User List</h3>
+                        <button class="btn btn-success mb-3" id="showAddUserModal" style="float:right;">Add User</button>
+                        <table class="table table-bordered" id="userTable">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Plant</th>
+                                    <th>Privilege</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Add User Modal -->
+                <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form id="addUserForm" autocomplete="off">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" class="form-control" id="add-username" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" class="form-control" id="add-password" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" class="form-control" id="add-confirm-password" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Privilege Type</label>
+                                <input type="number" class="form-control" id="add-prvlgtyp" required min="0" max="@prvlgtyp" value="0" />
+                            </div>
+                            <div class="form-group">
+                                <label>Station</label>
+                                <input type="text" class="form-control" id="add-station" value="WebUser" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Plant</label>
+                                <input type="text" class="form-control" id="add-plant" required />
+                            </div>
+                            <div id="addUserMsg" class="mt-2"></div>
+                            <button type="submit" class="btn btn-info btn-block">Add User</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer class="footer mt-4">
+                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">© MAS KREEDA - FOF | 2025</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ensure Bootstrap JS is loaded for modal functionality -->
+<script src="/assets/vendors2/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const currentPrvlgtyp = @prvlgtyp;
+    const currentPlant = '@plant';
+    $(document).ready(function () {
+        // Plant field logic
+        if (currentPrvlgtyp < 5) {
+            $('#add-plant').val(currentPlant).prop('readonly', true);
+        }
+        // Show modal on button click
+        $('#showAddUserModal').on('click', function() {
+            $('#addUserForm')[0].reset();
+            $('#addUserMsg').text('');
+            if (currentPrvlgtyp < 5) $('#add-plant').val(currentPlant);
+            // Set min/max for privilege input
+            $('#add-prvlgtyp').attr('min', 0).attr('max', currentPrvlgtyp).val(0);
+            $('#addUserModal').modal('show');
+        });
+        // Fetch and populate user list
+        function loadUsers() {
+            $.get('/GM/GetUsers', function (data) {
+                let users = data.users || [];
+                let rows = '';
+                users.forEach(function (user) {
+                    rows += `<tr>
+                        <td>${user.username}</td>
+                        <td>${user.plant}</td>
+                        <td>${user.prvlgtyp}</td>
+                        <td>`;
+                    if (parseInt(currentPrvlgtyp) >= parseInt(user.prvlgtyp)) {
+                        rows += `<button class='btn btn-danger btn-sm delete-user' data-username='${user.username}'>Delete</button>`;
+                    }
+                    rows += `</td></tr>`;
+                });
+                $('#userTable tbody').html(rows);
+            });
+        }
+        loadUsers();
+        // Delete user
+        $('#userTable').on('click', '.delete-user', function () {
+            const username = $(this).data('username');
+            if (!confirm('Are you sure you want to delete user ' + username + '?')) return;
+            $.ajax({
+                url: '/GM/DeleteUser',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ username }),
+                success: function (res) {
+                    loadUsers();
+                },
+                error: function () {
+                    alert('Failed to delete user.');
+                }
+            });
+        });
+        // Add user
+        $('#addUserForm').on('submit', async function (e) {
+            e.preventDefault();
+            const username = $('#add-username').val().trim();
+            const password = $('#add-password').val();
+            const confirmPassword = $('#add-confirm-password').val();
+            const prvlgtyp = $('#add-prvlgtyp').val();
+            const plant = $('#add-plant').val();
+            const station = $('#add-station').val();
+            if (!username || !password || !confirmPassword || !prvlgtyp || !plant || !station) {
+                $('#addUserMsg').text('All fields are required.').css('color', 'red');
+                return;
+            }
+            if (password !== confirmPassword) {
+                $('#addUserMsg').text('Passwords do not match.').css('color', 'red');
+                return;
+            }
+            // Send add user request (encryption handled server-side)
+            $.ajax({
+                url: '/GM/AddUser',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    username,
+                    password,
+                    prvlgtyp,
+                    plant,
+                    station
+                }),
+                success: function (res) {
+                    $('#addUserMsg').text('User added successfully!').css('color', 'green');
+                    loadUsers();
+                    setTimeout(() => { $('#addUserModal').modal('hide'); }, 1000);
+                },
+                error: function () {
+                    $('#addUserMsg').text('Failed to add user.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

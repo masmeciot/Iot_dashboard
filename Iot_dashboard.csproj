@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,13 +13,15 @@
     <Content Remove="Views\synergy\synout.cshtml" />
   </ItemGroup>
 
-	<ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="9.0.0" />
     <PackageReference Include="Microsoft.Azure.Devices" Version="1.40.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
@@ -32,10 +35,26 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\iotmainmenu.cshtml" />
+    <None Include="Views\ESL\ESLMenu.cshtml" />
+    <None Include="Views\GM\GMLogin.cshtml" />
+    <None Include="Views\GM\GMIndex.cshtml" />
+    <None Include="Views\GM\GMDashboard.cshtml" />
+    <None Include="Views\GM\GMReport.cshtml" />
+    <None Include="Views\GM\GMStyles.cshtml" />
+    <None Include="Views\GM\GMUsers.cshtml" />
+    <None Include="Views\GM\GMUpload.cshtml" />
     <None Include="Views\Home\outanalyze.cshtml" />
     <None Include="Views\SynBest.cshtml" />
     <None Include="Views\synergy\synbest.cshtml" />
     <None Include="Views\synout.cshtml" />
+    <None Include="wwwroot\assets\vendors2\bootstrap\.github\CONTRIBUTING.md" />
+    <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\bug.md" />
+    <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\bug_report.md" />
+    <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\feature.md" />
+    <None Include="wwwroot\assets\vendors2\bootstrap\.github\ISSUE_TEMPLATE\feature_request.md" />
+    <None Include="wwwroot\assets\vendors2\bootstrap\.github\SUPPORT.md" />
+    <None Include="wwwroot\assets\vendors2\jquery-validation-unobtrusive\.vsts-pipelines\builds\ci-public.yml" />
   </ItemGroup>
 
   <ItemGroup>

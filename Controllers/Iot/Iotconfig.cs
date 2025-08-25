@@ -44,7 +44,6 @@ namespace Iot_dashboard.Controllers.Iot
 
 
         }
-
         [HttpGet]
         public IActionResult SearchBy(string snm, string mac)
         {

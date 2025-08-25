@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="~/css/style.css" />
     <link rel="stylesheet" href="~/css/green.css" />
   
-    <link rel="shortcut icon" href="~/icon.png" />
+    <link rel="shortcut icon" href="/assets/images/logo3.png"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -78,6 +78,8 @@
         </ul>
     </div>
 
+
+
     <div class="content-wrapper">
         <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
@@ -95,7 +97,7 @@
                                                     <th>Style</th>
                                                     <th>Operation</th>
                                                     <th>Machine</th>
-                                                    <th>User</th>
+                                                    <th>User</th>   
                                                     <th>Target count</th>
                                                     <th>1</th>
                                                     <th>2</th>
@@ -147,7 +149,9 @@
                         username: username,
                         style: style,
                         mac: mac,
-                    };
+                    }; 
+
+
 
                     $.ajax({
                         url: '/iotout/DeleteIotData',
@@ -250,7 +254,7 @@
                 return '<span class="' + color + '">' + value + '</span>';
             }
 
-            fetchData();
+            fetchData(); 
             setInterval(fetchData, 180000);
         });
 

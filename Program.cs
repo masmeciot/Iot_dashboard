@@ -9,10 +9,13 @@ using Microsoft.Extensions.Configuration;
 using Iot_dashboard.Hubs;
 using static Iot_dashboard.Controllers.andon.andonController;
 
+
+
 using static Iot_dashboard.Controllers.AMR.confirmController;
 using static Iot_dashboard.Controllers.AMR.L1Controller;
 using static Iot_dashboard.Controllers.AMR.L2Controller;
 using static Iot_dashboard.Controllers.AMR.L3Controller;
+using static Iot_dashboard.Controllers.AMR.AMRMenuController;
 using Iot_dashboard.Models.AMR;
 using static Iot_dashboard.Controllers.AMR.amr_dashController;
 using static Iot_dashboard.Controllers.AMR.AMR_FG.FG1Controller;
@@ -28,6 +31,11 @@ using static Iot_dashboard.Controllers.Iot.Iotconfig;
 using static Iot_dashboard.Controllers.Iot.IoTbestController;
 using static Iot_dashboard.Controllers.Iot.iotout;
 using static Iot_dashboard.Controllers.Iot.IoTzone;
+
+
+
+
+
 
 using static Iot_dashboard.Controllers.Iot.iotpast;
 using static Iot_dashboard.Controllers.Iot.iotoutfl;
@@ -52,6 +60,11 @@ using static Iot_dashboard.Controllers.Synergy.bestsewf;
 using static Iot_dashboard.Controllers.hanger.AQL;
 using static Iot_dashboard.Controllers.hanger.input;
 using static Iot_dashboard.Controllers.Synergy.manualOutput;
+using Iot_dashboard.Controllers.Iot;
+
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Iot_dashboard.Controllers.GM_API.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -149,8 +162,6 @@ builder.Services.AddDbContext<AppDbContext20>(options =>
    options.UseSqlServer(andonre));
 
 
-
-
 var FG = builder.Configuration.GetConnectionString("DefaultConnection4");
 builder.Services.AddDbContext<AppDbContext21>(options =>
     options.UseSqlServer(FG));
@@ -241,6 +252,14 @@ builder.Services.AddDbContext<AppDbContext37>(options =>
 var tout = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext38>(options =>
    options.UseSqlServer(tout));
+   
+var utilization = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext1000>(options =>
+   options.UseSqlServer(utilization));
+
+var machineInputs = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext1000>(options =>
+   options.UseSqlServer(machineInputs));
 
 var usmv = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext39>(options =>
@@ -451,9 +470,54 @@ builder.Services.AddCors(options =>
         builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(1);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Add SignalR
 builder.Services.AddSignalR();
+
+// Add memory cache, authentication, and authorization for GM_API endpoints
+builder.Services.AddMemoryCache();
+
+// Add OpenAPI/Swagger if not already present
+#if DEBUG
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "IoT Dashboard API", Version = "v1" });
+});
+#endif
+
+// Add JWT authentication for GM_API endpoints
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+#if DEBUG
+// Enable Swagger UI for development
+app.UseSwagger();
+app.UseSwaggerUI();
+#endif
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -468,7 +532,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseCors("AllowAll");
+
+// Add authentication and custom middleware for GM_API endpoints
+app.UseAuthentication();
+app.UseMiddleware<JwtRevocationMiddleware>();
 app.UseAuthorization();
+app.UseSession();
 app.UseStaticFiles();
 
 app.UseEndpoints(endpoints =>
@@ -476,17 +545,21 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 
     endpoints.MapControllerRoute(
-    name: "iotmenu",
-    pattern: "{controller=iotmenu}/{action=Index}/{id?}");
+        name: "default",
+        pattern: "{controller=IndexM}/{action=Index}/{id?}");
 
     endpoints.MapControllerRoute(
- name: "synout",
- pattern: "{controller=synout}/{action=Index}/{id?}");
+        name: "iotmenu",
+        pattern: "{controller=iotmenu}/{action=Index}/{id?}");
+
+    endpoints.MapControllerRoute(
+        name: "synout",
+        pattern: "{controller=synout}/{action=Index}/{id?}");
 
     endpoints.MapControllerRoute(
         name: "fallback",
         pattern: "{*url}",
-        defaults: new { controller = "iotmenu", action = "Index" });
+        defaults: new { controller = "IndexM", action = "Index" });
 
     endpoints.MapHub<HistoryHub>("/HistoryHub");
     endpoints.MapHub<DashboardHub>("/dashboardHub");
@@ -499,4 +572,21 @@ app.UseEndpoints(endpoints =>
 
     
 });
+
+// Ensure RSA keypair is generated and cached at startup for GM_API endpoints
+using (var scope = app.Services.CreateScope())
+{
+    var provider = scope.ServiceProvider;
+    var config = provider.GetRequiredService<IConfiguration>();
+    var cache = provider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+    if (!cache.TryGetValue("PrivateKeyPem", out object _))
+    {
+        var client = new System.Net.Http.HttpClient();
+        var url = config["PublicKeyEndpointUrl"] ?? "http://localhost:5000/api/gm/publicKey";
+        try { var _ = client.GetStringAsync(url).Result; } catch { }
+    }
+}
+
+// Optionally listen on 0.0.0.0:5003 for legacy support
+// app.Urls.Add("http://0.0.0.0:5003");
 app.Run();
