@@ -32,6 +32,11 @@ using static Iot_dashboard.Controllers.Iot.IoTbestController;
 using static Iot_dashboard.Controllers.Iot.iotout;
 using static Iot_dashboard.Controllers.Iot.IoTzone;
 
+
+
+
+
+
 using static Iot_dashboard.Controllers.Iot.iotpast;
 using static Iot_dashboard.Controllers.Iot.iotoutfl;
 using static IotDeviceController;
@@ -55,6 +60,7 @@ using static Iot_dashboard.Controllers.Synergy.bestsewf;
 using static Iot_dashboard.Controllers.hanger.AQL;
 using static Iot_dashboard.Controllers.hanger.input;
 using static Iot_dashboard.Controllers.Synergy.manualOutput;
+using Iot_dashboard.Controllers.Iot;
 
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -156,8 +162,6 @@ builder.Services.AddDbContext<AppDbContext20>(options =>
    options.UseSqlServer(andonre));
 
 
-
-
 var FG = builder.Configuration.GetConnectionString("DefaultConnection4");
 builder.Services.AddDbContext<AppDbContext21>(options =>
     options.UseSqlServer(FG));
@@ -248,6 +252,14 @@ builder.Services.AddDbContext<AppDbContext37>(options =>
 var tout = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext38>(options =>
    options.UseSqlServer(tout));
+   
+var utilization = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext1000>(options =>
+   options.UseSqlServer(utilization));
+
+var machineInputs = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext1000>(options =>
+   options.UseSqlServer(machineInputs));
 
 var usmv = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext39>(options =>

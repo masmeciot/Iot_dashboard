@@ -2,7 +2,7 @@
 
 namespace Iot_dashboard.Controllers.Iot
 {
-    public class iotmenu : Controller
+    public class iotmenuController : Controller
     {
         public IActionResult Index()
         {
