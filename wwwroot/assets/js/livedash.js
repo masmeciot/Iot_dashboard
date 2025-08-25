@@ -177,5 +177,5 @@ document.addEventListener('DOMContentLoaded', function () {
   loadCharts();
 
   // Refresh charts every 10 seconds
-  setInterval(loadCharts, 10000);
+  setInterval(loadCharts, 300000);
 });

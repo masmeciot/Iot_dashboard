@@ -736,21 +736,24 @@
             }
         }
 
+        function isPass(val, m) {
+            const ref  = Number(m.reference);
+            const tolP = Number(m.toleranceP ?? m.tolerance ?? 0);   // fall back if P missing
+            const tolM = Number(m.toleranceM ?? m.tolerance ?? 0);   // fall back if M missing
+            return val >= ref - tolM && val <= ref + tolP;
+        }
+
         function updatePassFail(val, m, ref = null, tolM = null, tolP = null) {
             const statusDiv = document.getElementById('passFailStatus');
-
-            ref  = ref  ?? Number(m.reference);
-            tolM = tolM ?? Number(m.toleranceM ?? 0);
-            tolP = tolP ?? Number(m.toleranceP ?? 0);
-
             const num = Number(val);
+
             if (!val || isNaN(num)) {
                 statusDiv.innerText = '-';
                 statusDiv.className = '';
                 return;
             }
 
-            if (num >= ref - tolM && num <= ref + tolP) {
+            if (isPass(num, m)) {
                 statusDiv.innerText = 'PASS';
                 statusDiv.className = 'status-pass';
             } else {
@@ -787,21 +790,19 @@
         }
 
         function checkOverallStatusAndPrompt() {
-            var size = document.getElementById('sizeSelector').value;
-            var measurements = (currentSizeObj && currentSizeObj.measurements) ? currentSizeObj.measurements : [];
-            var allPass = true;
-            var measurementResults = [];
-            measurements.forEach(function (m) {
-                var val = measuredValues[size] && measuredValues[size][m.measurement] ? Number(measuredValues[size][m.measurement]) : null;
-                var offset = val !== null ? val - Number(m.reference) : null;
-                var mStatus = (val !== null && val >= (m.reference - m.tolerance) && val <= (m.reference + m.tolerance)) ? 'Pass' : 'Fail';
+            const size = document.getElementById('sizeSelector').value;
+            const measurements = currentSizeObj?.measurements || [];
+            let allPass = true;
+            const measurementResults = measurements.map(m => {
+                const val = Number(measuredValues[size]?.[m.measurement]);
+                const mStatus = isPass(val, m) ? 'Pass' : 'Fail';
                 if (mStatus === 'Fail') allPass = false;
-                measurementResults.push({
+                return {
                     Measurement: m.measurement,
                     Value: val,
-                    Offset: offset,
-                    mStatus: mStatus
-                });
+                    Offset: val - Number(m.reference),
+                    mStatus
+                };
             });
             var status = allPass ? 'Pass' : 'Fail';
             if (!allPass) {

@@ -515,15 +515,18 @@ namespace Iot_dashboard.Controllers.GM_API
                                 {
                                     // Insert
                                     using (var insertCmd = new SqlCommand(
-                                        "INSERT INTO CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS (style_id, [size], stylemeas_id, ref_value, tolerance_value_p) VALUES (@styleId, @size, @styleMeasId, @ref, @tolP, @tolM)", connection, tran))
+                                        "INSERT INTO CODE.hanger_sys.GM_REFERENCE_MEASUREMENTS (style_id, [size], stylemeas_id, ref_value, tolerance_value_p, tolerance_value_m) VALUES (@styleId, @size, @styleMeasId, @ref, @tolP, @tolM)", connection, tran))
                                     {
                                         insertCmd.Parameters.AddWithValue("@styleId", styleId);
                                         insertCmd.Parameters.AddWithValue("@size", size);
                                         insertCmd.Parameters.AddWithValue("@styleMeasId", styleMeasId);
+                                        insertCmd.Parameters.AddWithValue("@ref", reference);
                                         insertCmd.Parameters.AddWithValue("@tolP", toleranceP);
                                         insertCmd.Parameters.AddWithValue("@tolM", toleranceM);
                                         await insertCmd.ExecuteNonQueryAsync();
                                     }
+
+                                    
                                 }
                             }
                         }
