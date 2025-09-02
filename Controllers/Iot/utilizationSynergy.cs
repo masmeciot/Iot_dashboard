@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Iot_dashboard.Controllers.Iot
 {
-    public class utilization : Controller
+    public class UtilizationSynergy : Controller
     {
         private readonly AppDbContext1000 _dbContext;
-        private readonly ILogger<utilization> _utilizationLogger;
+        private readonly ILogger<UtilizationSynergy> _utilizationLogger;
 
-        public utilization(AppDbContext1000 dbContext, ILogger<utilization> utilizationLogger)
+        public UtilizationSynergy(AppDbContext1000 dbContext, ILogger<UtilizationSynergy> utilizationLogger)
         {
             _dbContext = dbContext;
             _utilizationLogger = utilizationLogger;
@@ -20,7 +20,7 @@ namespace Iot_dashboard.Controllers.Iot
 
         public IActionResult Index()
         {
-            return View("~/Views/utilization.cshtml");
+            return View("~/Views/utilizationSynergy.cshtml");
         }
 
         [HttpGet]
@@ -28,14 +28,13 @@ namespace Iot_dashboard.Controllers.Iot
         {
             try
             {
-                dynamic result = "";
+                var result = Enumerable.Empty<object>();
 
                 if (date.HasValue)
                 {
-                    Console.WriteLine("======\n the date is : " + date.Value.Date);
-
                     result = await _dbContext.KreedaIOTTestNew
-                        .Where(x => x.Date == date.Value.Date && x.Plant == "MEC") // ✅ Filter for MEC
+                        .Where(x => x.Date == date.Value.Date && x.Plant == "SYNERGY") // ✅ Filter for SYNERGY
+                        // .Where(x => x.Date == date.Value.Date)
                         .GroupBy(x => new { x.ChipID, x.UserName, x.Plant, x.Operation, x.MachineID, x.Shift })
                         .Select(g => new
                         {
@@ -50,15 +49,11 @@ namespace Iot_dashboard.Controllers.Iot
                         .OrderByDescending(x => x.UserName)
                         .Take(100)
                         .ToListAsync();
-
-                    Console.WriteLine("======\n the result is : " + result);
                 }
                 else
                 {
-                    Console.WriteLine("======\n the date is null");
-
                     result = await _dbContext.KreedaIOTTestNew
-                        .Where(x => x.Plant == "MEC") // ✅ Filter for MEC
+                        .Where(x => x.Plant == "SYNERGY") //✅ Filter for SYNERGY
                         .OrderByDescending(x => x.Date)
                         .Take(100)
                         .ToListAsync();
@@ -74,11 +69,11 @@ namespace Iot_dashboard.Controllers.Iot
         }
     }
 
-    public class AppDbContext1000 : DbContext
+    public class AppDbContext1001 : DbContext
     {
         public DbSet<KreedaIOTTestNew> KreedaIOTTestNew { get; set; }
 
-        public AppDbContext1000(DbContextOptions<AppDbContext1000> options) : base(options)
+        public AppDbContext1001(DbContextOptions<AppDbContext1001> options) : base(options)
         {
         }
 

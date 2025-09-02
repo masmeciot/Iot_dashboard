@@ -257,6 +257,10 @@ var utilization = builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddDbContext<AppDbContext1000>(options =>
    options.UseSqlServer(utilization));
 
+var utilizationSynergy = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext10001>(options =>
+   options.UseSqlServer(utilizationSynergy));
+
 var machineInputs = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext1000>(options =>
    options.UseSqlServer(machineInputs));

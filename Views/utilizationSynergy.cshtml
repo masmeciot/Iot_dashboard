@@ -162,7 +162,7 @@
             $(document).ready(function () {
 
                 function fetchData(selectedDate = null) {
-                    let url = '/utilization/GetUtilizeIotData';
+                    let url = '/utilizationSynergy/GetUtilizeIotData';
                     if (selectedDate) {
                         url += `?date=${selectedDate}`;
                     }
@@ -229,8 +229,6 @@
                 });
             });
     </script>
-
-
     <!-- content-wrapper ends -->
     <!-- partial:partials/_footer.html -->
     <footer class="footer">
