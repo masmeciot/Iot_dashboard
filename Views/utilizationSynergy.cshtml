@@ -117,7 +117,8 @@
                                                     <th>Operation</th>
                                                     <th>MachineID</th>
                                                     <th>Shift</th>
-                                                    <th>Total Runtime</th>
+                                                    <th>Target Qty (80% SMV)</th>
+                                                    <th>Actual Qty</th>
                                                     <th>Machine Utilization</th>
                                                 </tr>
                                             </thead>
@@ -135,28 +136,75 @@
     </div>
 
     <script>
-            function calculateShiftHours(shiftStr) {
-                if (!shiftStr || !shiftStr.includes('-')) return 1;
+        function calculateShiftHours(shiftStr, selectedDate) {
+            console.log(selectedDate);
+            if (!shiftStr || !shiftStr.includes('-')) return 1;
 
-                const [startStr, endStr] = shiftStr.split('-').map(s => s.trim());
-                const [startH, startM] = startStr.split(':').map(Number);
-                const [endH, endM] = endStr.split(':').map(Number);
+            const [startStr, endStr] = shiftStr.split('-').map(s => s.trim());
+            const [startH, startM] = startStr.split(':').map(Number);
+            const [endH, endM] = endStr.split(':').map(Number);
 
-                const now = new Date();
-                const start = new Date(now);
-                start.setHours(startH, startM, 0, 0);
+            // Get current time in +5:30 timezone (IST) only if not already in IST
+            const nowUtc = new Date();
+            const istOffsetMinutes = 330; // 5*60 + 30
+            const localOffsetMinutes = nowUtc.getTimezoneOffset() * -1; // JS returns offset in minutes, but negative for IST
 
-                const end = new Date(now);
-                end.setHours(endH, endM, 0, 0);
+            let now;
+            if (localOffsetMinutes !== istOffsetMinutes) {
+                // Not IST, so add offset
+                const istOffsetMs = istOffsetMinutes * 60 * 1000;
+                now = new Date(nowUtc.getTime() + istOffsetMs - (nowUtc.getTimezoneOffset() * 60 * 1000));
+            } else {
+                // Already IST, use local time
+                now = nowUtc;
+            }
 
-                // Handle overnight shifts (e.g., 22:00 - 06:00)
-                if (end <= start) {
-                    end.setDate(end.getDate() + 1);
-                }
+            const selected = selectedDate ? new Date(selectedDate) : now;
 
+            const start = new Date(selected);
+            start.setHours(startH, startM, 0, 0);
+
+            const end = new Date(selected);
+            end.setHours(endH, endM, 0, 0);
+
+            // Handle overnight shifts (e.g., 22:00 - 06:00)
+            if (end <= start) {
+                end.setDate(end.getDate() + 1);
+            }
+
+            // If selected date is in the past, consider the whole shift duration
+            const todayStr = now.toISOString().split('T')[0];
+            const selectedStr = selected.toISOString().split('T')[0];
+            if (selectedStr < todayStr) {
+                console.log("Old date");
+                //console.log(selectedStr);
+                //console.log(todayStr);
                 const durationMs = end - start;
                 return durationMs / (1000 * 60 * 60); // Convert ms to hours
             }
+
+            // If shift is already over, consider the whole duration
+            if (now >= end) {
+                console.log("Shift over");
+                //console.log(now);
+                //console.log(end);
+                const durationMs = end - start;
+                return durationMs / (1000 * 60 * 60); // Convert ms to hours
+            }
+
+            // If shift has started but not ended, consider duration from start to now
+            if (now >= start && now < end) {
+                console.log("Current shift");
+                //console.log(start);
+                //console.log(now);
+                //console.log(end);
+                const durationMs = now - start;
+                return durationMs / (1000 * 60 * 60); // Convert ms to hours
+            }
+
+            // If shift hasn't started yet, return 0
+            return 0;
+        }
 
 
             $(document).ready(function () {
@@ -179,14 +227,16 @@
                                 return;
                             }
                             var totalRuntimeHours = 0;
-                            data.forEach(item => {
-
-                            const totalRuntimeMs = item.totalRuntimeSum || 0;
-                            totalRuntimeHours = totalRuntimeMs / (1000 * 60 * 60);
                             
-                            const shiftHours = calculateShiftHours(item.shift) || 1;
+                            data.forEach(item => {
+                                const shiftHours = calculateShiftHours(item.shift, selectedDate) || 1;
+                                const targetQty = (shiftHours * 60 * 60 * 0.8) / item.sew || 0;
+                                contotalRuntimeHours = item.totalRuntimeSum / (1000 * 60 * 60);  
+                                console.log("Sewing SMV: ", item.sew);
+                                console.log("TargetQty (80%)", targetQty);
+                                console.log("Actual Qty", item.totalQty);
 
-                            const utilization = ((totalRuntimeHours / shiftHours) * 100).toFixed(2);
+                                const utilization = ((item.totalQty / targetQty) * 100).toFixed(2);
                             console.log(`Utilization: ${utilization}% | TotalRuntimeHours: ${totalRuntimeHours} | ShiftHours: ${shiftHours}`);
 
                             const row = `
@@ -197,8 +247,9 @@
                                     <td>${item.operation}</td>
                                     <td>${item.machineID}</td>
                                     <td>${item.shift}</td>
-                                    <td>${totalRuntimeHours.toFixed(2)}</td>
-                                    <td>${utilization}</td>
+                                    <td>${targetQty.toFixed(0)}</td>
+                                    <td>${item.totalQty}</td>
+                                    <td>${utilization}%</td>
                                 </tr>
                             `;
 
@@ -210,6 +261,7 @@
                             $('#table tbody').html('<tr><td colspan="24">Error loading data</td></tr>');
                         }
                     });
+
                 }
 
                 // Initial load

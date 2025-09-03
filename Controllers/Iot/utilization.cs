@@ -28,43 +28,63 @@ namespace Iot_dashboard.Controllers.Iot
         {
             try
             {
-                dynamic result = "";
+                var query = _dbContext.KreedaIOTTestNew
+                    .Where(x => x.Plant == "MEC");
 
                 if (date.HasValue)
                 {
-                    Console.WriteLine("======\n the date is : " + date.Value.Date);
-
-                    result = await _dbContext.KreedaIOTTestNew
-                        .Where(x => x.Date == date.Value.Date && x.Plant == "MEC") // ✅ Filter for MEC
-                        .GroupBy(x => new { x.ChipID, x.UserName, x.Plant, x.Operation, x.MachineID, x.Shift })
-                        .Select(g => new
-                        {
-                            ChipID = g.Key.ChipID,
-                            UserName = g.Key.UserName,
-                            Plant = g.Key.Plant,
-                            Operation = g.Key.Operation,
-                            MachineID = g.Key.MachineID,
-                            Shift = g.Key.Shift,
-                            TotalRuntimeSum = g.Sum(x => x.DeltaTime)
-                        })
-                        .OrderByDescending(x => x.UserName)
-                        .Take(100)
-                        .ToListAsync();
-
-                    Console.WriteLine("======\n the result is : " + result);
+                    query = query.Where(x => x.Date == date.Value.Date);
                 }
-                else
+
+                var groupedResults = await query
+                    .GroupBy(x => new { x.ChipID, x.UserName, x.Plant, x.Operation, x.MachineID, x.Shift, x.Qty })
+                    .Select(g => new
+                    {
+                        ChipID = g.Key.ChipID,
+                        UserName = g.Key.UserName,
+                        Plant = g.Key.Plant,
+                        Operation = g.Key.Operation,
+                        MachineID = g.Key.MachineID,
+                        Shift = g.Key.Shift,
+                        TotalRuntimeSum = g.Sum(x => x.TotalRuntime),
+                        TotalQty = g.Sum(x => x.Qty)
+                    })
+                    .OrderByDescending(x => x.UserName)
+                    .Take(100)
+                    .ToListAsync();
+
+                // Get all unique operations from the results
+                var operations = groupedResults.Select(x => x.Operation).Distinct().ToList();
+
+                // Query KreedIot_UserSMV for hand and sew values using ToListAsync and then create a lookup manually
+                var smvList = await _dbContext.Set<KreedIot_UserSMV>()
+                    .Where(s => operations.Contains(s.Operation))
+                    .ToListAsync();
+
+                // Create a lookup from the list
+                var smvLookup = smvList.ToLookup(s => s.Operation ?? string.Empty);
+
+                // Map hand and sew values to each result using the lookup
+                var resultWithSmv = groupedResults.Select(x =>
                 {
-                    Console.WriteLine("======\n the date is null");
+                    var smvGroup = smvLookup[x.Operation ?? string.Empty];
+                    var smv = smvGroup.FirstOrDefault();
+                    return new
+                    {
+                        x.ChipID,
+                        x.UserName,
+                        x.Plant,
+                        x.Operation,
+                        x.MachineID,
+                        x.Shift,
+                        x.TotalRuntimeSum,
+                        x.TotalQty,
+                        Hand = smv?.Hand ?? 1,
+                        Sew = smv?.sew ?? 1
+                    };
+                });
 
-                    result = await _dbContext.KreedaIOTTestNew
-                        .Where(x => x.Plant == "MEC") // ✅ Filter for MEC
-                        .OrderByDescending(x => x.Date)
-                        .Take(100)
-                        .ToListAsync();
-                }
-
-                return Json(result);
+                return Json(resultWithSmv);
             }
             catch (Exception ex)
             {
@@ -77,6 +97,7 @@ namespace Iot_dashboard.Controllers.Iot
     public class AppDbContext1000 : DbContext
     {
         public DbSet<KreedaIOTTestNew> KreedaIOTTestNew { get; set; }
+        public DbSet<KreedIot_UserSMV> KreedIot_UserSMV { get; set; } // Add this line
 
         public AppDbContext1000(DbContextOptions<AppDbContext1000> options) : base(options)
         {
@@ -86,6 +107,9 @@ namespace Iot_dashboard.Controllers.Iot
         {
             modelBuilder.Entity<KreedaIOTTestNew>()
                 .HasKey(k => k.ID);
+
+            modelBuilder.Entity<KreedIot_UserSMV>() // Add this configuration if needed
+                .HasKey(k => k.ID); // Replace 'ID' with the actual primary key property of KreedIot_UserSMV
         }
     }
 }

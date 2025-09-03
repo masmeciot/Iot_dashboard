@@ -34,5 +34,22 @@
       public string? StationID { get; set; }
       public int? HSMV { get; set; }
       public int? SSMV { get; set; }
-      }
-  }
+      public int? Qty { get; set; }
+    }
+
+    [Table("KreedIot_UserSMV")]
+    public class KreedIot_UserSMV
+    {
+        public int ID { get; set; }
+        public string? UserName { get; set; }
+        public int Hand { get; set; }
+        public int sew { get; set; }
+        public string? style { get; set; }
+        public string? Plant { get; set; }
+        public string? Operation { get; set; }
+        public string? Module { get; set; }
+    }
+
+
+
+}
