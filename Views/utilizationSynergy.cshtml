@@ -230,7 +230,8 @@
                             
                             data.forEach(item => {
                                 const shiftHours = calculateShiftHours(item.shift, selectedDate) || 1;
-                                const targetQty = (shiftHours * 60 * 60 * 0.8) / item.sew || 0;
+                                // Use 3300 usable seconds per hour instead of 3600
+                                const targetQty = (shiftHours * 3300 * 0.8) / item.sew || 0;
                                 contotalRuntimeHours = item.totalRuntimeSum / (1000 * 60 * 60);  
                                 console.log("Sewing SMV: ", item.sew);
                                 console.log("TargetQty (80%)", targetQty);

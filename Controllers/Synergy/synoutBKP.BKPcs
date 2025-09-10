@@ -1,10 +1,9 @@
-﻿using Iot_dashboard.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Iot_dashboard.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Iot_dashboard.Controllers.Synergy
 {
@@ -31,13 +30,25 @@ namespace Iot_dashboard.Controllers.Synergy
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetIotData(DateTime? date, string PlantName)
+        public async Task<IActionResult> GetIotData()
         {
+            var tacks = await _dbContext1.KreedaIot_TackTime
+                                         .Where(t => t.Module == "SYN33")
+                                         .ToListAsync();
 
-            var iotData = await _dbContext.IoTHOut
+            if (tacks == null )
+            {
+                return NotFound("Tack times not found.");
+            }
+
+            var tackDict = tacks.ToDictionary(t => t.Module, t => t.Tack);
+
+            var target = 3600;
+         
+
+            var iotData = await _dbContext.SynOut
                                            .Select(i => new
                                            {
-                                               i.RecordDate,
                                                i.ChipID,
                                                i.H0,
                                                i.H1,
@@ -66,37 +77,45 @@ namespace Iot_dashboard.Controllers.Synergy
                                                i.UserName,
                                                i.Module,
                                                i.Operation,
+                                               
                                                i.style,
                                                i.MachineID,
                                                i.Plant,
-                                               i.MAC
+                                               i.MAC,
+                                               Target = target
                                            })
-                                           .Where(i => i.Plant == PlantName && i.RecordDate == date.Value.Date)
                                            .ToListAsync();
 
-            // Preload all UserSMV rows for efficient lookup
-            var userSmvList = await _dbContext2.KreedIot_UserSMV
-                .Select(u => new { u.Operation, u.sew })
-                .ToListAsync();
+          /*  var userSmvs = await _dbContext2.KreedIot_UserSMV
+                                            .Select(u => new
+                                            {
+                                                u.UserName,
+                                                u.style,
+                                                SumHandSew = u.Hand + u.sew,
+                                                u.Operation,
+                                            })
+                                             .ToDictionaryAsync(u => (u.UserName, u.style, u.Operation), u => u.SumHandSew);*/
 
             var result = iotData.Select(i =>
             {
-                var sumOfH = i.H0 + i.H1 + i.H2 + i.H3 + i.H4 + i.H5 + i.H6 + i.H7 + i.H8 + i.H9 + i.H10 + i.H11 + i.H12 + i.H13 + i.H14 + i.H15 + i.H16 + i.H17 + i.H18 + i.H19 + i.H20 + i.H21 + i.H22 + i.H23;
 
-                // Find the first matching UserSMV row for the operation
-                var smvRow = userSmvList.FirstOrDefault(u => u.Operation == i.Operation);
-                var sewSmv = smvRow?.sew ?? 1;
+                var sumOfH =i.H0+ i.H1 + i.H2 + i.H3 + i.H4 + i.H5 + i.H6 + i.H7 + i.H8 + i.H9+i.H10+i.H11+i.H12+i.H13+i.H14+i.H15+i.H16+i.H17+i.H18+i.H19+i.H20+i.H21+i.H22+i.H23;
+                //var key = (i.UserName, i.style, i.Operation); // Use all three keys
+             //   var sumOfHandSew = userSmvs.ContainsKey(key) ? userSmvs[key] : 0;
+              //  var summ = sumOfHandSew * sumOfH;
 
-                // Pseudocode:
-                // - When calculating 'target', if the result is a decimal, round it up to the next integer.
-                // - Use Math.Ceiling to achieve this.
-                // - Cast the result to int if needed.
+              //  var workingSeconds = CalculateWorkingSeconds();
 
-                double target = sewSmv > 0 ? Math.Ceiling((3300.0 / sewSmv) * 0.8) : 1;
+
+                // Console.WriteLine($"User: {i.UserName}, Sum of H: {sumOfH}, Sum of HandSew: {sumOfHandSew}, Summ: {summ}, WorkingSeconds: {workingSeconds}");
+
+                //var utilization = workingSeconds > 0 ? (int)Math.Round((summ / (double)workingSeconds) * 100) : 0;
+
+
+
 
                 return new
                 {
-                    i.RecordDate,
                     i.ChipID,
                     i.H0,
                     i.H1,
@@ -122,15 +141,17 @@ namespace Iot_dashboard.Controllers.Synergy
                     i.H21,
                     i.H22,
                     i.H23,
+
                     i.UserName,
                     i.Module,
                     i.Operation,
-                    Target = target,
+                   i.Target,
                     sum = sumOfH,
                     i.MAC,
                     i.style,
                     i.MachineID,
-                    i.Plant
+                    i.Plant,
+                   // Utilization = utilization.ToString("F0") + "%"
                 };
             }).ToList();
 
@@ -169,6 +190,9 @@ namespace Iot_dashboard.Controllers.Synergy
             return elapsedSeconds;
         }
 
+
+
+
         [HttpPost]
         public async Task<IActionResult> DeleteIotData([FromBody] DeleteIotDataRequest deleteData)
         {
@@ -183,9 +207,10 @@ namespace Iot_dashboard.Controllers.Synergy
                                                    .Where(r => r.ChipID == deleteData.chipid &&
                                                                r.style == deleteData.style &&
                                                                r.MAC == deleteData.mac &&
+                                                              // r.UserName == deleteData.username &&
                                                                r.Module == deleteData.module &&
                                                                r.Operation == deleteData.operation &&
-                                                               r.Plant == deleteData.plant &&
+                                                                r.Plant == deleteData.plant &&
                                                                r.Date == now);
 
                 _logger.LogInformation($"Generated SQL query: {rowsToDeleteQuery.ToQueryString()}");
@@ -242,6 +267,8 @@ namespace Iot_dashboard.Controllers.Synergy
             }
         }
 
+
+
         public class DeleteIotDataRequest
         {
             public string chipid { get; set; }
@@ -253,9 +280,14 @@ namespace Iot_dashboard.Controllers.Synergy
             public string operation { get; set; }
         }
 
+
+
+
+
+
         public class AppDbContext52 : DbContext
         {
-            public DbSet<IoTHOut> IoTHOut { get; set; }
+            public DbSet<SynOut> SynOut { get; set; }
 
             public AppDbContext52(DbContextOptions<AppDbContext52> options) : base(options)
             {
@@ -263,7 +295,7 @@ namespace Iot_dashboard.Controllers.Synergy
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-                modelBuilder.Entity<IoTHOut>().HasNoKey();
+                modelBuilder.Entity<SynOut>().HasNoKey();
             }
         }
 

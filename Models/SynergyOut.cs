@@ -1,7 +1,8 @@
 ﻿namespace Iot_dashboard.Models
 {
-    public class SynOut
+    public class IoTHOut
     {
+        public DateTime? RecordDate { get; set; }
         public string ChipID { get; set; }
         public string MAC { get; set; }
         public int H0 { get; set; }
@@ -36,6 +37,5 @@
      
         public string style { get; set; }
         public string MachineID { get; set; }
-
     }
 }

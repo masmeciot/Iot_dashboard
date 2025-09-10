@@ -78,6 +78,12 @@
         </ul>
     </div>
 
+    <div class="center-container">
+        <div class="form-group text-center">
+            <input type="date" id="filterDate" class="form-control" style="max-width: 250px; display: inline-block;">
+            <button id="filterBtn" class="btn btn-primary" style="margin-left: 10px;">Search</button>
+        </div>
+    </div>
 
 
     <div class="content-wrapper">
@@ -94,24 +100,34 @@
                                             <thead>
                                                 <tr>
                                                     <th>Module</th>
-                                                    <th>Style</th>
                                                     <th>Operation</th>
                                                     <th>Machine</th>
-                                                    <th>User</th>   
-                                                    <th>Target count</th>
-                                                    <th>1</th>
-                                                    <th>2</th>
-                                                    <th>3</th>
-                                                    <th>4</th>
+                                                    <th>Type</th>
+                                                    <!---- <th>0</th>
+                                                     <th>1</th>
+                                                     <th>2</th>
+                                                     <th>3</th>
+                                                     <th>4</th>-->
                                                     <th>5</th>
                                                     <th>6</th>
                                                     <th>7</th>
                                                     <th>8</th>
                                                     <th>9</th>
+                                                    <th>10</th>
+                                                    <th>11</th>
+                                                    <th>12</th>
+                                                    <th>13</th>
+                                                    <th>14</th>
+                                                    <th>15</th>
+                                                    <th>16</th>
+                                                    <th>17</th>
+                                                    <th>18</th>
+                                                    <th>19</th>
+                                                    <th>20</th>
+                                                    <th>21</th>
+                                                    <th>22</th>
+                                                    <th>Target</th>
                                                     <th>Total count</th>
-                                                   <!----<th>Total target</th>-->
-                                                   <!---- <th>Efficency</th>-->
-                                                   <!----<th>Utilization</th>-->
                                                     <th>Delete</th>
                                                 </tr>
                                             </thead>
@@ -177,86 +193,126 @@
             }
         }
 
-        $(document).ready(function () {
-            function fetchData() {
-                $.ajax({
-                    url: '/iotout/GetIotData',
-                    type: 'GET',
-                    success: function (data) {
-                        var tableBody = $('#table tbody');
-                        tableBody.empty();
-                        console.log("DATA:", data);
+           $(document).ready(function () {
+               let previousData = [];
 
-                        data.sort(function (a, b) {
-                            var order = ['FOF1', 'FOF2', 'FOF3', 'L2'];
-                            return order.indexOf(a.module) - order.indexOf(b.module);
-                        });
+               function fetchData(selectedDate = null) {
+                   let url = '/synout/GetIotData';
+                   if (selectedDate) {
+                        url += `?date=${selectedDate}&PlantName=MEC`;
+                     } else {
+                     url += `?date=${new Date().toISOString().slice(0, 10)}&PlantName=MEC`;
+                   }
+                   $.ajax({
+                       url: url,
+                       type: 'GET',
+                       success: function (data) {
+                           var tableBody = $('#table tbody');
+                           tableBody.empty();
 
-                        var previousModule = '';
+                           var previousModule = '';
 
-                        data.forEach(function (item, index) {
-                            console.log("Item:", item);
+                           data.forEach(function (item, index) {
+                               if (previousModule && previousModule !== item.module) {
+                                   var emptyRow = '<tr><td colspan="17"></td></tr>';
+                                   tableBody.append(emptyRow);
+                               }
 
-                            if (previousModule && previousModule !== item.module) {
-                                var emptyRow = '<tr><td colspan="17"></td></tr>';
-                                tableBody.append(emptyRow);
-                            }
+                               var rowClass = '';
 
-                            var row = '<tr ondblclick="redirectToDetailsPage(this)">' +
-                                '<td>' + (item.module || '') + '</td>' +
-                                 '<td>' + (item.style) + '</td>' +
-                                '<td class="custom-text-color">' + (item.operation || '') + '</td>' +
-                                '<td>' + (item.chipID || '') + '</td>' +
-                                '<td>' + (item.userName || '') + '</td>' +
-                                '<td>' + (item.target || '') + '</td>' +
-                                '<td>' + getColorCodedCell(item.h1, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h2, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h3, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h4, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h5, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h6, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h7, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h8, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h9, item.target) + '</td>' +
-                                '<td>' + (item.sum || '') + '</td>' +
-                               
-                              // '<td>' + (item.taregt || '') + '</td>' +
-                               // '<td>' + (item.efficiency || '') + '</td>' +
-                               // '<td>' + (item.utilization || '') + '</td>' +
-                                '<td class="hidden-column">' + (item.mac) + '</td>' +
-                                '<td class="hidden-column">' + (item.machineID) + '</td>' +
-                                '<td class="hidden-column">' + (item.plant) + '</td>' +
-                                '<td><button class="btn btn-inverse-danger btn-fw" onclick="deleteData(this.parentNode.parentNode.rowIndex)">Delete</button></td>' +
-                                '</tr>';
-                            tableBody.append(row);
+                               // Compare new data with previous data
+                               if (previousData.length > 0 && previousData[index]) {
+                                   if (JSON.stringify(item) !== JSON.stringify(previousData[index])) {
+                                       rowClass = 'blink-green'; // Apply blink effect if data changed
+                                   }
+                               }
 
-                            previousModule = item.module;
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching data: " + error);
-                    }
-                });
-            }
+                               var row = '<tr class="' + rowClass + '" ondblclick="redirectToDetailsPage(this)">' +
+                                   '<td>' + (item.module || '') + '</td>' +
+                                   '<td class="custom-text-color">' + (item.operation || '') + '</td>' +
+                                   '<td>' + (item.chipID || '') + '</td>' +
+                                   '<td>' + (item.machineID || '') + '</td>' +
 
-            function getColorCodedCell(value, target) {
-                var percentage = (value / target) * 100;
-                var color = '';
+                                /*   '<td>' + getColorCodedCell(item.h0, item.target) + '</td>' +
+                                   '<td>' + getColorCodedCell(item.h1, item.target) + '</td>' +
+                                   '<td>' + getColorCodedCell(item.h2, item.target) + '</td>' +
+                                   '<td>' + getColorCodedCell(item.h3, item.target) + '</td>' +
+                                   '<td>' + getColorCodedCell(item.h4, item.target) + '</td>' +*/
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h5, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h6, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h7, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h8, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h9, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h10, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h11, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h12, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h13, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h14, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h15, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h16, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h17, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h18, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h19, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h20, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h21, item.target) + '</td>' +
+                                   '<td class="custom-text-color1">' + getColorCodedCell(item.h22, item.target) + '</td>' +
+                                   '<td>' +(item.target ||'') + '</td>' +
+                                   '<td class="custom-text-color2">' + (item.sum || '') + '</td>' +
+                                   '<td><button class="btn btn-inverse-danger btn-fw" onclick="deleteData(this.parentNode.parentNode.rowIndex)">Delete</button></td>' +
+                                   '<td class="hidden-column">' + (item.style) + '</td>' +
+                                   '<td class="hidden-column">' + (item.mac) + '</td>' +
+                                   '<td class="hidden-column">' + (item.plant) + '</td>' +
+                                   '</tr>';
+                               tableBody.append(row);
 
-                if (percentage < 30) {
-                    color = 'text-danger';
-                } else if (percentage >= 30 && percentage < 70) {
-                    color = 'text-warning';
-                } else if (percentage >= 70) {
-                    color = 'text-success';
-                }
+                               previousModule = item.module;
+                           });
 
-                return '<span class="' + color + '">' + value + '</span>';
-            }
+                           // Store the new data as the previous data
+                           previousData = data;
 
-            fetchData(); 
-            setInterval(fetchData, 180000);
-        });
+
+                           setTimeout(function () {
+                               $('.blink-green').removeClass('blink-green');
+                           }, 15000);
+                       },
+                       error: function (xhr, status, error) {
+                           console.error("Error fetching data: " + error);
+                       }
+                   });
+               }
+
+               function getColorCodedCell(value, target) {
+                   var percentage = (value / target) * 100;
+                   var color = '';
+
+                   if (percentage < 30) {
+                       color = 'text-danger';
+                   } else if (percentage >= 30 && percentage < 70) {
+                       color = 'text-warning';
+                   } else if (percentage >= 70) {
+                       color = 'text-success';
+                   }
+
+                   return '<span class="' + color + '">' + value + '</span>';
+               }
+
+               // Initial load
+               $('#filterDate').val(new Date().toISOString().split('T')[0]);
+               fetchData(new Date().toISOString().split('T')[0]);
+
+               // Auto-refresh (every 60 seconds)
+               setInterval(() => {
+                   const selectedDate = $('#filterDate').val();
+                   fetchData(selectedDate);
+               }, 60000);
+
+               // Filter button click
+               $('#filterBtn').click(function () {
+                   const selectedDate = $('#filterDate').val();
+                   fetchData(selectedDate);
+               });
+           });
 
         function redirectToDetailsPage(row) {
             const cells = row.cells;
