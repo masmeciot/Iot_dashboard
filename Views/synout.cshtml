@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -18,18 +19,16 @@
     <link rel="stylesheet" href="~/css/style.css" />
     <link rel="stylesheet" href="~/css/green.css" />
 
-    <link rel="shortcut icon" href="/assets/images/logo3.png"/>
+    <link rel="shortcut icon" href="/assets/images/logo3.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-
-
         .custom-text-color {
             color: hotpink !important;
         }
 
-         .custom-text-color1 {
+        .custom-text-color1 {
             color: lightsteelblue !important;
         }
 
@@ -54,27 +53,28 @@
             padding: 1rem;
         }
 
-            .navbar-menu-wrapper .back-button {
-                position: absolute;
-                left: 1rem;
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-            }
+        .navbar-menu-wrapper .back-button {
+            position: absolute;
+            left: 1rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
 
-                .navbar-menu-wrapper .back-button i {
-                    margin-right: 0.5rem;
-                }
+        .navbar-menu-wrapper .back-button i {
+            margin-right: 0.5rem;
+        }
 
-            .navbar-menu-wrapper h3 {
-                margin: 0 auto;
-            }
+        .navbar-menu-wrapper h3 {
+            margin: 0 auto;
+        }
 
         .hidden-column {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <div class="navbar-menu-wrapper p-1 flex-grow d-flex align-items-stretch">
         <div class="back-button" onclick="window.location.href='/synmenu/Index'">
@@ -83,15 +83,51 @@
         </div>
         <ul class="navbar-nav w-100">
             <li class="nav-item w-100">
-                <h3 style="text-align: center;">IoT Pieces Count</h3>
+                <h3 style="text-align: center;">IoT Devices Utilization</h3>
             </li>
         </ul>
     </div>
 
-    <div class="center-container">
+    <div class="center-container" style="margin-top: 20px;">
         <div class="form-group text-center">
-            <input type="date" id="filterDate" class="form-control" style="max-width: 250px; display: inline-block;">
-            <button id="filterBtn" class="btn btn-primary" style="margin-left: 10px;">Search</button>
+            <!-- Output Type Dropdown -->
+            <select id="outputType" class="form-control"
+                style="max-width: 200px; display: inline-block; margin-right: 10px;">
+                <option value="hourly">Hourly Output</option>
+                <option value="daily">Daily Output</option>
+            </select>
+        </div>
+
+        <div id="hourlyControls" class="form-group text-center" style="margin-top: 20px;">
+            <!-- Hourly Output Controls -->
+            <div  class="d-inline-block">
+                <input type="date" id="filterDate" class="form-control"
+                    style="max-width: 250px; display: inline-block;">
+                <button id="filterBtn" class="btn btn-primary" style="margin: 10px;">Search</button>
+            </div>
+        </div>
+
+        <div id="dailyControls" class="form-group text-center" style="margin-top: 20px;">
+            <!-- Daily Output Controls -->
+            <div  class="d-inline-block" style="display: none;">
+                <label for="startDate" style="margin-right: 5px;">Start Date:</label>
+                <input type="date" id="startDate" class="form-control"
+                    style="max-width: 200px; display: inline-block; margin-right: 10px;" placeholder="Start Date">
+                <label for="endDate" style="margin-right: 5px;">End Date:</label>
+                <input type="date" id="endDate" class="form-control"
+                    style="max-width: 200px; display: inline-block; margin-right: 10px;" placeholder="End Date">
+
+                <!-- Efficiency Toggle -->
+                <div class="form-check form-switch d-inline-flex align-items-center" style="margin-right: 10px;">
+                    <input class="form-check-input" type="checkbox" id="efficiencyToggle" style="margin-right: 8px;">
+                    <label class="form-check-label mb-0" for="efficiencyToggle" style="white-space: nowrap;">
+                        Show Efficiency
+                    </label>
+                </div>
+                <div class="form-group text-center"">
+                    <button id="dailyFilterBtn" class="btn btn-primary" margin: 10px;>Search</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -103,44 +139,11 @@
                         <div class="col-lg-12 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title text-warning">Hourly Output by Operation</h4>
+                                    <h4 class="card-title text-warning" id="tableTitle">Hourly Output by Machine</h4>
                                     <div class="table-responsive">
                                         <table class="table table-hover" id="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Module</th>
-                                                    <th>Operation</th>
-                                                    <th>Machine</th>
-                                                    <th>Type</th>
-                                                   <!---- <th>0</th>
-                                                    <th>1</th>
-                                                    <th>2</th>
-                                                    <th>3</th>
-                                                    <th>4</th>-->
-                                                    <th>5</th>
-                                                    <th>6</th>
-                                                    <th>7</th>
-                                                    <th>8</th>
-                                                    <th>9</th>
-                                                    <th>10</th>
-                                                    <th>11</th>
-                                                    <th>12</th>
-                                                    <th>13</th>
-                                                    <th>14</th>
-                                                    <th>15</th>
-                                                    <th>16</th>
-                                                    <th>17</th>
-                                                    <th>18</th>
-                                                    <th>19</th>
-                                                    <th>20</th>
-                                                    <th>21</th>
-                                                    <th>22</th>
-
-
-                                                    <th>Target</th>
-                                                    <th>Total count</th>
-                                             <th>Delete</th>
-                                                </tr>
+                                            <thead id="tableHeader">
+                                                <!-- Header will be dynamically generated -->
                                             </thead>
                                             <tbody>
                                             </tbody>
@@ -156,6 +159,9 @@
     </div>
 
     <script>
+        let currentView = 'hourly';
+        let previousData = [];
+
         function deleteData(rowIndex) {
             if (confirm("Are you sure you want to delete this user?")) {
                 try {
@@ -174,10 +180,10 @@
                         module: module,
                         operation: operation,
                         chipid: chipid,
-                       // username: username,
+                        // username: username,
                         style: style,
                         mac: mac,
-                        plant:plant
+                        plant: plant
                     };
 
                     $.ajax({
@@ -203,156 +209,281 @@
                 }
             }
         }
+
+        function generateHourlyHeader() {
+            return '<tr>' +
+                '<th>Module</th>' +
+                '<th>Operation</th>' +
+                '<th>Machine</th>' +
+                '<th>Type</th>' +
+                '<th>5</th>' +
+                '<th>6</th>' +
+                '<th>7</th>' +
+                '<th>8</th>' +
+                '<th>9</th>' +
+                '<th>10</th>' +
+                '<th>11</th>' +
+                '<th>12</th>' +
+                '<th>13</th>' +
+                '<th>14</th>' +
+                '<th>15</th>' +
+                '<th>16</th>' +
+                '<th>17</th>' +
+                '<th>18</th>' +
+                '<th>19</th>' +
+                '<th>20</th>' +
+                '<th>21</th>' +
+                '<th>22</th>' +
+                '<th>Target</th>' +
+                '<th>Total count</th>' +
+                '<th>Delete</th>' +
+                '</tr>';
+        }
+
+        function generateDailyHeader(startDate, endDate) {
+            let header = '<tr>' +
+                '<th>ChipID</th>' +
+                '<th>Plant</th>' +
+                '<th>Module</th>' +
+                '<th>Username</th>' +
+                '<th>MachineID</th>';
+
+            const currentDate = new Date(startDate);
+            while (currentDate <= endDate) {
+                header += '<th>' + currentDate.toISOString().split('T')[0] + '</th>';
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            header += '</tr>';
+            return header;
+        }
+        function fetchHourlyData(selectedDate = null) {
+            let url = '/synout/GetIotData';
+            if (selectedDate) {
+                url += `?date=${selectedDate}&PlantName=SYNERGY`;
+            } else {
+                url += `?date=${new Date().toISOString().slice(0, 10)}&PlantName=SYNERGY`;
+            }
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    var tableBody = $('#table tbody');
+                    tableBody.empty();
+                    $('#tableHeader').html(generateHourlyHeader());
+                    $('#tableTitle').text('Hourly Output by Machine');
+
+                    var previousModule = '';
+
+                    data.forEach(function (item, index) {
+                        if (previousModule && previousModule !== item.module) {
+                            var emptyRow = '<tr><td colspan="17"></td></tr>';
+                            tableBody.append(emptyRow);
+                        }
+
+                        var rowClass = '';
+
+                        // Compare new data with previous data
+                        if (previousData.length > 0 && previousData[index]) {
+                            if (JSON.stringify(item) !== JSON.stringify(previousData[index])) {
+                                rowClass = 'blink-green'; // Apply blink effect if data changed
+                            }
+                        }
+
+                        var row = '<tr class="' + rowClass + '">' +
+                            '<td>' + (item.module || '') + '</td>' +
+                            '<td class="custom-text-color">' + (item.operation || '') + '</td>' +
+                            '<td>' + (item.chipID || '') + '</td>' +
+                            '<td>' + (item.machineID || '') + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h5, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h6, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h7, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h8, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h9, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h10, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h11, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h12, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h13, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h14, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h15, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h16, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h17, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h18, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h19, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h20, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h21, item.target) + '</td>' +
+                            '<td class="custom-text-color1">' + getColorCodedCell(item.h22, item.target) + '</td>' +
+                            '<td>' + (item.target || '') + '</td>' +
+                            '<td class="custom-text-color2">' + (item.sum || '') + '</td>' +
+                            '<td><button class="btn btn-inverse-danger btn-fw" onclick="deleteData(this.parentNode.parentNode.rowIndex)">Delete</button></td>' +
+                            '<td class="hidden-column">' + (item.style) + '</td>' +
+                            '<td class="hidden-column">' + (item.mac) + '</td>' +
+                            '<td class="hidden-column">' + (item.plant) + '</td>' +
+                            '</tr>';
+                        tableBody.append(row);
+
+                        previousModule = item.module;
+                    });
+
+                    // Store the new data as the previous data 
+                    previousData = data;
+
+                    setTimeout(function () {
+                        $('.blink-green').removeClass('blink-green');
+                    }, 15000);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching hourly data: " + error);
+                }
+            });
+        }
+
+        function fetchDailyData(startDate, endDate, showEfficiency = false) {
+            let url = `/synout/GetDailyData?startDate=${startDate}&endDate=${endDate}&plantName=SYNERGY&showEfficiency=${showEfficiency}`;
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    var tableBody = $('#table tbody');
+                    tableBody.empty();
+
+                    // Generate header for daily view
+                    $('#tableHeader').html(generateDailyHeader(new Date(startDate), new Date(endDate)));
+                    $('#tableTitle').text(showEfficiency ? 'Daily Efficiency by Machine' : 'Daily Output by Machine');
+
+                    data.forEach(function (item, index) {
+                        var row = '<tr>' +
+                            '<td>' + (item.ChipID || '') + '</td>' +
+                            '<td>' + (item.Plant || '') + '</td>' +
+                            '<td>' + (item.Module || '') + '</td>' +
+                            '<td>' + (item.UserName || '') + '</td>' +
+                            '<td>' + (item.MachineID || '') + '</td>';
+
+                        // Add date columns
+                        const currentDate = new Date(startDate);
+                        while (currentDate <= new Date(endDate)) {
+                            const dateStr = currentDate.toISOString().split('T')[0];
+                            const value = item[dateStr] || 0;
+
+                            if (showEfficiency) {
+                                row += '<td class="custom-text-color1">' + value + '%</td>';
+                            } else {
+                                row += '<td class="custom-text-color1">' + value + '</td>';
+                            }
+
+                            currentDate.setDate(currentDate.getDate() + 1);
+                        }
+
+                        row += '</tr>';
+                        tableBody.append(row);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching daily data: " + error);
+                }
+            });
+        }
+
+        function getColorCodedCell(value, target) {
+            var percentage = (value / target) * 100;
+            var color = '';
+
+            if (percentage < 30) {
+                color = 'text-danger';
+            } else if (percentage >= 30 && percentage < 70) {
+                color = 'text-warning';
+            } else if (percentage >= 70) {
+                color = 'text-success';
+            }
+
+            return '<span class="' + color + '">' + value + '</span>';
+        }
+
+        function switchView() {
+            const viewType = $('#outputType').val();
+            currentView = viewType;
+
+            if (viewType === 'hourly') {
+                $('#hourlyControls').show();
+                $('#dailyControls').hide();
+                $('#filterDate').val(new Date().toISOString().split('T')[0]);
+                fetchHourlyData(new Date().toISOString().split('T')[0]);
+            } else {
+                $('#hourlyControls').hide();
+                $('#dailyControls').show();
+                $('#startDate').val(new Date().toISOString().split('T')[0]);
+                $('#endDate').val(new Date().toISOString().split('T')[0]);
+            }
+        }
+
         $(document).ready(function () {
-            let previousData = [];
-
-            function fetchData(selectedDate = null) {
-                let url = '/synout/GetIotData';
-                if (selectedDate) {
-                    url += `?date=${selectedDate}&PlantName=SYNERGY`;
-                    } else {
-                    url += `?date=${new Date().toISOString().slice(0, 10)}&PlantName=SYNERGY`;
-                }
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function (data) {
-                        var tableBody = $('#table tbody');
-                        tableBody.empty();
-
-                        var previousModule = '';
-
-                        data.forEach(function (item, index) {
-                            if (previousModule && previousModule !== item.module) {
-                                var emptyRow = '<tr><td colspan="17"></td></tr>';
-                                tableBody.append(emptyRow);
-                            }
-
-                            var rowClass = '';
-
-                            // Compare new data with previous data
-                            if (previousData.length > 0 && previousData[index]) {
-                                if (JSON.stringify(item) !== JSON.stringify(previousData[index])) {
-                                    rowClass = 'blink-green'; // Apply blink effect if data changed
-                                }
-                            }
-
-                            var row = '<tr class="' + rowClass + '" ondblclick="redirectToDetailsPage(this)">' +
-                                '<td>' + (item.module || '') + '</td>' +
-                                '<td class="custom-text-color">' + (item.operation || '') + '</td>' +
-                                '<td>' + (item.chipID || '') + '</td>' +
-                                '<td>' + (item.machineID || '') + '</td>' +
-
-                             /*   '<td>' + getColorCodedCell(item.h0, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h1, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h2, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h3, item.target) + '</td>' +
-                                '<td>' + getColorCodedCell(item.h4, item.target) + '</td>' +*/
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h5, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h6, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h7, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h8, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h9, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h10, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h11, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h12, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h13, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h14, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h15, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h16, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h17, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h18, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h19, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h20, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h21, item.target) + '</td>' +
-                                '<td class="custom-text-color1">' + getColorCodedCell(item.h22, item.target) + '</td>' +
-                                '<td>' +(item.target ||'') + '</td>' +
-                                '<td class="custom-text-color2">' + (item.sum || '') + '</td>' +
-                                '<td><button class="btn btn-inverse-danger btn-fw" onclick="deleteData(this.parentNode.parentNode.rowIndex)">Delete</button></td>' +
-                                '<td class="hidden-column">' + (item.style) + '</td>' +
-                                '<td class="hidden-column">' + (item.mac) + '</td>' +
-                                '<td class="hidden-column">' + (item.plant) + '</td>' +
-                                '</tr>';
-                            tableBody.append(row);
-
-                            previousModule = item.module;
-                        });
-
-                        // Store the new data as the previous data 
-                        previousData = data;
-
-                        
-                        setTimeout(function () {
-                            $('.blink-green').removeClass('blink-green');
-                        }, 15000); 
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching data: " + error);
-                    }
-                });
-            }
-
-            function getColorCodedCell(value, target) {
-                var percentage = (value / target) * 100;
-                var color = '';
-
-                if (percentage < 30) {
-                    color = 'text-danger';
-                } else if (percentage >= 30 && percentage < 70) {
-                    color = 'text-warning';
-                } else if (percentage >= 70) {
-                    color = 'text-success';
-                }
-
-                return '<span class="' + color + '">' + value + '</span>';
-            }
-
             // Initial load
             $('#filterDate').val(new Date().toISOString().split('T')[0]);
-            fetchData(new Date().toISOString().split('T')[0]);
+            fetchHourlyData(new Date().toISOString().split('T')[0]);
+            $('#dailyControls').hide();
+            // Output type change
+            $('#outputType').change(switchView);
 
-            // Auto-refresh (every 60 seconds)
-            setInterval(() => {
-                const selectedDate = $('#filterDate').val();
-                fetchData(selectedDate);
-            }, 60000);
-
-            // Filter button click
+            // Hourly filter button click
             $('#filterBtn').click(function () {
                 const selectedDate = $('#filterDate').val();
-                fetchData(selectedDate);
+                fetchHourlyData(selectedDate);
             });
+
+            // Daily filter button click
+            $('#dailyFilterBtn').click(function () {
+                const startDate = $('#startDate').val();
+                const endDate = $('#endDate').val();
+                const showEfficiency = $('#efficiencyToggle').is(':checked');
+
+                if (startDate && endDate) {
+                    fetchDailyData(startDate, endDate, showEfficiency);
+                } else {
+                    alert('Please select both start and end dates');
+                }
+            });
+
+            // Auto-refresh for hourly view only
+            setInterval(() => {
+                if (currentView === 'hourly') {
+                    const selectedDate = $('#filterDate').val();
+                    fetchHourlyData(selectedDate);
+                }
+            }, 60000);
         });
 
-     /*   function redirectToDetailsPage(row) {
-            const cells = row.cells;
-            const rowData = {
-                module: cells[0].textContent.trim(),
-                operation: cells[2].textContent.trim(),
-                chipID: cells[3].textContent.trim(),
-                userName: cells[4].textContent.trim(),
-                target: cells[5].textContent.trim(),
-                h1: cells[6].textContent.trim(),
-                h2: cells[7].textContent.trim(),
-                h3: cells[8].textContent.trim(),
-                h4: cells[9].textContent.trim(),
-                h5: cells[10].textContent.trim(),
-                h6: cells[11].textContent.trim(),
-                h7: cells[12].textContent.trim(),
-                h8: cells[13].textContent.trim(),
-                h9: cells[14].textContent.trim(),
-                sum: cells[15].textContent.trim(),
-                utilization: cells[16].textContent.trim(),
-                style: cells[1].textContent.trim(),
-                mac: cells[17].textContent.trim(),
-                plant: cells[19].textContent.trim(),
-                ft: cells[18].textContent.trim()
-            };
-
-            const url = new URL('/iotplusminus', window.location.origin);
-            Object.keys(rowData).forEach(key => url.searchParams.append(key, rowData[key]));
-            window.location.href = url;
-        }*/
+        /*   function redirectToDetailsPage(row) {
+               const cells = row.cells;
+               const rowData = {
+                   module: cells[0].textContent.trim(),
+                   operation: cells[2].textContent.trim(),
+                   chipID: cells[3].textContent.trim(),
+                   userName: cells[4].textContent.trim(),
+                   target: cells[5].textContent.trim(),
+                   h1: cells[6].textContent.trim(),
+                   h2: cells[7].textContent.trim(),
+                   h3: cells[8].textContent.trim(),
+                   h4: cells[9].textContent.trim(),
+                   h5: cells[10].textContent.trim(),
+                   h6: cells[11].textContent.trim(),
+                   h7: cells[12].textContent.trim(),
+                   h8: cells[13].textContent.trim(),
+                   h9: cells[14].textContent.trim(),
+                   sum: cells[15].textContent.trim(),
+                   utilization: cells[16].textContent.trim(),
+                   style: cells[1].textContent.trim(),
+                   mac: cells[17].textContent.trim(),
+                   plant: cells[19].textContent.trim(),
+                   ft: cells[18].textContent.trim()
+               };
+   
+               const url = new URL('/iotplusminus', window.location.origin);
+               Object.keys(rowData).forEach(key => url.searchParams.append(key, rowData[key]));
+               window.location.href = url;
+           }*/
     </script>
 </body>
+
 </html>

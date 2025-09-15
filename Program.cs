@@ -336,7 +336,7 @@ builder.Services.AddDbContext<AppDbContext55>(options =>
 
 
 var plusout134 = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext56>(options =>
+builder.Services.AddDbContext<Iot_dashboard.Controllers.Iot.IoTPastVisual.AppDbContext56>(options =>
    options.UseSqlServer(plusout134));
 
 var plusout2333 = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -467,6 +467,8 @@ var H2216 = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext81>(options =>
    options.UseSqlServer(H2216));
 
+builder.Services.AddDbContext<AppDbContext82>(options =>
+       options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddCors(options =>
 {

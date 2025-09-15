@@ -14,14 +14,16 @@ namespace Iot_dashboard.Controllers.Synergy
         private readonly AppDbContext53 _dbContext1;
         private readonly AppDbContext54 _dbContext2;
         private readonly AppDbContext55 _dbContext3;
+        private readonly AppDbContext82 _dbContext4;
 
         private readonly ILogger<synout> _logger;
-        public synout(AppDbContext52 dbContext, AppDbContext53 dbContext1, AppDbContext54 dbContext2, AppDbContext55 dbContext3, ILogger<synout> logger)
+        public synout(AppDbContext52 dbContext, AppDbContext53 dbContext1, AppDbContext54 dbContext2, AppDbContext55 dbContext3, AppDbContext82 dbContext4, ILogger<synout> logger)
         {
             _dbContext = dbContext;
             _dbContext1 = dbContext1;
             _dbContext2 = dbContext2;
-            _dbContext3 = dbContext3; 
+            _dbContext3 = dbContext3;
+            _dbContext4 = dbContext4;
             _logger = logger;
         }
 
@@ -135,6 +137,89 @@ namespace Iot_dashboard.Controllers.Synergy
             }).ToList();
 
             return Json(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyData(DateTime startDate, DateTime endDate, string plantName, bool showEfficiency = false)
+        {
+            try
+            {
+                // Get daily sum data for the date range
+                var dailyData = await _dbContext4.KreedaIot_DailySum
+                    .Where(d => d.Plant == plantName && d.Date >= startDate && d.Date <= endDate)
+                    .ToListAsync();
+
+                // Get SMV data for efficiency calculation
+                var smvData = await _dbContext2.KreedIot_UserSMV
+                    .Select(u => new { u.Operation, u.sew })
+                    .ToListAsync();
+
+                // Group by ChipID to create rows
+                var groupedData = dailyData.GroupBy(d => new { d.Chip_ID, d.Plant, d.Module, d.UserName, d.MachineID, d.Operation })
+                    .Select(g => new
+                    {
+                        ChipID = g.Key.Chip_ID,
+                        Plant = g.Key.Plant,
+                        Module = g.Key.Module,
+                        UserName = g.Key.UserName,
+                        MachineID = g.Key.MachineID,
+                        DailyData = g.ToList(),
+                        Operation = g.Key.Operation
+                    })
+                    .ToList();
+
+                var result = new List<object>();
+
+                foreach (var group in groupedData)
+                {
+                    var rowData = new Dictionary<string, object>
+                    {
+                        ["ChipID"] = group.ChipID,
+                        ["Plant"] = group.Plant,
+                        ["Module"] = group.Module,
+                        ["UserName"] = group.UserName,
+                        ["MachineID"] = group.MachineID,
+                        ["Operation"] = group.Operation
+                    };
+
+                    // Add date columns
+                    var currentDate = startDate;
+                    while (currentDate <= endDate)
+                    {
+                        var dayData = group.DailyData.FirstOrDefault(d => d.Date.Date == currentDate.Date);
+                        var value = 0;
+
+                        if (dayData != null)
+                        {
+                            if (showEfficiency)
+                            {
+                                // Calculate efficiency
+                                var smvRow = smvData.FirstOrDefault(s => s.Operation == dayData.Operation); // Assuming Style maps to Operation
+                                var sewSmv = smvRow?.sew ?? 1;
+                                var maxValue = Math.Ceiling((3300.0 / sewSmv) * 0.8) * 16; // 16 hours, 80% efficiency
+                                var efficiency = maxValue > 0 ? (dayData.DailySum / maxValue) * 100 : 0;
+                                value = (int)Math.Round(efficiency, 2);
+                            }
+                            else
+                            {
+                                value = dayData.DailySum;
+                            }
+                        }
+
+                        rowData[currentDate.ToString("yyyy-MM-dd")] = value;
+                        currentDate = currentDate.AddDays(1);
+                    }
+
+                    result.Add(rowData);
+                }
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching daily data: {Message}", ex.Message);
+                return Json(new { error = ex.Message });
+            }
         }
 
         private int CalculateWorkingSeconds()
@@ -289,6 +374,15 @@ namespace Iot_dashboard.Controllers.Synergy
             public DbSet<KreedaIotTestNew> KreedaIotTestNew { get; set; }
 
             public AppDbContext55(DbContextOptions<AppDbContext55> options) : base(options)
+            {
+            }
+        }
+
+        public class AppDbContext82 : DbContext
+        {
+            public DbSet<KreedaIot_DailySum> KreedaIot_DailySum { get; set; }
+
+            public AppDbContext82(DbContextOptions<AppDbContext82> options) : base(options)
             {
             }
         }
