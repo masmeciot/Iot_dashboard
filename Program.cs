@@ -344,6 +344,12 @@ builder.Services.AddDbContext<AppDbContext57>(options =>
    options.UseSqlServer(plusout2333));
 
 
+// DailySum context for synout daily view
+var dailySum = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext82>(options =>
+   options.UseSqlServer(dailySum));
+
+
 var outana = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext58>(options =>
    options.UseSqlServer(outana));

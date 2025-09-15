@@ -240,13 +240,17 @@
                 '</tr>';
         }
 
-        function generateDailyHeader(startDate, endDate) {
+        function generateDailyHeader(startDate, endDate, includeTarget) {
             let header = '<tr>' +
                 '<th>ChipID</th>' +
                 '<th>Plant</th>' +
                 '<th>Module</th>' +
                 '<th>Username</th>' +
                 '<th>MachineID</th>';
+
+            if (!includeTarget) {
+                header += '<th>Daily Target</th>';
+            }
 
             const currentDate = new Date(startDate);
             while (currentDate <= endDate) {
@@ -350,7 +354,7 @@
                     tableBody.empty();
 
                     // Generate header for daily view
-                    $('#tableHeader').html(generateDailyHeader(new Date(startDate), new Date(endDate)));
+                    $('#tableHeader').html(generateDailyHeader(new Date(startDate), new Date(endDate), showEfficiency));
                     $('#tableTitle').text(showEfficiency ? 'Daily Efficiency by Machine' : 'Daily Output by Machine');
 
                     data.forEach(function (item, index) {
@@ -361,16 +365,39 @@
                             '<td>' + (item.UserName || '') + '</td>' +
                             '<td>' + (item.MachineID || '') + '</td>';
 
+                        if (!showEfficiency) {
+                            const dt = item.DailyTarget || 0;
+                            row += '<td>' + dt + '</td>';
+                        }
+
                         // Add date columns
                         const currentDate = new Date(startDate);
                         while (currentDate <= new Date(endDate)) {
                             const dateStr = currentDate.toISOString().split('T')[0];
                             const value = item[dateStr] || 0;
 
+                            // Compute percentage for coloring
+                            let percent = 0;
                             if (showEfficiency) {
-                                row += '<td class="custom-text-color1">' + value + '%</td>';
+                                percent = value; // already a percentage
                             } else {
-                                row += '<td class="custom-text-color1">' + value + '</td>';
+                                const dt = item.DailyTarget || 0;
+                                percent = dt > 0 ? (value / dt) * 100 : 0;
+                            }
+
+                            var colorClass = '';
+                            if (percent < 30) {
+                                colorClass = 'text-danger';
+                            } else if (percent >= 30 && percent < 70) {
+                                colorClass = 'text-warning';
+                            } else if (percent >= 70) {
+                                colorClass = 'text-success';
+                            }
+
+                            if (showEfficiency) {
+                                row += '<td class="' + colorClass + '">' + value + '%</td>';
+                            } else {
+                                row += '<td class="' + colorClass + '">' + value + '</td>';
                             }
 
                             currentDate.setDate(currentDate.getDate() + 1);

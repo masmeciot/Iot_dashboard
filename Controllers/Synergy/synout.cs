@@ -172,6 +172,12 @@ namespace Iot_dashboard.Controllers.Synergy
 
                 foreach (var group in groupedData)
                 {
+                    // Calculate daily target using group's operation SMV (80% of 16 hours)
+                    var smvRowForGroup = smvData.FirstOrDefault(s => s.Operation == group.Operation);
+                    var sewSmvForGroup = smvRowForGroup?.sew ?? 1;
+                    var dailyTargetDouble = Math.Ceiling((3300.0 / (sewSmvForGroup > 0 ? sewSmvForGroup : 1)) * 0.8) * 16; // 16 hours
+                    var dailyTarget = (int)dailyTargetDouble;
+
                     var rowData = new Dictionary<string, object>
                     {
                         ["ChipID"] = group.ChipID,
@@ -179,7 +185,8 @@ namespace Iot_dashboard.Controllers.Synergy
                         ["Module"] = group.Module,
                         ["UserName"] = group.UserName,
                         ["MachineID"] = group.MachineID,
-                        ["Operation"] = group.Operation
+                        ["Operation"] = group.Operation,
+                        ["DailyTarget"] = dailyTarget
                     };
 
                     // Add date columns
@@ -194,10 +201,10 @@ namespace Iot_dashboard.Controllers.Synergy
                             if (showEfficiency)
                             {
                                 // Calculate efficiency
-                                var smvRow = smvData.FirstOrDefault(s => s.Operation == dayData.Operation); // Assuming Style maps to Operation
+                                var smvRow = smvRowForGroup; // reuse group's mapping
                                 var sewSmv = smvRow?.sew ?? 1;
-                                var maxValue = Math.Ceiling((3300.0 / sewSmv) * 0.8) * 16; // 16 hours, 80% efficiency
-                                var efficiency = maxValue > 0 ? (dayData.DailySum / maxValue) * 100 : 0;
+                                var maxValue = Math.Ceiling((3300.0 / (sewSmv > 0 ? sewSmv : 1)) * 0.8) * 16; // 16 hours, 80% efficiency
+                                var efficiency = maxValue > 0 ? (dayData.DailySum / maxValue) * 100.0 : 0.0;
                                 value = (int)Math.Round(efficiency, 2);
                             }
                             else
