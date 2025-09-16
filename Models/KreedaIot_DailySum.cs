@@ -38,5 +38,7 @@ namespace Iot_dashboard.Models
         public DateTime Date { get; set; }
 
         public string Operation { get; set; }
+
+        public string Shift { get; set; }
     }
 }

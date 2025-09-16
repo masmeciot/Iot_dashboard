@@ -246,7 +246,9 @@
                 '<th>Plant</th>' +
                 '<th>Module</th>' +
                 '<th>Username</th>' +
-                '<th>MachineID</th>';
+                '<th>MachineID</th>'+
+                '<th>Operation</th>' +
+                '<th>Shift</th>';
 
             if (!includeTarget) {
                 header += '<th>Daily Target</th>';
@@ -363,7 +365,9 @@
                             '<td>' + (item.Plant || '') + '</td>' +
                             '<td>' + (item.Module || '') + '</td>' +
                             '<td>' + (item.UserName || '') + '</td>' +
-                            '<td>' + (item.MachineID || '') + '</td>';
+                            '<td>' + (item.MachineID || '') + '</td>' +
+                            '<td>' + (item.Operation || '') + '</td>' +
+                            '<td>' + (item.Shift || '') + '</td>';
 
                         if (!showEfficiency) {
                             const dt = item.DailyTarget || 0;
@@ -480,36 +484,6 @@
                 }
             }, 60000);
         });
-
-        /*   function redirectToDetailsPage(row) {
-               const cells = row.cells;
-               const rowData = {
-                   module: cells[0].textContent.trim(),
-                   operation: cells[2].textContent.trim(),
-                   chipID: cells[3].textContent.trim(),
-                   userName: cells[4].textContent.trim(),
-                   target: cells[5].textContent.trim(),
-                   h1: cells[6].textContent.trim(),
-                   h2: cells[7].textContent.trim(),
-                   h3: cells[8].textContent.trim(),
-                   h4: cells[9].textContent.trim(),
-                   h5: cells[10].textContent.trim(),
-                   h6: cells[11].textContent.trim(),
-                   h7: cells[12].textContent.trim(),
-                   h8: cells[13].textContent.trim(),
-                   h9: cells[14].textContent.trim(),
-                   sum: cells[15].textContent.trim(),
-                   utilization: cells[16].textContent.trim(),
-                   style: cells[1].textContent.trim(),
-                   mac: cells[17].textContent.trim(),
-                   plant: cells[19].textContent.trim(),
-                   ft: cells[18].textContent.trim()
-               };
-   
-               const url = new URL('/iotplusminus', window.location.origin);
-               Object.keys(rowData).forEach(key => url.searchParams.append(key, rowData[key]));
-               window.location.href = url;
-           }*/
     </script>
 </body>
 

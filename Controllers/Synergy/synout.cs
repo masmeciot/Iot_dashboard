@@ -155,7 +155,7 @@ namespace Iot_dashboard.Controllers.Synergy
                     .ToListAsync();
 
                 // Group by ChipID to create rows
-                var groupedData = dailyData.GroupBy(d => new { d.Chip_ID, d.Plant, d.Module, d.UserName, d.MachineID, d.Operation })
+                var groupedData = dailyData.GroupBy(d => new { d.Chip_ID, d.Plant, d.Module, d.UserName, d.MachineID, d.Operation, d.Shift })
                     .Select(g => new
                     {
                         ChipID = g.Key.Chip_ID,
@@ -164,7 +164,8 @@ namespace Iot_dashboard.Controllers.Synergy
                         UserName = g.Key.UserName,
                         MachineID = g.Key.MachineID,
                         DailyData = g.ToList(),
-                        Operation = g.Key.Operation
+                        Operation = g.Key.Operation,
+                        Shift = g.Key.Shift
                     })
                     .ToList();
 
@@ -172,10 +173,11 @@ namespace Iot_dashboard.Controllers.Synergy
 
                 foreach (var group in groupedData)
                 {
-                    // Calculate daily target using group's operation SMV (80% of 16 hours)
+                    // Calculate daily target using group's operation SMV and dynamic shift duration
                     var smvRowForGroup = smvData.FirstOrDefault(s => s.Operation == group.Operation);
                     var sewSmvForGroup = smvRowForGroup?.sew ?? 1;
-                    var dailyTargetDouble = Math.Ceiling((3300.0 / (sewSmvForGroup > 0 ? sewSmvForGroup : 1)) * 0.8) * 16; // 16 hours
+                    var shiftDuration = CalculateShiftDuration(group.Shift);
+                    var dailyTargetDouble = Math.Ceiling((3300.0 / (sewSmvForGroup > 0 ? sewSmvForGroup : 1)) * 0.8) * shiftDuration;
                     var dailyTarget = (int)dailyTargetDouble;
 
                     var rowData = new Dictionary<string, object>
@@ -186,7 +188,9 @@ namespace Iot_dashboard.Controllers.Synergy
                         ["UserName"] = group.UserName,
                         ["MachineID"] = group.MachineID,
                         ["Operation"] = group.Operation,
-                        ["DailyTarget"] = dailyTarget
+                        ["DailyTarget"] = dailyTarget,
+                        ["Shift"] = group.Shift,
+                        ["ShiftDuration"] = shiftDuration
                     };
 
                     // Add date columns
@@ -200,10 +204,10 @@ namespace Iot_dashboard.Controllers.Synergy
                         {
                             if (showEfficiency)
                             {
-                                // Calculate efficiency
+                                // Calculate efficiency using dynamic shift duration
                                 var smvRow = smvRowForGroup; // reuse group's mapping
                                 var sewSmv = smvRow?.sew ?? 1;
-                                var maxValue = Math.Ceiling((3300.0 / (sewSmv > 0 ? sewSmv : 1)) * 0.8) * 16; // 16 hours, 80% efficiency
+                                var maxValue = Math.Ceiling((3300.0 / (sewSmv > 0 ? sewSmv : 1)) * 0.8) * shiftDuration; // Dynamic shift duration, 80% efficiency
                                 var efficiency = maxValue > 0 ? (dayData.DailySum / maxValue) * 100.0 : 0.0;
                                 value = (int)Math.Round(efficiency, 2);
                             }
@@ -259,6 +263,61 @@ namespace Iot_dashboard.Controllers.Synergy
             }
 
             return elapsedSeconds;
+        }
+
+        /// <summary>
+        /// Calculates the duration of a shift in hours based on the shift time string format.
+        /// Handles both regular shifts (e.g., "06:00-22:00") and overnight shifts (e.g., "22:00-06:00").
+        /// </summary>
+        /// <param name="shiftTime">Shift time string in format "HH:mm-HH:mm"</param>
+        /// <returns>Duration of the shift in hours</returns>
+        private double CalculateShiftDuration(string shiftTime)
+        {
+            if (string.IsNullOrEmpty(shiftTime) || !shiftTime.Contains("-"))
+            {
+                // Default to 16 hours if shift time is invalid
+                return 16.0;
+            }
+
+            try
+            {
+                var parts = shiftTime.Split('-');
+                if (parts.Length != 2)
+                {
+                    return 16.0; // Default fallback
+                }
+
+                var startTimeStr = parts[0].Trim();
+                var endTimeStr = parts[1].Trim();
+
+                // Parse start and end times
+                if (!TimeSpan.TryParse(startTimeStr, out var startTime) || 
+                    !TimeSpan.TryParse(endTimeStr, out var endTime))
+                {
+                    return 16.0; // Default fallback
+                }
+
+                // Calculate duration
+                double duration;
+                if (endTime > startTime)
+                {
+                    // Regular shift (e.g., 06:00-22:00)
+                    duration = (endTime - startTime).TotalHours;
+                }
+                else
+                {
+                    // Overnight shift (e.g., 22:00-06:00)
+                    // Add 24 hours to end time to get the correct duration
+                    duration = (endTime.Add(TimeSpan.FromHours(24)) - startTime).TotalHours;
+                }
+
+                return duration;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error calculating shift duration for '{ShiftTime}', using default 16 hours", shiftTime);
+                return 16.0; // Default fallback
+            }
         }
 
         [HttpPost]
